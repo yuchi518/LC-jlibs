@@ -1,3 +1,6 @@
+2013/11/21
+	1. Add MessageConsole to support ui standard/error output.
+
 2013/9/18
 	1. Merge crypto, util libs.
 	2. Add more functions in DynamicByteBuffer.
