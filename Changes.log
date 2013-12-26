@@ -1,3 +1,9 @@
+2013/12/26
+	1. Developing TieredIndexTable, not complete yet.
+
+2013/12/24
+	1. Add JavaEWAH library. (This is a word-aligned compressed variant of the Java Bitset class. We provide both a 64-bit and a 32-bit RLE-like compression scheme. It can be used to implement bitmap indexes.)
+
 2013/11/24
 	1. Update json.
 
