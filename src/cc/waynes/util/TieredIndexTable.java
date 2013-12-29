@@ -186,19 +186,27 @@ public class TieredIndexTable<E> {
 	protected void cb(int v, long []_indexes)
 	{
 		//int bitPos[]=new int[_numberOfTiers];
+		final boolean ver = false;
 		for (int i=0; i<_numberOfTiers; i++)
 		{
-			long mv = v % ((_tierBits[i]+1)*_tierBits[i]/2);
-			for (int l=_tierBits[i]; l>0; l--)
-			{
-				//System.out.printf("v:%d l:%d\n", mv, l);
-				if (mv<l) {
-					//bitPos[i] = v;
-					if (_indexes!=null) _indexes[i] |= (1L<<(mv));
-					break;
-				} else {
-					mv -= l;
+			if (ver) {
+				// 
+				long mv = v % ((_tierBits[i]+1)*_tierBits[i]/2);
+				for (int l=_tierBits[i]; l>0; l--)
+				{
+					//System.out.printf("v:%d l:%d\n", mv, l);
+					if (mv<l) {
+						//bitPos[i] = v;
+						if (_indexes!=null) _indexes[i] |= (1L<<(mv));
+						break;
+					} else {
+						mv -= l;
+					}
 				}
+			} else {
+				long mv = v % _tierBits[i];
+				//bitPos[i] = v;
+				if (_indexes!=null) _indexes[i] |= (1L<<(mv));
 			}
 			
 		}
