@@ -2,6 +2,7 @@ package cc.waynes.util;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,6 +11,12 @@ import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.EWAHIterator;
 import com.googlecode.javaewah.RunningLengthWord;
 
+/**
+ * Not Thread Safe, be careful to use it.
+ * @author YuChi
+ *
+ * @param <E>
+ */
 public class TieredIndexTable<E> {
 
 	final protected Comparator<? super E> _comparator;
@@ -87,7 +94,7 @@ public class TieredIndexTable<E> {
 	@SuppressWarnings("unchecked")
 	protected Set<E> getLastSet(EWAHCompressedBitmap bitmap, boolean created)
 	{
-		Number[] indexes = getIndexesFromBitmap(bitmap);
+		long[] indexes = getIndexesFromBitmap(bitmap);
 		Map<?,?> map = _rootMap;
 		
 		int i=0;
@@ -129,8 +136,37 @@ public class TieredIndexTable<E> {
 		}
 	}
 	
+	public void interateObjects(EWAHCompressedBitmap bitmap, FindingHandler<E> handler)
+	{
+		long[] indexes = getIndexesFromBitmap(bitmap);
+		iteratorMap(this._rootMap, 0, indexes, bitmap, handler);
+	}
 	
-	public Number[] getIndexesFromBitmap(EWAHCompressedBitmap bitmap)
+	private void iteratorMap(Map<?,?> map, int deep, long[] indexes, EWAHCompressedBitmap bitmap, FindingHandler<E> handler)
+	{
+		for (Map.Entry<?,?> entry: map.entrySet())
+		{
+			if (deep==(_numberOfTiers-1)) {
+				if ((((Number)entry.getKey()).longValue() & indexes[deep])==indexes[deep]) {
+					@SuppressWarnings("unchecked")
+					Set<E> set = (Set<E>)(entry.getValue());
+					Iterator<E> iter = set.iterator();
+					while(iter.hasNext()) {
+						if (handler.foundObject(iter.next())) {
+							iter.remove();
+						}
+					}
+				}
+			//} else if (deep==(_numberOfTiers-2)) {
+			} else {
+				if ((((Number)entry.getKey()).longValue() & indexes[deep])==indexes[deep])		// contains subset
+					iteratorMap((Map<?, ?>)entry.getValue(), deep+1, indexes, bitmap, handler);
+			}
+		}
+	}
+	
+	
+	public long[] getIndexesFromBitmap(EWAHCompressedBitmap bitmap)
 	{
 		//final ArrayList<Integer> v = new ArrayList<Integer>();
 	    final EWAHIterator iter = bitmap.getEWAHIterator();
@@ -171,7 +207,8 @@ public class TieredIndexTable<E> {
 	    	}
 	    }
 	    
-	    Number num[] = new Number[_numberOfTiers];
+	    return _indexes;
+	    /*Number num[] = new Number[_numberOfTiers];
 	    for (int i=0; i<_numberOfTiers; i++) {
 	    	if (_indexes[i] > (long)Integer.MAX_VALUE || _indexes[i] < (long)Integer.MIN_VALUE) {
 	    		num[i] = (Long)_indexes[i]; 
@@ -180,7 +217,7 @@ public class TieredIndexTable<E> {
 	    	}
 	    }
 	    
-	    return num;
+	    return num;*/
 	}
 	
 	protected void cb(int v, long []_indexes)
@@ -212,6 +249,12 @@ public class TieredIndexTable<E> {
 		}
 		
 		//return bitPos;
+	}
+	
+	public static interface FindingHandler<E>
+	{
+		public boolean expiredObject(E e);		// return true for expired object and need to delete
+		public boolean foundObject(E e);		// return true for stop iterator
 	}
 	
 	

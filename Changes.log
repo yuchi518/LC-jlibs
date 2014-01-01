@@ -1,3 +1,6 @@
+2014/1/1
+	1. Add iterate function for TieredIndexTable. 
+
 2013/12/29
 	1. Update TieredIndexTable algorithm. (Simple, but not good enough)
 
