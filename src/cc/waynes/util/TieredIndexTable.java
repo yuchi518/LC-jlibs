@@ -12,7 +12,9 @@ import com.googlecode.javaewah.EWAHIterator;
 import com.googlecode.javaewah.RunningLengthWord;
 
 /**
- * Not Thread Safe, be careful to use it.
+ * Note:
+ * 1. Not Thread Safe, be careful to use it.
+ * 2. Iterate the table is not order guarantee.
  * @author YuChi
  *
  * @param <E>
@@ -152,9 +154,12 @@ public class TieredIndexTable<E> {
 					Set<E> set = (Set<E>)(entry.getValue());
 					Iterator<E> iter = set.iterator();
 					while(iter.hasNext()) {
-						if (handler.foundObject(iter.next())) {
+						E e = iter.next();
+						if (handler.foundObject(e)) {
 							iter.remove();
 						}
+						
+						if (handler.shouldStop()) return;
 					}
 				}
 			//} else if (deep==(_numberOfTiers-2)) {
@@ -253,8 +258,8 @@ public class TieredIndexTable<E> {
 	
 	public static interface FindingHandler<E>
 	{
-		public boolean expiredObject(E e);		// return true for expired object and need to delete
-		public boolean foundObject(E e);		// return true for stop iterator
+		public boolean foundObject(E e);		// return true to delete object
+		public boolean shouldStop();			// return true for stop iterator. Call for each time after call foundObject
 	}
 	
 	
