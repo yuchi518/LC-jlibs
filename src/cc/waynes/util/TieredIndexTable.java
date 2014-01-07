@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.EWAHIterator;
@@ -21,6 +23,8 @@ import com.googlecode.javaewah.RunningLengthWord;
  */
 public class TieredIndexTable<E> {
 
+	final protected static Logger log = Logger.getLogger(TieredIndexTable.class.getName());
+	
 	final protected Comparator<? super E> _comparator;
 	final protected int _numberOfTiers;
 	final protected int _tierBits[];
@@ -56,12 +60,14 @@ public class TieredIndexTable<E> {
 		}
 	}
 	
-	public void printIndexTable()
+	public void printIndexTable(String title)
 	{
 		//System.out.println(_rootMap);
 		StringBuffer output = new StringBuffer();
 		printMap(_rootMap, 0, output);
-		System.out.println(output);
+		
+		log.log(Level.INFO, "<====== {0} \n{1}\n ======>", new Object[]{title, output});
+		//System.out.println(output);
 	}
 	
 	void printMap(Map<?,?> map, int deep, StringBuffer output)
@@ -84,6 +90,7 @@ public class TieredIndexTable<E> {
 	public void addObject(EWAHCompressedBitmap bitmap, E e)
 	{
 		Set<E> set = getLastSet(bitmap, true);
+		set.remove(e);		// remove old one first, else old one will not be replaced by new one
 		set.add(e);
 	}
 	
@@ -171,7 +178,7 @@ public class TieredIndexTable<E> {
 	}
 	
 	
-	public long[] getIndexesFromBitmap(EWAHCompressedBitmap bitmap)
+	protected long[] getIndexesFromBitmap(EWAHCompressedBitmap bitmap)
 	{
 		//final ArrayList<Integer> v = new ArrayList<Integer>();
 	    final EWAHIterator iter = bitmap.getEWAHIterator();
