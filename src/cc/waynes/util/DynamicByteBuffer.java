@@ -333,32 +333,6 @@ public class DynamicByteBuffer {
 	}*/
 
 	
-	public double getDouble() {
-		return Double.longBitsToDouble(getLong());
-	}
-	
-	public double peekDouble() {
-		return Double.longBitsToDouble(peekLong());
-	}
-	
-	public double getDouble(int index) {
-		return Double.longBitsToDouble(getLong(index));
-	}
-
-	
-	public float getFloat() {
-		return Float.intBitsToFloat(getInt());
-	}
-	
-	public float peekFloat() {
-		return Float.intBitsToFloat(peekInt());
-	}
-	
-	public float getFloat(int index) {
-		return Float.intBitsToFloat(getInt(index));
-	}
-
-	
 	public int getInt() {
 		if (_position<0 || _position+4>_limit) {
 			throw new IndexOutOfBoundsException();
@@ -805,26 +779,6 @@ public class DynamicByteBuffer {
 	}*/
 
 	
-	public DynamicByteBuffer putDouble(double value) {
-		return putLong(Double.doubleToLongBits(value));
-	}
-
-	
-	public DynamicByteBuffer putDouble(int index, double value) {
-		return putLong(index, Double.doubleToLongBits(value));
-	}
-
-	
-	public DynamicByteBuffer putFloat(float value) {
-		return putInt(Float.floatToIntBits(value));
-	}
-
-	
-	public DynamicByteBuffer putFloat(int index, float value) {
-		return putInt(index, Float.floatToIntBits(value));
-	}
-
-	
 	public DynamicByteBuffer putInt(int value) {
 		if (_position<0) {
 			throw new IndexOutOfBoundsException();
@@ -1022,9 +976,52 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
+/// === DOUBLE, FLOAT
+	public DynamicByteBuffer putDouble(double value) {
+		//return putLong(Double.doubleToLongBits(value));
+		return putLong(Double.doubleToRawLongBits(value));
+	}
 	
+	public DynamicByteBuffer putDouble(int index, double value) {
+		//return putLong(index, Double.doubleToLongBits(value));
+		return putLong(index, Double.doubleToRawLongBits(value));
+	}
 
-	public DynamicByteBuffer putFloatValue(float value) {
+	public DynamicByteBuffer putFloat(float value) {
+		//return putInt(Float.floatToIntBits(value));
+		return putInt(Float.floatToRawIntBits(value));
+	}
+	
+	public DynamicByteBuffer putFloat(int index, float value) {
+		//return putInt(index, Float.floatToIntBits(value));
+		return putInt(index, Float.floatToRawIntBits(value));
+	}
+	
+	public double getDouble() {
+		return Double.longBitsToDouble(getLong());
+	}
+	
+	public double peekDouble() {
+		return Double.longBitsToDouble(peekLong());
+	}
+	
+	public double getDouble(int index) {
+		return Double.longBitsToDouble(getLong(index));
+	}
+
+	public float getFloat() {
+		return Float.intBitsToFloat(getInt());
+	}
+	
+	public float peekFloat() {
+		return Float.intBitsToFloat(peekInt());
+	}
+	
+	public float getFloat(int index) {
+		return Float.intBitsToFloat(getInt(index));
+	}
+
+	/*public DynamicByteBuffer putFloatValue(float value) {
 		putInt(Float.floatToRawIntBits(value));
 		return this;
 	}
@@ -1040,9 +1037,9 @@ public class DynamicByteBuffer {
 	
 	public double getDoubleValue() {
 		return Double.longBitsToDouble(getLong());
-	}
+	}*/
 	
-	
+	///
 	
 	public DynamicByteBuffer putLastBytes(byte bytes[]) {
 		if (bytes==null) return this;
