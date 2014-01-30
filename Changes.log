@@ -1,3 +1,7 @@
+2014/1/27
+	1. Refine DynamicByteBuffer;
+	2. Update javaewah lib.
+
 2014/1/7
 	1. Fix TIeredIndexTable add object issue. (New object can't replace old object(same hash value))
 	2. Use log flow.
