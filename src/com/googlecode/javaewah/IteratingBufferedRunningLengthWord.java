@@ -72,13 +72,16 @@ public final class IteratingBufferedRunningLengthWord implements IteratingRLW,
                                 }
                                 this.brlw.reset(this.iterator.next());
                                 this.literalWordStartPosition = this.iterator
-                                        .literalWords(); // +
-                                                         // this.brlw.literalwordoffset
-                                                         // ==0
+                                        .literalWords(); 
                         }
                 }
         }
-
+        @Override
+        public void discardRunningWords() {
+                this.brlw.RunningLength = 0;
+                if(this.brlw.getNumberOfLiteralWords() == 0)
+                        this.next();
+        }
         /**
          * Move to the next RunningLengthWord
          * 

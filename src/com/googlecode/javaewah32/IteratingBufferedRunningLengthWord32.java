@@ -71,11 +71,16 @@ public final class IteratingBufferedRunningLengthWord32 implements
                                 }
                                 this.brlw.reset(this.iterator.next());
                                 this.literalWordStartPosition = this.iterator
-                                        .literalWords(); // +
-                                                         // this.brlw.literalwordoffset
-                                                         // == 0;
+                                        .literalWords();
                         }
                 }
+        }
+        
+        @Override
+        public void discardRunningWords() {
+                this.brlw.RunningLength = 0;
+                if(this.brlw.getNumberOfLiteralWords() == 0)
+                        this.next();
         }
 
         /**
@@ -312,4 +317,5 @@ public final class IteratingBufferedRunningLengthWord32 implements
         private int[] buffer;
         private int literalWordStartPosition;
         private EWAHIterator32 iterator;
+
 }

@@ -59,6 +59,15 @@ public class IteratorAggregation32 {
                                 x.discardFirstWords(y);
                         }
 
+                        @Override
+                        public void discardRunningWords() {
+                                x.discardRunningWords();
+                        }
+                        @Override
+                        public IteratingRLW32 clone()
+                                throws CloneNotSupportedException {
+                                throw new CloneNotSupportedException();
+                        }
                 };
         }
 
@@ -210,7 +219,7 @@ public class IteratorAggregation32 {
                         if (L + counter > max)
                                 L = max - counter;
                         for (int k = 0; k < L; ++k) {
-                                container.add(i.getLiteralWordAt(k));
+                                container.addWord(i.getLiteralWordAt(k));
                         }
                         counter += L;
                         i.discardFirstWords(L + L1);
@@ -245,7 +254,7 @@ public class IteratorAggregation32 {
                         if (L + counter > max)
                                 L = max - counter;
                         for (int k = 0; k < L; ++k) {
-                                container.add(i.getLiteralWordAt(k));
+                                container.addWord(i.getLiteralWordAt(k));
                         }
                         counter += L;
                         i.discardFirstWords(L + L1);
@@ -291,7 +300,7 @@ public class IteratorAggregation32 {
                         if (nbre_literal > 0) {
                                 desiredrlwcount -= nbre_literal;
                                 for (int k = 0; k < nbre_literal; ++k)
-                                        container.add(rlwi.getLiteralWordAt(k)
+                                        container.addWord(rlwi.getLiteralWordAt(k)
                                                 & rlwj.getLiteralWordAt(k));
                                 rlwi.discardFirstWords(nbre_literal);
                                 rlwj.discardFirstWords(nbre_literal);
@@ -334,7 +343,7 @@ public class IteratorAggregation32 {
                                 rlwj.getNumberOfLiteralWords());
                         if (nbre_literal > 0) {
                                 for (int k = 0; k < nbre_literal; ++k)
-                                        container.add(rlwi.getLiteralWordAt(k)
+                                        container.addWord(rlwi.getLiteralWordAt(k)
                                                 & rlwj.getLiteralWordAt(k));
                                 rlwi.discardFirstWords(nbre_literal);
                                 rlwj.discardFirstWords(nbre_literal);
@@ -394,7 +403,7 @@ public class IteratorAggregation32 {
                         if (nbre_literal > 0) {
                                 desiredrlwcount -= nbre_literal;
                                 for (int k = 0; k < nbre_literal; ++k)
-                                        container.add(rlwi.getLiteralWordAt(k)
+                                        container.addWord(rlwi.getLiteralWordAt(k)
                                                 ^ rlwj.getLiteralWordAt(k));
                                 rlwi.discardFirstWords(nbre_literal);
                                 rlwj.discardFirstWords(nbre_literal);
@@ -572,7 +581,7 @@ class ORIt implements CloneableIterator<EWAHIterator32> {
                                 i.remove();
                 }
                 for (int k = 0; k < effective; ++k)
-                        this.buffer.add(this.hardbitmap[k]);
+                        this.buffer.addWord(this.hardbitmap[k]);
                 Arrays.fill(this.hardbitmap, 0);
                 return this.buffer.getEWAHIterator();
         }
@@ -619,7 +628,7 @@ class XORIt implements CloneableIterator<EWAHIterator32> {
                                 i.remove();
                 }
                 for (int k = 0; k < effective; ++k)
-                        this.buffer.add(this.hardbitmap[k]);
+                        this.buffer.addWord(this.hardbitmap[k]);
                 Arrays.fill(this.hardbitmap, 0);
                 return this.buffer.getEWAHIterator();
         }
