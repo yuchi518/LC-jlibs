@@ -1,23 +1,26 @@
 package com.googlecode.javaewah;
 
+import static com.googlecode.javaewah.EWAHCompressedBitmap.wordinbits;
+
 /*
- * Copyright 2012, Google Inc.
+ * Copyright 2009-2014, Daniel Lemire, Cliff Moon, David McIntosh, Robert Becho, Google Inc., Veronika Zenz, Owen Kaser, gssiyankai
  * Licensed under the Apache License, Version 2.0.
  */
 
-import static com.googlecode.javaewah.EWAHCompressedBitmap.wordinbits;
-
 /**
- * The IntIteratorImpl is the 64 bit implementation of the IntIterator
- * interface, which efficiently returns the stream of integers represented by an
- * EWAHIterator.
  * 
- * @author Colby Ranger
- * @since 0.5.6
+ * This class is equivalent to IntIteratorImpl, except that it allows
+ * use to iterate over "clear" bits (bits set to 0).
+ * 
+ * 
+ * 
+ * @author gssiyankai
+ *
  */
-final class IntIteratorImpl implements IntIterator {
+final class ClearIntIterator implements IntIterator {
 
         private final EWAHIterator ewahIter;
+        private final int sizeinbits;
         private final long[] ewahBuffer;
         private int position;
         private int runningLength;
@@ -27,8 +30,9 @@ final class IntIteratorImpl implements IntIterator {
         private int literalPosition;
         private boolean hasnext;
 
-        IntIteratorImpl(EWAHIterator ewahIter) {
+        ClearIntIterator(EWAHIterator ewahIter, int sizeinbits) {
                 this.ewahIter = ewahIter;
+                this.sizeinbits = sizeinbits;
                 this.ewahBuffer = ewahIter.buffer();
                 this.hasnext = this.moveToNext();
         }
@@ -65,7 +69,7 @@ final class IntIteratorImpl implements IntIterator {
         private final void setRunningLengthWord(RunningLengthWord rlw) {
                 this.runningLength = wordinbits * (int) rlw.getRunningLength()
                         + this.position;
-                if (!rlw.getRunningBit()) {
+                if (rlw.getRunningBit()) {
                         this.position = this.runningLength;
                 }
 
@@ -80,7 +84,13 @@ final class IntIteratorImpl implements IntIterator {
 
         private final boolean literalHasNext() {
                 while (this.word == 0 && this.wordPosition < this.wordLength) {
-                        this.word = this.ewahBuffer[this.wordPosition++];
+                        this.word = ~this.ewahBuffer[this.wordPosition++];
+                        if(this.wordPosition == this.wordLength && !this.ewahIter.hasNext()) {
+                            final int usedbitsinlast = this.sizeinbits % wordinbits;
+                            if (usedbitsinlast > 0) {
+                                this.word &= ((~0l) >>> (wordinbits - usedbitsinlast));
+                            }
+                        }
                         this.literalPosition = this.position;
                         this.position += wordinbits;
                 }

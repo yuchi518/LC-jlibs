@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /*
- * Copyright 2009-2013, Daniel Lemire, Cliff Moon, David McIntosh, Robert Becho, Google Inc., Veronika Zenz and Owen Kaser
+ * Copyright 2009-2014, Daniel Lemire, Cliff Moon, David McIntosh, Robert Becho, Google Inc., Veronika Zenz, Owen Kaser, gssiyankai
  * Licensed under the Apache License, Version 2.0.
  */
 
@@ -253,6 +253,8 @@ public class FastAggregation {
         /**
          * Uses a priority queue to compute the or aggregate.
          * 
+         * The content of the container is overwritten.
+         * 
          * @param container
          *                where we write the result
          * @param bitmaps
@@ -316,6 +318,8 @@ public class FastAggregation {
 
         /**
          * Uses a priority queue to compute the xor aggregate.
+         * 
+         * The content of the container is overwritten.
          * 
          * @param container
          *                where we write the result

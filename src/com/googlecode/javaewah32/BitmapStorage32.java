@@ -1,7 +1,7 @@
 package com.googlecode.javaewah32;
 
 /*
- * Copyright 2009-2013, Daniel Lemire, Cliff Moon, David McIntosh, Robert Becho, Google Inc., Veronika Zenz and Owen Kaser
+ * Copyright 2009-2014, Daniel Lemire, Cliff Moon, David McIntosh, Robert Becho, Google Inc., Veronika Zenz, Owen Kaser, gssiyankai
  * Licensed under the Apache License, Version 2.0.
  */
 
@@ -60,6 +60,11 @@ public interface BitmapStorage32 {
          */
         public void addStreamOfNegatedLiteralWords(int[] data, final int start,
                 final int number);
+
+        /**
+         * Empties the container.
+         */
+        public void clear();
 
         /**
          * directly set the sizeinbits field

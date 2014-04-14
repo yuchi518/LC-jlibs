@@ -4,6 +4,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+/*
+ * Copyright 2009-2014, Daniel Lemire, Cliff Moon, David McIntosh, Robert Becho, Google Inc., Veronika Zenz, Owen Kaser, gssiyankai
+ * Licensed under the Apache License, Version 2.0.
+ */
+
 /**
  * Fast algorithms to aggregate many bitmaps. These algorithms are just given as
  * reference. They may not be faster than the corresponding methods in the
@@ -217,6 +222,8 @@ public class FastAggregation32 {
         /**
          * Uses a priority queue to compute the or aggregate.
          * 
+         * The content of the container is overwritten.
+         * 
          * @param container
          *                where we write the result
          * @param bitmaps
@@ -250,6 +257,8 @@ public class FastAggregation32 {
 
         /**
          * Uses a priority queue to compute the xor aggregate.
+         * 
+         * The content of the container is overwritten.
          * 
          * @param container
          *                where we write the result
