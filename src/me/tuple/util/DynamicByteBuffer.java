@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -16,9 +17,69 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class DynamicByteBuffer {
 	static Logger log  = Logger.getLogger(DynamicByteBuffer.class.getName());
+	
+	
+	/**
+	 * TO-DO: automatically free cached memory block
+	 */
+	static SortedMap<Integer, Queue<byte[]>> memcache = new TreeMap<Integer, Queue<byte[]>>();
+	final static int CACHE_SIZE_UNIT	= 32;
+	final static int MAX_CACHE_SIZE		= 1024*32;
+	final static double log2 = Math.log(2);
+	public static int hitC=0, misC=0;
+	public static long totalCachedSize = 0;
+	public static long totalReusedSize = 0;
+	public static long maxRequestSize = 0;
+	
+	static byte[] allocBytes(int size) {
+		//size = size==0?CACHE_SIZE_UNIT:(size%CACHE_SIZE_UNIT==0)?size:(size/CACHE_SIZE_UNIT+1)*CACHE_SIZE_UNIT;
+		maxRequestSize = Math.max(size, maxRequestSize);
+		if (size>MAX_CACHE_SIZE) {
+			return new byte[size];
+		} else if (size<CACHE_SIZE_UNIT) {
+			size = CACHE_SIZE_UNIT;
+		} else {
+			size = CACHE_SIZE_UNIT * (int)Math.pow(2, Math.ceil(Math.log(1.0*size/CACHE_SIZE_UNIT) / log2));
+		}
+		//if (size>100000) throw new RuntimeException("What");
+		//System.out.printf("allsize %d\n", size);
+		synchronized(memcache) {
+			Queue<byte[]> dq = memcache.get(size);
+			if (dq==null||dq.size()==0) {
+				misC++;
+				return new byte[size];
+			}
+			byte bytes[] = dq.poll();
+			hitC++;
+			totalCachedSize -= bytes.length;
+			totalReusedSize += bytes.length;
+			return bytes;
+		}
+	}
+	
+	static void releaseBytes(byte bs[]) {
+		int size = bs.length;
+		if (size<CACHE_SIZE_UNIT || size>MAX_CACHE_SIZE) return;
+		//size = (size/CACHE_SIZE_UNIT)*CACHE_SIZE_UNIT;		// we should put in less-value queue, instead of larger-value queue.
+		size = CACHE_SIZE_UNIT * (int)Math.pow(2, Math.floor(Math.log(1.0*size/CACHE_SIZE_UNIT) / log2));
+		//System.out.printf("Rel size: %d\n", size);
+		synchronized(memcache) {
+			Queue<byte[]> dq = memcache.get(size);
+			if (dq==null) {
+				dq = new ArrayDeque<byte[]>();
+				memcache.put(size, dq);
+			}
+			dq.add(bs);
+			totalCachedSize += bs.length;
+		}
+	}
 	
 	/**
 	 * 0 <= mark <= position <= limit <= capacity
@@ -36,29 +97,43 @@ public class DynamicByteBuffer {
 	int _position;
 	int _mark;
 	
+	boolean fixedCapacity = false;		// default is dynamic enlarge when write
+	
 	public DynamicByteBuffer(int capacity) {
-		_capacity = capacity;
-		_data = new byte[_capacity];
+		_data = allocBytes(_capacity);
+		_capacity = _data.length;
 		_limit = 0;
 		_position = 0;
 		_mark = 0;
 	}
 	
 	public DynamicByteBuffer(byte data[], boolean noCopy) {
-		if (data==null) data=new byte[0];
-		
-		if (noCopy) {
-			_data = data;
+		if (data==null) {
+			_data = allocBytes(CACHE_SIZE_UNIT);
+			_capacity = _limit = _data.length;
 		} else {
-			_data = data.clone();
+			if (noCopy) {
+				_data = data;
+				_capacity = _limit = _data.length;
+			} else {
+				_data = allocBytes(data.length);
+				System.arraycopy(data, 0, _data, 0, data.length);
+				_capacity = _data.length;
+				_limit = data.length;
+			}
 		}
 		
-		_capacity = _limit = _data.length;
 		_position = _mark = 0;
 	}
 	
 	public DynamicByteBuffer(InputStream input) {
 		this(DynamicByteBuffer.readAllBytes(input),true);
+	}
+	
+	@Override
+	protected void finalize() {
+		releaseBytes(_data);
+		_data = null;
 	}
 	
 	public final int capacity()
@@ -68,7 +143,19 @@ public class DynamicByteBuffer {
 	
 	public final DynamicByteBuffer capacity(int newCapacity)
 	{
-		_capacity = newCapacity;
+		if (fixedCapacity && (newCapacity!=_capacity)) {
+			throw new IndexOutOfBoundsException("Capacity can't be changed");
+		}
+		
+		//System.out.printf("old d: %d for %d\n", _data.length, newCapacity);
+		if (newCapacity==_capacity) return this; 
+		
+		byte newData[] = allocBytes(newCapacity);		
+		System.arraycopy(_data, 0, newData, 0, _capacity);
+		_capacity = newData.length;
+		releaseBytes(_data);
+		_data = newData;
+		newData = null;
 		
 		if (_limit >= _capacity) {
 			_limit = _capacity;
@@ -84,8 +171,7 @@ public class DynamicByteBuffer {
 			_mark = _capacity;
 		}
 		
-		_data = Arrays.copyOf(_data, _capacity);
-		
+		//System.out.printf("new d: %d\n", _data.length);
 		return this;
 	}
 	
@@ -124,7 +210,8 @@ public class DynamicByteBuffer {
 		if (newLimit > _capacity) {
 			//_limit = _capacity;
 			// expand size
-			this.capacity(newLimit+32);
+			//System.out.printf("new lim: %d\n", newLimit);
+			capacity(newLimit);
 		}
 		
 		_limit = newLimit;
@@ -223,7 +310,7 @@ public class DynamicByteBuffer {
 		return false;
 	}
 	
-	public boolean hasArray()
+	/*public boolean hasArray()
 	{
 		return true;
 	}
@@ -231,7 +318,7 @@ public class DynamicByteBuffer {
 	public byte[] array()
 	{
 		return _data;
-	}
+	}*/
 	
 	public int arrayOffset()
 	{
@@ -1187,10 +1274,10 @@ public class DynamicByteBuffer {
 			put((byte)((vat.RPCValueType<<4) | vat.value));
 		} else if (vat.value>=0 && vat.value <= 0x03FF+(0x08)) {									// 0x08 ~ 0x3FF+0x08
 			putShort((short)((vat.RPCValueType<<12) | 0x0800 | (vat.value-0x08)));
-		} else if (vat.value>=0 && vat.value <= 0x01FFFF+0x0408) {									// 0x0408 ~ 0x01FFFF+0x0408
-			put3bytesInt((int)((vat.RPCValueType<<20) | 0x0C0000 | (vat.value-0x0408)));
-		} else if (vat.value>=0 && vat.value <= 0x00FFFFFF+0x020408) {								// 0x020408 ~ 0x00FFFFFF+0x020408
-			putInt((int)((vat.RPCValueType<<28) | 0x0E000000 | (vat.value-0x020408)));
+		} else if (vat.value>=0 && vat.value <= 0x01FFFFL+0x0408L) {									// 0x0408 ~ 0x01FFFF+0x0408
+			put3bytesInt((int)((vat.RPCValueType<<20) | 0x0C0000 | (vat.value-0x0408L)));
+		} else if (vat.value>=0 && vat.value <= 0x00FFFFFFL+0x020408L) {								// 0x020408 ~ 0x00FFFFFF+0x020408
+			putInt((int)((vat.RPCValueType<<28) | 0x0E000000L | (vat.value-0x020408L)));
 		} else {
 			//throw new RuntimeException("Type value(%lld) to long", value);
 			//EXCEPTIONv(@"Type value(%lld) to long", value);
@@ -1207,9 +1294,9 @@ public class DynamicByteBuffer {
 		} else if ((t&0x04)==0) {
 			vat.value = (((t&0x03)<<8) | (get()&0x00FF)) + 0x08;
 		} else if ((t&0x02)==0) {
-			vat.value = (((t&0x01)<<16) | (getShort()&0x00FFFF)) + 0x0408;
+			vat.value = (((t&0x01)<<16) | (getShort()&0x00FFFFL)) + 0x0408;
 		} else if ((t&0x01)==0) {
-			vat.value = (((t&0x00)<<24) | (get3bytesInt()&0x00FFFFFF)) + 0x020408;
+			vat.value = (((t&0x00)<<24) | (get3bytesInt()&0x00FFFFFFL)) + 0x020408L;
 		} else {
 			//EXCEPTIONv(@"Type value(%d) to long", vat.type);
 		}
@@ -1225,18 +1312,18 @@ public class DynamicByteBuffer {
 			// (0x7F+1) ~ 0x3FFF+(0x7F+1)
 			// 0x80 ~ 0x3FFF+0x80
 			putShort((short)(0x8000 | (value-0x80)));
-		} else if (value>=0 && value <= (0x1FFFFF+0x4080)) {
+		} else if (value>=0 && value <= (0x1FFFFFL+0x4080L)) {
 			// (0x3FFF+(0x7F+1)+1) ~ 0x1FFFFF+(0x3FFF+(0x7F+1)+1)
 			// 0x4080 ~ 0x1FFFFF + 0x4080
 			put3bytesInt((int)(0xC00000 | (value-0x4080)));
-		} else if (value>=0 && value <= (0x0FFFFFFF+0x204080)) {
+		} else if (value>=0 && value <= (0x0FFFFFFFL+0x204080L)) {
 			// (0x1FFFFF+(0x3FFF+(0x7F+1)+1)+1) ~ 0x0FFFFFFF+(0x1FFFFF+(0x3FFF+(0x7F+1)+1)+1)
 			// 0x204080 ~ 0x0FFFFFFF + 0x204080
-			putInt((int)(0xE0000000 | (value-0x204080)));
-		} else if (value>=0 && value <= (0x07FFFFFFFFL+0x10204080)) {
+			putInt((int)(0xE0000000 | (value-0x204080L)));
+		} else if (value>=0 && value <= (0x07FFFFFFFFL+0x10204080L)) {
 			// (0x0FFFFFFF+(0x1FFFFF+(0x3FFF+(0x7F+1)+1)+1)+1) ~ 0x07FFFFFFFF+(0x0FFFFFFF+(0x1FFFFF+(0x3FFF+(0x7F+1)+1)+1)+1)
 			// 0x10204080 ~ 0x07FFFFFFFF+0x10204080
-			put5bytesLong(0xF000000000L | (value-0x10204080));
+			put5bytesLong(0xF000000000L | (value-0x10204080L));
 		} else if (value>=0 && value <= (0x03FFFFFFFFFFL+0x0810204080L)) {
 			//  (0x07FFFFFFFF+(0x0FFFFFFF+(0x1FFFFF+(0x3FFF+(0x7F+1)+1)+1)+1)) ~ 0x03FFFFFFFFFF+(0x07FFFFFFFF+(0x0FFFFFFF+(0x1FFFFF+(0x3FFF+(0x7F+1)+1)+1)+1))
 			// 0x0810204080 ~ 0x03FFFFFFFFFF+0x0810204080
@@ -1264,11 +1351,11 @@ public class DynamicByteBuffer {
 		} else if ((b&0x40)==0) {
 			return (((b&0x3F)<<8) | (get() & 0x00FF))+0x80;
 		} else if ((b&0x20)==0) {
-			return (((b&0x1F)<<16) | (getShort() & 0x00FFFF))+0x4080;
+			return (((b&0x1F)<<16) | (getShort() & 0x00FFFFL))+0x4080L;
 		} else if ((b&0x10)==0) {
-			return (((b&0x0F)<<24) | (get3bytesInt() & 0x00FFFFFF))+0x204080;
+			return (((b&0x0F)<<24) | (get3bytesInt() & 0x00FFFFFFL))+0x204080L;
 		} else if ((b&0x08)==0) {
-			return (((long)(b&0x07)<<32) | (getInt() & 0x00FFFFFFFF))+0x10204080;
+			return (((long)(b&0x07)<<32) | (getInt() & 0x00FFFFFFFFL))+0x10204080L;
 		} else if ((b&0x04)==0) {
 			return (((long)(b&0x03)<<40) | (get5bytesLong() & 0x00FFFFFFFFFFL))+0x0810204080L;
 		} else if ((b&0x02)==0) {
@@ -1493,6 +1580,89 @@ public class DynamicByteBuffer {
 		} catch(Exception e) {
 			return new String(bs);
 		}
+	}
+	
+	/// === Random access file handle
+	
+	/**
+	 * If length is large than file size, zero will be filled.
+	 * Data will write in current position. 
+	 * @throws IOException 
+	 * */
+	DynamicByteBuffer readDataFromFile(RandomAccessFile raFile, long filePosition, long length) throws IOException {
+		if (_position<0 || length>Integer.MAX_VALUE) {
+			throw new IndexOutOfBoundsException();
+		}
+		
+		if (_position+length>_limit) {
+			limit((int)(_position+length));
+		}
+		
+		int nL = 0;
+		if (filePosition < raFile.length())
+		{
+			nL = (int)Math.min(length, raFile.length()-filePosition);
+			
+			if (nL>0) {
+				raFile.seek(filePosition);
+				raFile.readFully(_data, _position, nL);
+			}			
+		}
+		
+		if (nL != length) {
+			Arrays.fill(_data, (int)(_position+nL), (int)(_position+length), (byte)0);
+		}
+		_position += length;
+		
+		return this;
+	}
+	
+	/**
+	 * Dump the data from position ~ limit to file.
+	 * @param raFile
+	 * @param filePosition
+	 * @param length
+	 * @return
+	 * @throws IOException
+	 */
+	DynamicByteBuffer dumpDataToFile(RandomAccessFile raFile, long filePosition, long length) throws IOException {
+		if (_position<0) {
+			throw new IndexOutOfBoundsException();
+		}
+		
+		raFile.seek(filePosition);
+		raFile.write(_data, _position, (int)Math.min(_limit-_position,length));
+		
+		return this;
+	}
+	
+	/**
+	 * 
+	 * @param shiftLength
+	 * @return
+	 */
+	DynamicByteBuffer shiftData(int shiftLength) {
+		if (shiftLength > 0) {
+			if (shiftLength >= _capacity) {
+				// clean 
+			} else {
+				int len = _capacity-shiftLength;//Math.min(shiftLength, _capacity-shiftLength);
+				System.arraycopy(_data, 0, _data, shiftLength, len);
+			}
+			
+		} else if (shiftLength < 0) {
+			shiftLength = -shiftLength;
+			if (shiftLength >= _capacity) {
+				// clean
+			} else {
+				int len = _capacity-shiftLength;//Math.min(shiftLength, _capacity-shiftLength);
+				System.arraycopy(_data, shiftLength, _data, 0, len);
+			}
+			
+			
+		}
+		
+		return this;
 	}
 }
 

@@ -1,3 +1,12 @@
+2014/5/7
+	1. Fix DynamicByteBuffer var long encoding/decoding problem.
+
+2014/5/6
+	1. Update Java EWAH 0.8.6. lib.
+	2. Add RocksDB lib.
+	3. Update Json.org lib.
+
+
 2014/1/27
 	1. Refine DynamicByteBuffer;
 	2. Update javaewah lib.

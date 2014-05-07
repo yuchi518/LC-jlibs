@@ -192,7 +192,7 @@ public class TieredIndexTable<E> {
 	    	{
 	    		for (int j = 0; j < localrlw.getRunningLength(); ++j)
 		        {
-	    			for (int c = 0; c < EWAHCompressedBitmap.wordinbits; ++c) {
+	    			for (int c = 0; c < EWAHCompressedBitmap.WORD_IN_BITS; ++c) {
 	    				//v.add(new Integer(pos++));
 	    				if (pos < sizeInBits) {
 	    					//v|=(pos)%64;
@@ -202,7 +202,7 @@ public class TieredIndexTable<E> {
 	    			}
 		        }
 	    	} else {
-	    		pos += EWAHCompressedBitmap.wordinbits * localrlw.getRunningLength();
+	    		pos += EWAHCompressedBitmap.WORD_IN_BITS * localrlw.getRunningLength();
 	    	}
 	    	for (int j = 0; j < localrlw.getNumberOfLiteralWords(); ++j) {
 	    		long data = iter.buffer()[iter.literalWords() + j];
@@ -215,7 +215,7 @@ public class TieredIndexTable<E> {
 	    				cb((ntz+pos), _indexes);
 	    			}
 	    		}
-	    		pos += EWAHCompressedBitmap.wordinbits;
+	    		pos += EWAHCompressedBitmap.WORD_IN_BITS;
 	    	}
 	    }
 	    
