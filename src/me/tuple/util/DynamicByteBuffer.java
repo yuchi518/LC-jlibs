@@ -30,7 +30,7 @@ public class DynamicByteBuffer {
 	 * TO-DO: automatically free cached memory block
 	 */
 	static SortedMap<Integer, Queue<byte[]>> memcache = new TreeMap<Integer, Queue<byte[]>>();
-	final static int CACHE_SIZE_UNIT	= 32;
+	final static int CACHE_SIZE_UNIT	= 16;
 	final static int MAX_CACHE_SIZE		= 1024*32;
 	final static double log2 = Math.log(2);
 	public static int hitC=0, misC=0;
@@ -41,12 +41,15 @@ public class DynamicByteBuffer {
 	static byte[] allocBytes(int size) {
 		//size = size==0?CACHE_SIZE_UNIT:(size%CACHE_SIZE_UNIT==0)?size:(size/CACHE_SIZE_UNIT+1)*CACHE_SIZE_UNIT;
 		maxRequestSize = Math.max(size, maxRequestSize);
-		if (size>MAX_CACHE_SIZE) {
-			return new byte[size];
-		} else if (size<CACHE_SIZE_UNIT) {
+		if (size<CACHE_SIZE_UNIT) {
 			size = CACHE_SIZE_UNIT;
 		} else {
 			size = CACHE_SIZE_UNIT * (int)Math.pow(2, Math.ceil(Math.log(1.0*size/CACHE_SIZE_UNIT) / log2));
+		}
+		
+		// force to enlarge faster
+		if (size>MAX_CACHE_SIZE) {
+			return new byte[size];
 		}
 		//if (size>100000) throw new RuntimeException("What");
 		//System.out.printf("allsize %d\n", size);

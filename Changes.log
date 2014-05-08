@@ -1,3 +1,13 @@
+2014/5/8
+	1. Add TaskMonitor class to monitor task usage. (time, memory, etc.)
+
+2014/5/7
+	1. Rename RocksObject -> RockingObject, RocksCache -> RockingCache to avoid class conflict with RocksDB 3.0.
+
+2014/5/7
+	1. Merge RocksCache, RocksObject, RocksObjectSlice into me.tuple.rocksdb.
+	
+
 2014/5/7
 	1. Fix DynamicByteBuffer var long encoding/decoding problem.
 
