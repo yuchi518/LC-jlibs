@@ -35,6 +35,7 @@ public class TaskMonitor {
 	public String name;
 	public long usedMemory;
 	public long elapsedTime;
+	int _cnt=0;
 	
 	protected long lastUsedMemory;
 	protected long lastUsedTime;
@@ -44,6 +45,7 @@ public class TaskMonitor {
 	}
 	
 	public void start() {
+		if (_cnt++ > 0) return;
 		
 		long total = rt.totalMemory();
 		long free = rt.freeMemory();
@@ -55,6 +57,8 @@ public class TaskMonitor {
 	}
 	
 	public void stop() {
+		if (--_cnt > 0) return;
+		
 		long total = rt.totalMemory();
 		long free = rt.freeMemory();
 		//long max = rt.maxMemory();

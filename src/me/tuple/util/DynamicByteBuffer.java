@@ -135,16 +135,19 @@ public class DynamicByteBuffer {
 	
 	@Override
 	protected void finalize() {
+		flushAllForWrite();
 		releaseBytes(_data);
 		_data = null;
 	}
+	
+	/// ======= data maintenance
 	
 	public final int capacity()
 	{
 		return _capacity;
 	}
 	
-	public final DynamicByteBuffer capacity(int newCapacity)
+	protected final DynamicByteBuffer capacity(int newCapacity)
 	{
 		if (fixedCapacity && (newCapacity!=_capacity)) {
 			throw new IndexOutOfBoundsException("Capacity can't be changed");
@@ -178,12 +181,12 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
-	public final int position()
+	public int position()
 	{
 		return _position;
 	}
 	
-	public final DynamicByteBuffer position(int newPosition)
+	public DynamicByteBuffer position(int newPosition)
 	{
 		if (newPosition > _limit) {
 			throw new IllegalArgumentException("newPosition(" + newPosition + ") is larger than limit(" + _limit + ")");
@@ -204,7 +207,7 @@ public class DynamicByteBuffer {
 		return _limit;
 	}
 	
-	public final DynamicByteBuffer limit(int newLimit)
+	protected final DynamicByteBuffer limit(int newLimit)
 	{
 		if (newLimit < 0) {
 			throw new IllegalArgumentException("newLimit(" + newLimit + ") is les than 0");
@@ -230,7 +233,40 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
-	public final DynamicByteBuffer mark()
+
+	/**
+	 * The bytes between the buffer's current position and its limit, if any, are copied to the beginning of the buffer.
+	 * This is user for read. If use for write, the copy is meaningless.
+	 * @return
+	 */
+	public DynamicByteBuffer compact() {
+		if (_position==0) return this;
+		System.arraycopy(_data, _position, _data, 0, _limit-_position);
+		_limit = _limit - _position;
+		_position = 0;
+		_mark = 0;
+		return this;
+	}
+	
+	public int remaining()
+	{
+		return _limit - _position;
+	}
+	
+	public boolean hasRemaining()
+	{
+		return remaining()>0;
+		//return (_limit - _position) > 0;
+	}
+	
+	
+	/// ====== Position operation
+	
+	/**
+	 * Mark the current position, and go back later.
+	 * @return
+	 */
+	public DynamicByteBuffer mark()
 	{
 		_mark = _position;
 		
@@ -241,7 +277,7 @@ public class DynamicByteBuffer {
 	 * Go to mark position.
 	 * @return
 	 */
-	public final DynamicByteBuffer reset()
+	public DynamicByteBuffer reset()
 	{
 		_position = _mark;
 		
@@ -253,7 +289,7 @@ public class DynamicByteBuffer {
 	 * Clears this buffer. The position is set to zero, the limit is set to the capacity, and the mark is discarded.
 	 * @return
 	 */
-	public final DynamicByteBuffer clear()
+	public DynamicByteBuffer clear()
 	{
 		_position = 0;
 		_mark = 0;
@@ -264,9 +300,10 @@ public class DynamicByteBuffer {
 	/**
 	 * Flips this buffer. The limit is set to the current position and then the position is set to zero. 
 	 * If the mark is defined then it is discarded.
+	 * This is use for write and then read.
 	 * @return
 	 */
-	public final DynamicByteBuffer flip()
+	public DynamicByteBuffer flip()
 	{
 		_limit = _position;
 		_position = 0;
@@ -278,7 +315,7 @@ public class DynamicByteBuffer {
 	 * Repeat a sequence again. The position is set to zero and the mark is discarded.
 	 * @return
 	 */
-	public final DynamicByteBuffer rewind()
+	public DynamicByteBuffer rewind()
 	{
 		_position = 0;
 		_mark = 0;
@@ -286,32 +323,10 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
-	/**
-	 * The bytes between the buffer's current position and its limit, if any, are copied to the beginning of the buffer.
-	 * @return
-	 */
-	public DynamicByteBuffer compact() {
-		System.arraycopy(_data, _position, _data, 0, _limit-_position);
-		_position = _limit - _position;
-		_limit = _capacity;
-		_mark = 0;
-		return this;
-	}
-	
-	public final int remaining()
-	{
-		return _limit - _position;
-	}
-	
-	public final boolean hasRemaining()
-	{
-		return (_limit - _position) > 0;
-	}
-	
-	public boolean isReadOnly()
+	/*public boolean isReadOnly()
 	{
 		return false;
-	}
+	}*/
 	
 	/*public boolean hasArray()
 	{
@@ -323,7 +338,7 @@ public class DynamicByteBuffer {
 		return _data;
 	}*/
 	
-	public int arrayOffset()
+	/*public int arrayOffset()
 	{
 		return 0;
 	}
@@ -374,30 +389,104 @@ public class DynamicByteBuffer {
 	public ShortBuffer asShortBuffer() {
 		// TODO: Auto-generated method stub
 		return null;
-	}
+	}*/
 
+	//// ====
+	/**
+	 * Subclass should override this to support loading automatically.
+	 * @param size
+	 */
+	protected void prepareForRead(int size) {
+		if (/*_position<0 ||*/ _position+size>_limit) {
+			throw new BufferUnderflowException();
+		}
+	}
+	
+	/**
+	 * Subclass should override this to support loading automatically.
+	 * @param index
+	 * @param size
+	 */
+	protected void prepareForRead(int index, int size) {
+		if (/*index<0 ||*/ index+size>_limit) {
+			throw new BufferUnderflowException();
+		}
+	}
+	
+	/**
+	 * Subclass should override this function or override the functions: getLastBytes(), getLastString() to improve memory usage. 
+	 */
+	protected void prepareAllForRead() {
+		///
+	}
+	
+	/**
+	 * Subclass should override this to support storing automatically.
+	 * @param size
+	 */
+	protected void prepareForWrite(int size) {
+		/*if (_position<0) {
+			throw new IndexOutOfBoundsException();
+		}*/
+		
+		if (_position+size>_limit) {
+			limit(_position+size);
+		}
+	}
+	
+	/**
+	 * Subclass should override this to support storing automatically.
+	 * @param index
+	 * @param size
+	 */
+	protected void prepareForWrite(int index, int size) {
+		/*if (_position<0) {
+			throw new IndexOutOfBoundsException();
+		}*/
+		
+		if (index+size>_limit) {
+			limit(index+size);
+		}
+	}
+	
+	/**
+	 * Subclass should override this to support storing automatically.
+	 * This will be called before object release. Try to call this manually if possible. 
+	 * After the function have called, no other functions should be called. 
+	 * If subclass doesn't support writing, this function should leave empty instead of 
+	 * throwing an exception.
+	 */
+	public void flushAllForWrite() {
+		
+	}
+	
+	/**
+	 * Subclass should override this to throw an exception if not support.
+	 */
+	protected void checkFullDataAlgorithmSupport() {
+		
+	}
+	
+	
+	//// =====   Get & Put codes
+	//// ======
+	
 	
 	
 	public byte get() {
-		if (_position >= _limit) {
-			throw new BufferUnderflowException();
-		}
+		prepareForRead(1);
 		
 		return _data[_position++];
 	}
 	
 	public byte peek() {
-		if (_position >= _limit) {
-			throw new BufferUnderflowException();
-		}
+		prepareForRead(1);
 		
 		return _data[_position];
 	}
 	
 	public byte get(int index) {
-		if (index<0 || index>=_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(index, 1);
 		
 		return _data[index];
 	}
@@ -424,9 +513,7 @@ public class DynamicByteBuffer {
 
 	
 	public int getInt() {
-		if (_position<0 || _position+4>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(4);
 		
 		int i;
 		i = ((_data[_position++]&0x00ff) << 24);
@@ -438,9 +525,7 @@ public class DynamicByteBuffer {
 	}
 	
 	public int get3bytesInt() {
-		if (_position<0 || _position+3>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(3);
 		
 		int i;
 		i = ((_data[_position++]&0x00ff) << 16);
@@ -451,9 +536,7 @@ public class DynamicByteBuffer {
 	}
 
 	public int peekInt() {
-		if (_position<0 || _position+4>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(4);
 		
 		return (((_data[_position]&0x00ff) << 24) |
 				((_data[_position+1]&0x00ff) << 16) |
@@ -462,9 +545,7 @@ public class DynamicByteBuffer {
 	}
 	
 	public int peek3bytesInt() {
-		if (_position<0 || _position+3>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(3);
 		
 		return (((_data[_position+0]&0x00ff) << 16) |
 				((_data[_position+1]&0x00ff) << 8) |
@@ -472,9 +553,7 @@ public class DynamicByteBuffer {
 	}
 	
 	public int getInt(int index) {
-		if (index<0 || index+4>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(index,4);
 		
 		return (((_data[index]&0x00ff) << 24) |
 				((_data[index+1]&0x00ff) << 16) |
@@ -483,9 +562,7 @@ public class DynamicByteBuffer {
 	}
 
 	public int get3bytesInt(int index) {
-		if (index<0 || index+3>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(index,3);
 		
 		return (((_data[index+0]&0x00ff) << 16) |
 				((_data[index+1]&0x00ff) << 8) |
@@ -493,14 +570,9 @@ public class DynamicByteBuffer {
 	}
 	
 	public long get5bytesLong() {
-		if (_position<0 || _position+5>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(5);
 		
 		long l;
-		//l = (((long)_data[_position++]&0x00ff) << 56);
-		//l |= (((long)_data[_position++]&0x00ff) << 48);
-		//l |= (((long)_data[_position++]&0x00ff) << 40);
 		l = (((long)_data[_position++]&0x00ff) << 32);
 		l |= (((long)_data[_position++]&0x00ff) << 24);
 		l |= (((long)_data[_position++]&0x00ff) << 16);
@@ -511,13 +583,9 @@ public class DynamicByteBuffer {
 	}
 
 	public long get6bytesLong() {
-		if (_position<0 || _position+6>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(6);
 		
 		long l;
-		//l = (((long)_data[_position++]&0x00ff) << 56);
-		//l |= (((long)_data[_position++]&0x00ff) << 48);
 		l = (((long)_data[_position++]&0x00ff) << 40);
 		l |= (((long)_data[_position++]&0x00ff) << 32);
 		l |= (((long)_data[_position++]&0x00ff) << 24);
@@ -529,12 +597,9 @@ public class DynamicByteBuffer {
 	}
 
 	public long get7bytesLong() {
-		if (_position<0 || _position+7>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(7);
 		
 		long l;
-		//l = (((long)_data[_position++]&0x00ff) << 56);
 		l = (((long)_data[_position++]&0x00ff) << 48);
 		l |= (((long)_data[_position++]&0x00ff) << 40);
 		l |= (((long)_data[_position++]&0x00ff) << 32);
@@ -547,9 +612,7 @@ public class DynamicByteBuffer {
 	}
 	
 	public long getLong() {
-		if (_position<0 || _position+8>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(8);
 		
 		long l;
 		l = (((long)_data[_position++]&0x00ff) << 56);
@@ -565,9 +628,7 @@ public class DynamicByteBuffer {
 	}
 
 	public long peekLong() {
-		if (_position<0 || _position+8>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(8);
 		
 		return ((((long)_data[_position]&0x00ff) << 56) |
 				(((long)_data[_position+1]&0x00ff) << 48) |
@@ -581,9 +642,7 @@ public class DynamicByteBuffer {
 
 	
 	public long getLong(int index) {
-		if (index<0 || index+8>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(index, 8);
 		
 		return ((((long)_data[index]&0x00ff) << 56) |
 				(((long)_data[index+1]&0x00ff) << 48) |
@@ -597,9 +656,7 @@ public class DynamicByteBuffer {
 
 	
 	public short getShort() {
-		if (_position<0 || _position+2>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(2);
 		
 		short s;
 		s = (short)((_data[_position++]&0x00ff) << 8);
@@ -609,18 +666,14 @@ public class DynamicByteBuffer {
 	}
 	
 	public short peekShort() {
-		if (_position<0 || _position+2>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(2);
 		
 		return (short)(((_data[_position]&0x00ff) << 8) |
 				((_data[_position+1]&0x00ff) << 0));
 	}
 	
 	public short getShort(int index) {
-		if (index<0 || index+2>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(index,2);
 		
 		return (short)(((_data[index]&0x00ff) << 8) |
 				((_data[index+1]&0x00ff) << 0));
@@ -629,6 +682,8 @@ public class DynamicByteBuffer {
 	// get bytes
 	
 	public byte[] getLastBytes() {
+		prepareAllForRead();
+		
 		byte b[];
 		
 		if (_limit-_position<=0) return null;
@@ -640,11 +695,9 @@ public class DynamicByteBuffer {
 	}
 	
 	public byte[] getBytesWithFixedLength(int length) {
-		if (_position<0 || _position+length>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
-		
 		if (length==0) return null;
+		
+		prepareForRead(length);
 		
 		byte b[];
 		
@@ -655,17 +708,13 @@ public class DynamicByteBuffer {
 	}
 	
 	public byte[] getBytesWithOneByteLength() {
-		if (_position<0 || _position+1>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(1);
 		
 		int length = _data[_position++];
 		
 		if (length==0) return null;
 		
-		if (_position<0 || _position+length>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(length);
 		
 		byte b[];
 		
@@ -676,18 +725,14 @@ public class DynamicByteBuffer {
 	}
 	
 	public byte[] getBytesWithTwoBytesLength() {
-		if (_position<0 || _position+2>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(2);
 		
 		int length = ((int)_data[_position++] & 0x00ff) << 8;
 		length |= ((int)_data[_position++] & 0x00ff);
 		
 		if (length==0) return null;
 		
-		if (_position<0 || _position+length>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(length);
 		
 		byte b[];
 		
@@ -697,27 +742,10 @@ public class DynamicByteBuffer {
 		return b;
 	}
 	
-	
-	
-	/*
-	public byte[] getBytesWithRemainingLength(int remainingLength) {
-		int to = _limit - remainingLength;
-		
-		if (to<_position || to>=_limit) {
-			throw new IndexOutOfBoundsException();
-		}
-		
-		byte b[];
-		
-		b = Arrays.copyOfRange(_data, _position, to);
-		_position = to;
-		
-		return b;
-	}
-	*/
-	
 	// get string
 	public String getLastString() {
+		prepareAllForRead();
+		
 		if (_limit-_position<=0) return null;
 		
 		String s;
@@ -736,6 +764,8 @@ public class DynamicByteBuffer {
 	public String getStringWithFixedLength(int length) {
 		if (length<=0) return null;
 		
+		prepareForRead(length);
+		
 		String s;
 		try {
 			s = new String(_data, _position, length, "UTF-8");
@@ -750,17 +780,13 @@ public class DynamicByteBuffer {
 	}
 	
 	public String getStringWithOneByteLength() {
-		if (_position<0 || _position+1>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(1);
 		
 		int length = _data[_position++];
 		
 		if (length==0) return null;
 		
-		if (_position<0 || _position+length>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(length);
 		
 		String s;
 		try {
@@ -776,18 +802,14 @@ public class DynamicByteBuffer {
 	}
 	
 	public String getStringWithTwoBytesLength() {
-		if (_position<0 || _position+2>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(2);
 		
 		int length = ((int)_data[_position++] & 0x00ff) << 8;
 		length |= ((int)_data[_position++] & 0x00ff);
 		
 		if (length==0) return null;
 		
-		if (_position<0 || _position+length>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
+		prepareForRead(length);
 		
 		String s;
 		try {
@@ -802,34 +824,8 @@ public class DynamicByteBuffer {
 		return s;
 	}
 	
-	/*public String getStringWithRemainingLength(int remainingLength) {
-		int length = _limit - remainingLength - _position;
-		
-		if (length<0 || _position+length>_limit) {
-			throw new IndexOutOfBoundsException();
-		}
-		
-		String s;
-		try {
-			s = new String(_data, _position, length, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported decoded", e);
-			s = new String(_data, _position, length);
-		}
-		
-		_position += length;
-		
-		return s;
-	}*/
-	
 	public DynamicByteBuffer put(byte b) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		
-		if (_position+1>_limit) {
-			limit(_position+1);
-		}
+		prepareForWrite(1);
 		
 		_data[_position++] = b;
 		
@@ -838,12 +834,7 @@ public class DynamicByteBuffer {
 	
 	
 	public DynamicByteBuffer put(int index, byte b) {
-		if (index<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (index+1>_limit) {
-			limit(index+1);
-		}
+		prepareForWrite(index, 1);
 		
 		_data[index] = b;
 		
@@ -870,13 +861,7 @@ public class DynamicByteBuffer {
 
 	
 	public DynamicByteBuffer putInt(int value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		
-		if (_position+4>_limit) {
-			limit(_position+4);
-		}
+		prepareForWrite(4);
 		
 		_data[_position++] = (byte)((value>>24) & 0xff);
 		_data[_position++] = (byte)((value>>16) & 0xff);
@@ -887,13 +872,7 @@ public class DynamicByteBuffer {
 	}
 
 	public DynamicByteBuffer put3bytesInt(int value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		
-		if (_position+3>_limit) {
-			limit(_position+3);
-		}
+		prepareForWrite(3);
 		
 		_data[_position++] = (byte)((value>>16) & 0xff);
 		_data[_position++] = (byte)((value>>8) & 0xff);
@@ -903,12 +882,7 @@ public class DynamicByteBuffer {
 	}
 
 	public DynamicByteBuffer putInt(int index, int value) {
-		if (index<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (index+4>_limit) {
-			limit(index+4);
-		}
+		prepareForWrite(index,4);
 		
 		_data[index] = (byte)((value>>24) & 0xff);
 		_data[index+1] = (byte)((value>>16) & 0xff);
@@ -920,12 +894,7 @@ public class DynamicByteBuffer {
 	
 	
 	public DynamicByteBuffer put3bytesInt(int index, int value) {
-		if (index<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (index+3>_limit) {
-			limit(index+3);
-		}
+		prepareForWrite(index,3);
 		
 		_data[index+0] = (byte)((value>>16) & 0xff);
 		_data[index+1] = (byte)((value>>8) & 0xff);
@@ -936,16 +905,8 @@ public class DynamicByteBuffer {
 
 	
 	public DynamicByteBuffer put5bytesLong(long value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (_position+5>_limit) {
-			limit(_position+5);
-		}
+		prepareForWrite(5);
 		
-		//_data[_position++] = (byte)((value>>56) & 0xff);
-		//_data[_position++] = (byte)((value>>48) & 0xff);
-		//_data[_position++] = (byte)((value>>40) & 0xff);
 		_data[_position++] = (byte)((value>>32) & 0xff);
 		_data[_position++] = (byte)((value>>24) & 0xff);
 		_data[_position++] = (byte)((value>>16) & 0xff);
@@ -956,15 +917,8 @@ public class DynamicByteBuffer {
 	}
 
 	public DynamicByteBuffer put6bytesLong(long value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (_position+6>_limit) {
-			limit(_position+6);
-		}
+		prepareForWrite(6);
 		
-		//_data[_position++] = (byte)((value>>56) & 0xff);
-		//_data[_position++] = (byte)((value>>48) & 0xff);
 		_data[_position++] = (byte)((value>>40) & 0xff);
 		_data[_position++] = (byte)((value>>32) & 0xff);
 		_data[_position++] = (byte)((value>>24) & 0xff);
@@ -976,14 +930,8 @@ public class DynamicByteBuffer {
 	}
 
 	public DynamicByteBuffer put7bytesLong(long value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (_position+7>_limit) {
-			limit(_position+7);
-		}
+		prepareForWrite(7);
 		
-		//_data[_position++] = (byte)((value>>56) & 0xff);
 		_data[_position++] = (byte)((value>>48) & 0xff);
 		_data[_position++] = (byte)((value>>40) & 0xff);
 		_data[_position++] = (byte)((value>>32) & 0xff);
@@ -996,12 +944,7 @@ public class DynamicByteBuffer {
 	}
 
 	public DynamicByteBuffer putLong(long value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (_position+8>_limit) {
-			limit(_position+8);
-		}
+		prepareForWrite(8);
 		
 		_data[_position++] = (byte)((value>>56) & 0xff);
 		_data[_position++] = (byte)((value>>48) & 0xff);
@@ -1017,12 +960,7 @@ public class DynamicByteBuffer {
 
 	
 	public DynamicByteBuffer putLong(int index, long value) {
-		if (index<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (index+8>_limit) {
-			limit(index+8);
-		}
+		prepareForWrite(index,8);
 		
 		_data[index] = (byte)((value>>56) & 0xff);
 		_data[index+1] = (byte)((value>>48) & 0xff);
@@ -1038,12 +976,7 @@ public class DynamicByteBuffer {
 
 	
 	public DynamicByteBuffer putShort(short value) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (_position+2>_limit) {
-			limit(_position+2);
-		}
+		prepareForWrite(2);
 		
 		_data[_position++] = (byte)((value>>8) & 0xff);
 		_data[_position++] = (byte)(value & 0xff);
@@ -1053,12 +986,7 @@ public class DynamicByteBuffer {
 
 	
 	public DynamicByteBuffer putShort(int index, short value) {
-		if (index<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		if (index+2>_limit) {
-			limit(index+2);
-		}
+		prepareForWrite(index,2);
 		
 		_data[index] = (byte)((value>>8) & 0xff);
 		_data[index+1] = (byte)(value & 0xff);
@@ -1111,62 +1039,29 @@ public class DynamicByteBuffer {
 		return Float.intBitsToFloat(getInt(index));
 	}
 
-	/*public DynamicByteBuffer putFloatValue(float value) {
-		putInt(Float.floatToRawIntBits(value));
-		return this;
-	}
-	
-	public float getFloatValue() {
-		return Float.intBitsToFloat(getInt());
-	}
-	
-	public DynamicByteBuffer putDoubleValue(double value) {
-		putLong(Double.doubleToRawLongBits(value));
-		return this;
-	}
-	
-	public double getDoubleValue() {
-		return Double.longBitsToDouble(getLong());
-	}*/
-	
 	///
 	
 	public DynamicByteBuffer putLastBytes(byte bytes[]) {
 		if (bytes==null) return this;
 		
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
+		int l = bytes.length;
 		
-		int l = bytes==null?0:bytes.length;
+		prepareForWrite(l);
 		
-		if (_position+l>_limit) {
-			limit(_position+l);
-		}
-		
-		if (l>0) {
-			System.arraycopy(bytes, 0, _data, _position, bytes.length);
-			_position += bytes.length;			
-		}
+		System.arraycopy(bytes, 0, _data, _position, bytes.length);
+		_position += bytes.length;			
 		
 		return this;
 	}
 	
 	public DynamicByteBuffer putBytesWithOneByteLength(byte bytes[]) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		
 		int l = bytes==null?0:bytes.length;
 		
 		if (l>255) {
 			throw new IllegalArgumentException("Put data length(" + l + ") > 255");
 		}
 		
-		
-		if (_position+l+1>_limit) {
-			limit(_position+l+1);
-		}
+		prepareForWrite(1+l);
 		
 		_data[_position++] = (byte)l;
 		
@@ -1179,20 +1074,13 @@ public class DynamicByteBuffer {
 	}
 	
 	public DynamicByteBuffer putBytesWithTwoBytesLength(byte bytes[]) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		
 		int l = bytes==null?0:bytes.length;
 		
 		if (l>65535) {
 			throw new IllegalArgumentException("Put data length(" + l + ") > 65535");
 		}
 		
-		
-		if (_position+l+2>_limit) {
-			limit(_position+l+2);
-		}
+		prepareForWrite(2+l);
 		
 		_data[_position++] = (byte)((l>>8) & 0xff);
 		_data[_position++] = (byte)(l & 0xff);
@@ -1232,10 +1120,10 @@ public class DynamicByteBuffer {
 		}
 	}
 	
-	public DynamicByteBuffer slice() {
+	/*public DynamicByteBuffer slice() {
 		// TODO: Auto-generated method stub
 		return null;
-	}
+	}*/
 	
 	/**
 	 * From: mark, To: position
@@ -1387,16 +1275,10 @@ public class DynamicByteBuffer {
 	}
 	
 	public DynamicByteBuffer putVarLengthData(ByteBuffer buffer) {
-		if (_position<0) {
-			throw new IndexOutOfBoundsException();
-		}
-		
 		int l = buffer.remaining();
 		putVarLong(l);
 		
-		if (_position+l>_limit) {
-			limit(_position+l);
-		}
+		prepareForWrite(l);
 		
 		if (l>0) {
 			buffer.get(_data, _position, l);
@@ -1433,7 +1315,10 @@ public class DynamicByteBuffer {
 	}
 	
 	/// 1 byte crc and xor
-	public DynamicByteBuffer put1ByteCRC() {
+	public DynamicByteBuffer put1ByteCRC()
+	{
+		checkFullDataAlgorithmSupport();
+		
 		byte crc=0;
 		for (int i=0; i<_position; i++) {
 			if ((i&0x0f)==0) {
@@ -1445,7 +1330,10 @@ public class DynamicByteBuffer {
 		return this.put(crc);
 	}	
 
-	public DynamicByteBuffer applyXOR() {
+	public DynamicByteBuffer applyXOR()
+	{
+		checkFullDataAlgorithmSupport();
+		
 		byte xor = (byte) 0xff;
 		for (int i=_position-1; i>=0; i--) {
 			xor ^= _data[i];
@@ -1455,7 +1343,10 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
-	public DynamicByteBuffer applyXOR2() {
+	public DynamicByteBuffer applyXOR2()
+	{
+		checkFullDataAlgorithmSupport();
+		
 		byte xor = (byte) 0x5a;
 		for (int i=_position-1; i>=0; i--) {
 			//System.out.printf("%02x ^ %02x", xor, _data[i]);
@@ -1467,7 +1358,10 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
-	public DynamicByteBuffer applyXOR3() {
+	public DynamicByteBuffer applyXOR3()
+	{
+		checkFullDataAlgorithmSupport();
+		
 		byte xor = (byte) 0x5a;
 		for (int i=_position-1; i>=0; i-=3) {
 			//System.out.printf("%02x ^ %02x", xor, _data[i]);
@@ -1494,10 +1388,11 @@ public class DynamicByteBuffer {
 		return this;
 	}
 
-	
-
-		// if use, always call this after init.
-	public boolean truncate1ByteCRC() {
+	// if use, always call this after init.
+	public boolean truncate1ByteCRC()
+	{
+		checkFullDataAlgorithmSupport();
+		
 		switch (_limit) {
 		case 0:
 			return false;
@@ -1522,6 +1417,8 @@ public class DynamicByteBuffer {
 
 	public DynamicByteBuffer unapplyXOR()
 	{
+		checkFullDataAlgorithmSupport();
+		
 		byte xor=(byte) 0xff,pre=0;
 		for (int i=_limit-1; i>=0; i--) {
 			pre = _data[i];
@@ -1534,6 +1431,8 @@ public class DynamicByteBuffer {
 	
 	public DynamicByteBuffer unapplyXOR2()
 	{
+		checkFullDataAlgorithmSupport();
+		
 		byte xor=(byte) 0x5a,pre=0;
 		for (int i=_limit-1; i>=0; i--) {
 			pre = _data[i];
@@ -1544,9 +1443,11 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
+	/// === herlp function
 	
-	public static byte[] readAllBytes(InputStream is) {
-
+	
+	public static byte[] readAllBytes(InputStream is) 
+	{
 	    ByteArrayOutputStream ous = null;
 	    try {
 	        byte[] buffer = new byte[1024];
@@ -1585,7 +1486,7 @@ public class DynamicByteBuffer {
 		}
 	}
 	
-	/// === Random access file handle
+	/// === Random access file handle, use it be carefully
 	
 	/**
 	 * If length is large than file size, zero will be filled.

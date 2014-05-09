@@ -1,3 +1,8 @@
+2014/5/9
+	1. Refine DynamicByteBuffer architecture. Now it can be subclass for special function.
+	2. Add InputStreamByteBuffer, OutputStreamByteBuffer to read/write stream dynamically.
+	3. Update TaskMonitor for nest start,stop cases.
+
 2014/5/8
 	1. Add TaskMonitor class to monitor task usage. (time, memory, etc.)
 
