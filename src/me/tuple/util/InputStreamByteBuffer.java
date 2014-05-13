@@ -41,6 +41,12 @@ public class InputStreamByteBuffer extends DynamicByteBuffer {
 	}
 	
 	@Override
+	public boolean hasRemaining() {
+		prepareForRead(1);
+		return _limit - _position > 0;
+	}
+	
+	@Override
 	public DynamicByteBuffer mark() { throw new UnsupportedOperationException();}
 	
 	@Override

@@ -1,3 +1,8 @@
+~2014/5/13
+	1. Update InputStreamByteBuffer hasRemaining function.
+	2. Add SizeAware, SizeAwareIterative, IterableChain.
+	
+
 2014/5/9
 	1. Refine DynamicByteBuffer architecture. Now it can be subclass for special function.
 	2. Add InputStreamByteBuffer, OutputStreamByteBuffer to read/write stream dynamically.

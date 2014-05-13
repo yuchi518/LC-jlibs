@@ -44,8 +44,8 @@ public class TaskMonitor {
 		this.name = name;
 	}
 	
-	public void start() {
-		if (_cnt++ > 0) return;
+	public TaskMonitor start() {
+		if (_cnt++ > 0) return this;
 		
 		long total = rt.totalMemory();
 		long free = rt.freeMemory();
@@ -54,10 +54,12 @@ public class TaskMonitor {
 		
 		lastUsedMemory = used;
 		lastUsedTime = System.currentTimeMillis();
+		
+		return this;
 	}
 	
-	public void stop() {
-		if (--_cnt > 0) return;
+	public TaskMonitor stop() {
+		if (--_cnt > 0) return this;
 		
 		long total = rt.totalMemory();
 		long free = rt.freeMemory();
@@ -66,6 +68,8 @@ public class TaskMonitor {
 		
 		usedMemory += used-lastUsedMemory;
 		elapsedTime += System.currentTimeMillis()-lastUsedTime;
+		
+		return this;
 	}
 
 	
