@@ -133,8 +133,12 @@ public class DynamicByteBuffer {
 		this(DynamicByteBuffer.readAllBytes(input),true);
 	}
 	
-	@Override
-	protected void finalize() {
+	/**
+	 * Don't call this before using.
+	 * After calling, no other operation should be called.
+	 * If you have no idea when to call, DON'T CALL.
+	 */
+	protected void releaseForReuse() {
 		flushAllForWrite();
 		releaseBytes(_data);
 		_data = null;
@@ -450,8 +454,8 @@ public class DynamicByteBuffer {
 	}
 	
 	/**
-	 * Subclass should override this to support storing automatically.
-	 * This will be called before object release. Try to call this manually if possible. 
+	 * Subclass should override this to support storing immediately.
+	 * This will not be called before object release. Try to call this manually. 
 	 * After the function have called, no other functions should be called. 
 	 * If subclass doesn't support writing, this function should leave empty instead of 
 	 * throwing an exception.

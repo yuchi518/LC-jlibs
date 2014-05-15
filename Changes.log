@@ -1,3 +1,9 @@
+2014/5/15
+	1. Improve, fix DynamicByteBuffer memory release algorithm, try to do MORE.
+
+2014/5/14
+	1. Change some RocksDB setting.
+
 ~2014/5/13
 	1. Update InputStreamByteBuffer hasRemaining function.
 	2. Add SizeAware, SizeAwareIterative, IterableChain.

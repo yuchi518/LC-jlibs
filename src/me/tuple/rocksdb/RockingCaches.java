@@ -30,8 +30,8 @@ public class RockingCaches {
 			_options = new Options();
 			_options.setCreateIfMissing(true);
 			_options.setMaxOpenFiles(-1);
-			_options.setAllowMmapReads(true);
-			_options.setAllowMmapWrites(true);
+			_options.setAllowMmapReads(false);		// use true for SSD, else false
+			_options.setAllowMmapWrites(false);		// use true for SSD, else false
 			_options.setMaxWriteBufferNumber(3);
 		} else {
 			_options = options;
