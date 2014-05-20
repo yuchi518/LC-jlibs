@@ -138,7 +138,7 @@ public class DynamicByteBuffer {
 	 * After calling, no other operation should be called.
 	 * If you have no idea when to call, DON'T CALL.
 	 */
-	protected void releaseForReuse() {
+	public void releaseForReuse() {
 		flushAllForWrite();
 		releaseBytes(_data);
 		_data = null;

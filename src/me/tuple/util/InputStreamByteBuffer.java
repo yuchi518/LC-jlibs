@@ -130,6 +130,14 @@ public class InputStreamByteBuffer extends DynamicByteBuffer {
 	@Override
 	protected void checkFullDataAlgorithmSupport() {throw new UnsupportedOperationException();}
 	
+	
+	/**
+	 * Call this to close internal stream, don't do anything anymore.
+	 * @throws IOException
+	 */
+	public void close() throws IOException {
+		inputStream.close();
+	}
 }
 
 

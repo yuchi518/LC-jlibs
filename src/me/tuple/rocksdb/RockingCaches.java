@@ -11,6 +11,11 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
+/**
+ * Thread safe.
+ * @author YuChi
+ *
+ */
 public class RockingCaches {
 
 	protected static Logger log = Logger.getLogger(RockingCaches.class.getName());
@@ -19,10 +24,10 @@ public class RockingCaches {
 	protected final Map<String, RocksDB> _rDBs;
 	protected final Options _options;
 	
-	protected RockingCaches(File folder) {
+	public RockingCaches(File folder) {
 		this(folder, null);
 	}
-	protected RockingCaches(File folder, Options options) {
+	public RockingCaches(File folder, Options options) {
 		_folder = folder;
 		_folder.mkdirs();
 		_rDBs = new HashMap<String, RocksDB>();
@@ -32,37 +37,71 @@ public class RockingCaches {
 			_options.setMaxOpenFiles(-1);
 			_options.setAllowMmapReads(false);		// use true for SSD, else false
 			_options.setAllowMmapWrites(false);		// use true for SSD, else false
-			_options.setMaxWriteBufferNumber(3);
+			_options.setMaxWriteBufferNumber(4);
 		} else {
 			_options = options;
 		}
 	}
 	
-	protected RocksDB db(String name) {
+	public RocksDB db(String name) {
 		RocksDB rDB = _rDBs.get(name);
 		if (rDB!=null) return rDB;
 		
-		File folder = new File(_folder, name);
-		folder.mkdirs();
-		
-		try {
-			rDB = RocksDB.open(_options, _folder.getAbsolutePath());
-		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't create", e);
-			throw new RuntimeException(e);
+		synchronized(_rDBs) {
+			// try again
+			rDB = _rDBs.get(name);
+			if (rDB!=null) return rDB;
+			
+			File folder = new File(_folder, name);
+			folder.mkdirs();
+			
+			try {
+				rDB = RocksDB.open(_options, folder.getAbsolutePath());
+			} catch (RocksDBException e) {
+				log.log(Level.WARNING, "RocksDB can't create", e);
+				throw new RuntimeException(e);
+			}
+			
+			_rDBs.put(name, rDB);
+			
+			return rDB;
 		}
-		
-		_rDBs.put(name, rDB);
-		
-		return rDB;
+	}
+	
+	public RockingCache cache(String name) {
+		return new RockingCache(db(name));
+	}
+	
+	public <T extends RockingCache> T cache(String name, Class<T> cla) {
+		try {
+			return cla.getConstructor(RocksDB.class).newInstance(db(name));
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			log.log(Level.WARNING, "Unsupported class", e);
+		}
+		return null;
 	}
 	
 	/**
-	 * User ro.getClass().getName() as cache folder name.
+	 * Return a RockingSetCache cache, make sure the DB is this type.
+	 * @param name
+	 * @return A RockingSetCache cache.
+	 */
+	public RockingSetCache setCache(String name) {
+		return new RockingSetCache(db(name));
+	}
+	
+	public RockingPropertiesCache propertiesCache(String name) {
+		return new RockingPropertiesCache(db(name));
+	}
+	
+	/**
+	 * Use 'ro.getClass().getPackage().getName() + "." + ro.getClass().getName()' as cache folder name.
 	 * @param ro
 	 */
 	public void put(RockingObject ro) {
-		put(ro.getClass().getName(), ro.keyBytes(), ro.valueBytes());
+		put(ro.getClass().getPackage().getName() + "." + ro.getClass().getName(), ro.keyBytes(), ro.valueBytes());
 	}
 	
 	/**
@@ -113,13 +152,20 @@ public class RockingCaches {
 			throw new RuntimeException(e);
 		}
 	}
-
-	@Override
-	protected void finalize() {
+	
+	/**
+	 * Call this before application termination.
+	 */
+	public void dispose() {
 		for (RocksDB rDB: _rDBs.values()) {
 			rDB.close();
 		}
 		_rDBs.clear();
+	}
+
+	@Override
+	protected void finalize() {
+		dispose();
 	}
 
 }

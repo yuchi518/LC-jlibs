@@ -2,7 +2,10 @@ package me.tuple.rocksdb;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,7 +15,7 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
-public abstract class RockingCache {
+public class RockingCache {
 
 	protected static Logger log = Logger.getLogger(RockingCache.class.getName());
 
@@ -32,7 +35,7 @@ public abstract class RockingCache {
 			options.setMaxOpenFiles(-1);
 			options.setAllowMmapReads(false);		// use true for SSD, else false
 			options.setAllowMmapWrites(false);		// use true for SSD, else false
-			options.setMaxWriteBufferNumber(3);
+			options.setMaxWriteBufferNumber(4);
 		}
 		
 		try {
@@ -43,8 +46,29 @@ public abstract class RockingCache {
 		}
 	}
 	
+	protected RockingCache(RocksDB rDB) {
+		_folder = null;
+		_rDB = rDB;
+	}
+	
 	public void put(RockingObject ro) {
 		put(ro.keyBytes(), ro.valueBytes());
+	}
+	
+	/**
+	 * If use one of putAsync(...) functions, you should not
+	 * change to use put(...) functions. If you want to use
+	 * put(...) functions, use it after calling waitAsync().
+	 * @param ro
+	 */
+	public void putAsync(RockingObject ro) {
+		AsyncRO aro = new AsyncRO(ro);
+		this.putAsync(aro);
+	}
+	
+	public void putAsync(Collection<? extends RockingObject> ros) {
+		AsyncROs aros = new AsyncROs(ros);
+		this.putAsync(aros);
 	}
 	
 	public void put(byte key[], byte value[]) {
@@ -54,6 +78,11 @@ public abstract class RockingCache {
 			log.log(Level.WARNING, "RocksDB can't put", e);
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public void putAsync(byte key[], byte value[]) {
+		AsyncKbVb akv = new AsyncKbVb(key, value);
+		this.putAsync(akv);
 	}
 	
 	public byte[] get(byte key[]) {
@@ -97,6 +126,105 @@ public abstract class RockingCache {
 	@Override
 	protected void finalize() {
 		_rDB.close();
+	}
+	
+	/**
+	 * Wait for all async data write to database completed.
+	 */
+	public void waitAsync() {
+		synchronized(this) {
+			if (asyncT!=null) {
+				try {
+					this.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	
+	protected void putAsync(Async a) {
+		synchronized(this) {
+			if (asyncT==null) {
+				asyncT = a;
+				asyncList = new ArrayList<Async>();
+				new Thread(asyncT).start();
+			} else {
+				asyncList.add(a);
+			}
+		}
+	}
+	
+	
+	private Async asyncT = null;
+	private List<Async> asyncList = null;
+	protected abstract class Async implements Runnable {
+
+		@Override
+		public void run() {
+			Async T = this;
+			
+			while(true) {
+				T.process();
+				
+				synchronized(RockingCache.this) {
+					if (asyncList.size()==0) {
+						asyncT = null;
+						asyncList = null;
+						RockingCache.this.notifyAll();
+						return;
+					} else {
+						T = asyncList.remove(0);
+					}
+				}
+				
+			}
+		}
+		
+		abstract protected void process();
+	}
+	
+	protected class AsyncRO extends Async {
+		
+		final RockingObject ro;
+		AsyncRO(RockingObject ro) {
+			this.ro = ro;
+		}
+
+		@Override
+		protected void process() {
+			RockingCache.this.put(ro);
+		}
+		
+	}
+	
+	protected class AsyncROs extends Async {
+		final Collection<? extends RockingObject> ros;
+		AsyncROs(Collection<? extends RockingObject> ros) {
+			this.ros = ros;
+		}
+		@Override
+		protected void process() {
+			for (RockingObject ro: ros) {
+				RockingCache.this.put(ro);
+			}
+		}
+	}
+	
+	protected class AsyncKbVb extends Async {
+		final byte key[];
+		final byte value[];
+		AsyncKbVb(byte key[], byte value[]) {
+			this.key = key;
+			this.value = value;
+		}
+
+		@Override
+		protected void process() {
+			RockingCache.this.put(key, value);
+		}
+		
 	}
 
 }
