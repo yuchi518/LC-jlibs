@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.tuple.util.ExecutorServices;
 import me.tuple.util.MemoryPrinter;
 
 import org.rocksdb.Options;
@@ -122,10 +124,15 @@ public class RockingCache {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public void dispose() {
+		// dispose rDB if and only if it was created by self.
+		if (_folder!=null) _rDB.dispose();
+	}
 
 	@Override
 	protected void finalize() {
-		_rDB.close();
+		dispose();
 	}
 	
 	/**
@@ -133,7 +140,7 @@ public class RockingCache {
 	 */
 	public void waitAsync() {
 		synchronized(this) {
-			if (asyncT!=null) {
+			while (asyncT!=null) {
 				try {
 					this.wait();
 				} catch (InterruptedException e) {
@@ -147,9 +154,9 @@ public class RockingCache {
 	protected void putAsync(Async a) {
 		synchronized(this) {
 			if (asyncT==null) {
-				asyncT = a;
 				asyncList = new ArrayList<Async>();
-				new Thread(asyncT).start();
+				asyncT = ExecutorServices.es(ExecutorServices.DB_NAME).submit(a);
+				//new Thread(asyncT).start();
 			} else {
 				asyncList.add(a);
 			}
@@ -157,7 +164,8 @@ public class RockingCache {
 	}
 	
 	
-	private Async asyncT = null;
+	//private Async asyncT = null;
+	private Future<?> asyncT = null;
 	private List<Async> asyncList = null;
 	protected abstract class Async implements Runnable {
 
