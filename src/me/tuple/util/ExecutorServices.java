@@ -5,6 +5,7 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,13 +24,13 @@ public class ExecutorServices {
 	
 	static {
 		_ESs = new HashMap<String, ExecutorService>();
-		log.log(Level.SEVERE, "What!!{0}", new Object[]{_ESs});
+		//log.log(Level.SEVERE, "What!!{0}", new Object[]{_ESs});
 	}
 	
 	synchronized public static ExecutorService initES(String name, int numberOfThreads) {
 		ExecutorService es = Executors.newFixedThreadPool(numberOfThreads);
 		_ESs.put(name, es);
-		log.log(Level.INFO, "ExecutorService({0}) created with {1} threads.{2}", new Object[]{name, numberOfThreads, _ESs});
+		log.log(Level.INFO, "ExecutorService({0}) created with {1} threads.", new Object[]{name, numberOfThreads});
 		return es;
 	}
 	
@@ -69,6 +70,18 @@ public class ExecutorServices {
 	public static void shutdownNow() {
 		for (ExecutorService es: _ESs.values()) {
 			es.shutdownNow();
+		}
+	}
+	
+	public static void await() {
+		for (ExecutorService es: _ESs.values()) {
+			try {
+				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
+					log.log(Level.INFO, "Await..");
+				}
+			} catch (InterruptedException e) {
+				log.log(Level.WARNING, "Await interrupt", e);
+			}
 		}
 	}
 }

@@ -18,8 +18,8 @@ public class RockingSetCache extends RockingCache {
 		super(folder, options);
 	}
 	
-	protected RockingSetCache(RocksDB rDB) {
-		super(rDB);
+	protected RockingSetCache(RocksDB rDB, String name) {
+		super(rDB, name);
 	}
 	
 	public void set(long key) {

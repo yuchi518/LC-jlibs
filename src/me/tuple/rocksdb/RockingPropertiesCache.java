@@ -17,8 +17,8 @@ public class RockingPropertiesCache extends RockingCache {
 		super(folder, options);
 	}
 
-	protected RockingPropertiesCache(RocksDB rDB) {
-		super(rDB);
+	protected RockingPropertiesCache(RocksDB rDB, String name) {
+		super(rDB, name);
 	}
 	
 	public boolean contains(byte key[]) {

@@ -69,7 +69,7 @@ public class RockingCaches {
 	}
 	
 	public RockingCache cache(String name) {
-		return new RockingCache(db(name));
+		return new RockingCache(db(name), name);
 	}
 	
 	public <T extends RockingCache> T cache(String name, Class<T> cla) {
@@ -89,11 +89,11 @@ public class RockingCaches {
 	 * @return A RockingSetCache cache.
 	 */
 	public RockingSetCache setCache(String name) {
-		return new RockingSetCache(db(name));
+		return new RockingSetCache(db(name), name);
 	}
 	
 	public RockingPropertiesCache propertiesCache(String name) {
-		return new RockingPropertiesCache(db(name));
+		return new RockingPropertiesCache(db(name), name);
 	}
 	
 	/**

@@ -10,8 +10,10 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.tuple.util.DynamicByteBuffer;
 import me.tuple.util.ExecutorServices;
 import me.tuple.util.MemoryPrinter;
+import me.tuple.util.Percentage;
 
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
@@ -23,6 +25,7 @@ public class RockingCache {
 
 	protected final File _folder;
 	protected final RocksDB _rDB;
+	public final String name;		// for debug
 
 	protected RockingCache(File folder) {
 		this(folder, null);
@@ -46,11 +49,14 @@ public class RockingCache {
 			log.log(Level.WARNING, "RocksDB can't create", e);
 			throw new RuntimeException(e);
 		}
+		
+		name = _folder.getName();
 	}
 	
-	protected RockingCache(RocksDB rDB) {
+	protected RockingCache(RocksDB rDB, String name) {
 		_folder = null;
 		_rDB = rDB;
+		this.name = name;
 	}
 	
 	public void put(RockingObject ro) {
@@ -112,6 +118,13 @@ public class RockingCache {
 		}
 	}
 	
+	public <T extends RockingObject> T get(long longId, Class<T> cla) {
+		DynamicByteBuffer buff = new DynamicByteBuffer(8);
+		buff.putVarLong(longId);
+		byte kb[] = buff.toBytesBeforeCurrentPosition();
+		buff.releaseForReuse();
+		return get(kb, cla);
+	}
 	
 	public <T extends RockingObject> T get(byte key[], Class<T> cla) {
 		try {
@@ -150,61 +163,83 @@ public class RockingCache {
 		}
 	}
 	
-	
 	protected void putAsync(Async a) {
 		synchronized(this) {
 			if (asyncT==null) {
+				asyncPercentage = new Percentage(a.size(),0);
 				asyncList = new ArrayList<Async>();
-				asyncT = ExecutorServices.es(ExecutorServices.DB_NAME).submit(a);
+				asyncT = a;
+				ExecutorServices.es(ExecutorServices.DB_NAME).execute(a);
 				//new Thread(asyncT).start();
 			} else {
+				asyncPercentage.addTotal(a.size());
 				asyncList.add(a);
 			}
 		}
 	}
 	
+	public long uncompletedAsyncData() {
+		synchronized(this) {
+			return (long)asyncPercentage.gap();
+		}
+	}
 	
 	//private Async asyncT = null;
-	private Future<?> asyncT = null;
+	private Async asyncT = null;
 	private List<Async> asyncList = null;
+	private Percentage asyncPercentage = null;
 	protected abstract class Async implements Runnable {
-
+		
 		@Override
 		public void run() {
 			Async T = this;
 			
 			while(true) {
+				int size = T.size();
 				T.process();
+				String perText;
 				
 				synchronized(RockingCache.this) {
+					asyncPercentage.addValue(size);
+					perText = asyncPercentage.changedString();
+					
 					if (asyncList.size()==0) {
 						asyncT = null;
 						asyncList = null;
 						RockingCache.this.notifyAll();
-						return;
-					} else {
-						T = asyncList.remove(0);
+						break;
 					}
+					
+					//percentage = asyncList.size();
+					T = asyncList.remove(0);
+				}
+				
+				if (perText!=null) {
+					log.log(Level.INFO, "rDB({0}) saving {1}", new Object[]{name, perText});
 				}
 				
 			}
+			
+			log.log(Level.INFO, "rDB({0}) saved 100%", new Object[]{name});
 		}
 		
 		abstract protected void process();
+		abstract protected int size();
 	}
 	
 	protected class AsyncRO extends Async {
-		
 		final RockingObject ro;
 		AsyncRO(RockingObject ro) {
 			this.ro = ro;
 		}
-
 		@Override
 		protected void process() {
 			RockingCache.this.put(ro);
 		}
-		
+		@Override
+		protected int size() {
+			return 1;
+		}
 	}
 	
 	protected class AsyncROs extends Async {
@@ -218,6 +253,10 @@ public class RockingCache {
 				RockingCache.this.put(ro);
 			}
 		}
+		@Override
+		protected int size() {
+			return ros.size();
+		}
 	}
 	
 	protected class AsyncKbVb extends Async {
@@ -227,12 +266,14 @@ public class RockingCache {
 			this.key = key;
 			this.value = value;
 		}
-
 		@Override
 		protected void process() {
 			RockingCache.this.put(key, value);
 		}
-		
+		@Override
+		protected int size() {
+			return 1;
+		}
 	}
 
 }
