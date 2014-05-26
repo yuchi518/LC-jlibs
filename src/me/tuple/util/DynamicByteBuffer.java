@@ -1058,6 +1058,17 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
+	public DynamicByteBuffer putBytes(byte bytes[], int offset, int len) {
+		if (bytes==null) return this;
+		
+		prepareForWrite(len);
+		
+		System.arraycopy(bytes, offset, _data, _position, len);
+		_position += len;
+		
+		return this;
+	}
+	
 	public DynamicByteBuffer putBytesWithOneByteLength(byte bytes[]) {
 		int l = bytes==null?0:bytes.length;
 		
@@ -1145,7 +1156,9 @@ public class DynamicByteBuffer {
 		out.write(_data, _mark, _position-_mark);
 	}
 	
-	
+	public void writeBytesBeforeCurrentPositionTo(DynamicByteBuffer buff) {
+		buff.putBytes(_data, _mark, _position);
+	}
 	
 	/// ================= Variable, Non-fixed length variable =====================
 	

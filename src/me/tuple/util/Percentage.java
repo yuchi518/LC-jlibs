@@ -28,6 +28,24 @@ public class Percentage {
 	 *  degree should be between -1 to 5. (dd0.0 ~ ddd.ddddd)
 	 */
 	public Percentage(double total, int degree) {
+		reset(total, degree);
+	}
+	
+	public Percentage reset(int degree) {
+		return reset(0, degree);
+	}
+	
+	public Percentage reset(double total) {
+		return reset(total, 1);
+	}
+	
+	/**
+	 * Reset to reuse.
+	 * @param total
+	 * @param degree
+	 * @return
+	 */
+	public Percentage reset(double total, int degree) {
 		this.total = total;
 		this.value = 0;
 		this.percentage = 0;
@@ -35,8 +53,8 @@ public class Percentage {
 		this.degree = Math.pow(10, degree);
 		this.amplify = 100 * this.degree;
 		this.format = degree<=0?"%3.0f%%":("%3."+degree+"f%%");
+		return this;
 	}
-	
 	
 	public void setTotal(double total) {
 		this.total = total;
@@ -95,8 +113,26 @@ public class Percentage {
 		return this.total;
 	}
 	
+	/**
+	 * Increase total by 1.
+	 * @return
+	 */
+	public double incTotal() {
+		this.setTotal(this.total+1);
+		return this.total;
+	}
+	
 	public double addValue(double value) {
 		this.setValue(this.value+value);
+		return this.value;
+	}
+	
+	/**
+	 * Increase value by 1.
+	 * @return
+	 */
+	public double incValue() {
+		this.setValue(this.value+1);
 		return this.value;
 	}
 	

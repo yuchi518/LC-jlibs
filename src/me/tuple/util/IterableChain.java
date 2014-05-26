@@ -27,6 +27,17 @@ public class IterableChain<T> implements SizeAwareIterative<T> {
 		}
 		return this;
 	}
+	
+	public IterableChain<T> chainAll(Iterable<SizeAwareIterative<T>> iteratives) {
+		for (SizeAwareIterative<T> iterative: iteratives) {
+			if (iterative.size()!=0) {
+				if (chain==null) chain = new ArrayList<>();
+				size += iterative.size();
+				chain.add(iterative);
+			}
+		}
+		return this;
+	}
 
 	@Override
 	public Iterator<T> iterator() {
