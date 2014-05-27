@@ -1,3 +1,7 @@
+2014/5/27
+	1. Include RoaringBitmap lib. (Not use yet)
+	2. Support RocksDB iterator. (Iterate all database)
+
 2014/5/26
 	1. Improve Percentage, IterableChain, DynamicByteBuffer. 
 

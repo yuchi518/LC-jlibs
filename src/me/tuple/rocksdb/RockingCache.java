@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -102,22 +103,6 @@ public class RockingCache {
 		}
 	}
 	
-	public boolean checkVersion(byte hashCode[]) {
-		byte hashKey[] = "_._version_hash_code_._".getBytes();
-		byte value[] = get(hashKey);
-		
-		
-		if (value==null) {
-			put(hashKey, hashCode);
-			return true;
-		} else {
-			MemoryPrinter.printMemory(log, Level.INFO, this+" hash in db:", value, 0, value.length, 0);
-			MemoryPrinter.printMemory(log, Level.INFO, this+" hash for check:", hashCode, 0, hashCode.length, 0);
-			
-			return Arrays.equals(hashCode, value);
-		}
-	}
-	
 	public <T extends RockingObject> T get(long longId, Class<T> cla) {
 		DynamicByteBuffer buff = new DynamicByteBuffer(8);
 		buff.putVarLong(longId);
@@ -135,6 +120,62 @@ public class RockingCache {
 				| NoSuchMethodException | SecurityException e) {
 			log.log(Level.WARNING, "RocksDB can't load data", e);
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla) {
+		final org.rocksdb.Iterator roIter = _rDB.newIterator();
+		
+		roIter.seekToFirst();
+		
+		return new Iterator<T>() {
+
+			@Override
+			public boolean hasNext() {
+				return roIter.isValid();
+			}
+
+			@Override
+			public T next() {
+				byte ks[] = roIter.key();
+				byte vs[] = roIter.value();
+				T t;
+				try {
+					t = cla.getConstructor(byte[].class, byte[].class).newInstance(ks, vs);
+				} catch (InstantiationException | IllegalAccessException
+						| IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					log.log(Level.WARNING, "RocksDB can't load data", e);
+					throw new RuntimeException(e);
+				}
+				
+				roIter.next();
+				
+				return t;
+			}
+
+			@Override
+			public void remove() {
+				throw new java.lang.UnsupportedOperationException("Not support");
+			}
+			
+		};
+	}
+	
+	
+	public boolean checkVersion(byte hashCode[]) {
+		byte hashKey[] = "_._version_hash_code_._".getBytes();
+		byte value[] = get(hashKey);
+		
+		
+		if (value==null) {
+			put(hashKey, hashCode);
+			return true;
+		} else {
+			MemoryPrinter.printMemory(log, Level.INFO, this+" hash in db:", value, 0, value.length, 0);
+			MemoryPrinter.printMemory(log, Level.INFO, this+" hash for check:", hashCode, 0, hashCode.length, 0);
+			
+			return Arrays.equals(hashCode, value);
 		}
 	}
 	
