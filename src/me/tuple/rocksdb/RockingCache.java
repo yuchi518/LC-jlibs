@@ -103,6 +103,14 @@ public class RockingCache {
 		}
 	}
 	
+	public byte[] get(long longId) {
+		DynamicByteBuffer buff = new DynamicByteBuffer(8);
+		buff.putVarLong(longId);
+		byte kb[] = buff.toBytesBeforeCurrentPosition();
+		buff.releaseForReuse();
+		return get(kb);
+	}
+	
 	public <T extends RockingObject> T get(long longId, Class<T> cla) {
 		DynamicByteBuffer buff = new DynamicByteBuffer(8);
 		buff.putVarLong(longId);
@@ -235,33 +243,44 @@ public class RockingCache {
 		public void run() {
 			Async T = this;
 			
-			while(true) {
-				int size = T.size();
-				T.process();
-				String perText;
-				
-				synchronized(RockingCache.this) {
-					asyncPercentage.addValue(size);
-					perText = asyncPercentage.changedString();
+			try {
+				while(true) {
+					int size = T.size();
+					T.process();
+					String perText;
 					
+					synchronized(RockingCache.this) {
+						asyncPercentage.addValue(size);
+						perText = asyncPercentage.changedString();
+						
+						if (asyncList.size()==0) {
+							break;
+						}
+						
+						//percentage = asyncList.size();
+						T = asyncList.remove(0);
+					}
+					
+					if (perText!=null) {
+						log.log(Level.INFO, "rDB({0}) saving {1}", new Object[]{name, perText});
+					}
+					
+				}
+			} catch(Exception e) {
+				log.log(Level.WARNING, "rDB exception", e);
+			} finally {
+				synchronized(RockingCache.this) {
 					if (asyncList.size()==0) {
 						asyncT = null;
 						asyncList = null;
 						RockingCache.this.notifyAll();
-						break;
+						log.log(Level.INFO, "rDB({0}) saved 100%", new Object[]{name});
+					} else {
+						asyncT = asyncList.get(0);
+						ExecutorServices.es(ExecutorServices.DB_NAME).execute(asyncT);
 					}
-					
-					//percentage = asyncList.size();
-					T = asyncList.remove(0);
 				}
-				
-				if (perText!=null) {
-					log.log(Level.INFO, "rDB({0}) saving {1}", new Object[]{name, perText});
-				}
-				
 			}
-			
-			log.log(Level.INFO, "rDB({0}) saved 100%", new Object[]{name});
 		}
 		
 		abstract protected void process();
