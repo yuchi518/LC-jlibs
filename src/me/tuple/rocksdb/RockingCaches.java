@@ -32,18 +32,26 @@ public class RockingCaches {
 		_folder.mkdirs();
 		_rDBs = new HashMap<String, RocksDB>();
 		if (options==null) {
-			_options = new Options();
-			_options.setCreateIfMissing(true);
-			_options.setMaxOpenFiles(-1);
-			_options.setAllowMmapReads(false);		// use true for SSD, else false
-			_options.setAllowMmapWrites(false);		// use true for SSD, else false
-			_options.setMaxWriteBufferNumber(4);
+			_options = new Options()
+			.setCreateIfMissing(true)
+			.setMaxOpenFiles(-1)
+			.setAllowMmapReads(false)		// use true for SSD, else false
+			.setAllowMmapWrites(false)		// use true for SSD, else false
+			.setMaxWriteBufferNumber(4)
+			.setTargetFileSizeBase(1024*1024*2)
+			.setTargetFileSizeMultiplier(2)
+			.setMaxBytesForLevelBase(1024*1024*10)
+			.setMaxBytesForLevelMultiplier(10)
+			.setLevelZeroFileNumCompactionTrigger(2);
 		} else {
 			_options = options;
 		}
 	}
 	
 	public RocksDB db(String name) {
+		return db(name, null);
+	}
+	public RocksDB db(String name, Options options) {
 		RocksDB rDB = _rDBs.get(name);
 		if (rDB!=null) return rDB;
 		
@@ -56,7 +64,7 @@ public class RockingCaches {
 			folder.mkdirs();
 			
 			try {
-				rDB = RocksDB.open(_options, folder.getAbsolutePath());
+				rDB = RocksDB.open(options==null?_options:options, folder.getAbsolutePath());
 			} catch (RocksDBException e) {
 				log.log(Level.WARNING, "RocksDB can't create", e);
 				throw new RuntimeException(e);

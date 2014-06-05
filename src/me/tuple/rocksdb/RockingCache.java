@@ -36,12 +36,17 @@ public class RockingCache {
 		_folder.mkdirs();
 		
 		if (options==null) {
-			options = new Options();
-			options.setCreateIfMissing(true);
-			options.setMaxOpenFiles(-1);
-			options.setAllowMmapReads(false);		// use true for SSD, else false
-			options.setAllowMmapWrites(false);		// use true for SSD, else false
-			options.setMaxWriteBufferNumber(4);
+			options = new Options()
+			.setCreateIfMissing(true)
+			.setMaxOpenFiles(-1)
+			.setAllowMmapReads(false)		// use true for SSD, else false
+			.setAllowMmapWrites(false)		// use true for SSD, else false
+			.setMaxWriteBufferNumber(4)
+			.setTargetFileSizeBase(1024*1024*2)
+			.setTargetFileSizeMultiplier(2)
+			.setMaxBytesForLevelBase(1024*1024*10)
+			.setMaxBytesForLevelMultiplier(10)
+			.setLevelZeroFileNumCompactionTrigger(2);
 		}
 		
 		try {
