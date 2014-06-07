@@ -68,7 +68,7 @@ public class OutputStreamByteBuffer extends DynamicByteBuffer {
 	@Override
 	public void flushAllForWrite() {
 		try {
-			outputStream.write(_data, 0, _position);
+			if (_position>0) outputStream.write(_data, 0, _position);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
