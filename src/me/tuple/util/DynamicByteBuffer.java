@@ -22,6 +22,8 @@ import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 public class DynamicByteBuffer {
 	static Logger log  = Logger.getLogger(DynamicByteBuffer.class.getName());
 	
@@ -1273,6 +1275,36 @@ public class DynamicByteBuffer {
 		} else {
 			return getLong()+0x0102040810204080L;
 		}
+	}
+	
+	public byte[] getVarLongBytes() {
+		byte b = peek();
+		byte bs[];
+		int len;
+		if ((b&0x80)==0) {
+			len = 1;
+		} else if ((b&0x40)==0) {
+			len = 2;
+		} else if ((b&0x20)==0) {
+			len = 3;
+		} else if ((b&0x10)==0) {
+			len = 4;
+		} else if ((b&0x08)==0) {
+			len = 5;
+		} else if ((b&0x04)==0) {
+			len = 6;
+		} else if ((b&0x02)==0) {
+			len = 7;
+		} else if ((b&0x01)==0) {
+			len = 8;
+		} else {
+			len = 9;
+		}
+		prepareForRead(len);
+		bs = new byte[len];
+		System.arraycopy(_data, _position, bs, 0, len);
+		_position+=len;
+		return bs;
 	}
 	
 	public DynamicByteBuffer putSignedVarLong(long value) {
