@@ -22,7 +22,7 @@ import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class DynamicByteBuffer {
 	static Logger log  = Logger.getLogger(DynamicByteBuffer.class.getName());
@@ -1318,8 +1318,12 @@ public class DynamicByteBuffer {
 	}
 	
 	public DynamicByteBuffer putVarLengthData(byte data[]) {
-		putVarLong(data.length);
-		putLastBytes(data);
+		if (data==null) {
+			putVarLong(0);
+		} else {
+			putVarLong(data.length);
+			putLastBytes(data);
+		}
 		return this;
 	}
 	
@@ -1343,7 +1347,13 @@ public class DynamicByteBuffer {
 	}
 	
 	public DynamicByteBuffer putVarLengthString(String s) {
+		if (s==null) {
+			putVarLong(0);
+			return this;
+		}
+		
 		byte data[];
+		
 		try {
 			data = s.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
