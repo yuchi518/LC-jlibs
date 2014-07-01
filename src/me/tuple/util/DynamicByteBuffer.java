@@ -530,6 +530,22 @@ public class DynamicByteBuffer {
 		return i;
 	}
 	
+	/**
+	 * Get little endian integer
+	 * @return
+	 */
+	public int getLEInt() {
+		prepareForRead(4);
+		
+		int i;
+		i = ((_data[_position++]&0x00ff) << 0);
+		i |= ((_data[_position++]&0x00ff) << 8);
+		i |= ((_data[_position++]&0x00ff) << 16);
+		i |= ((_data[_position++]&0x00ff) << 24);
+		
+		return i;
+	}
+	
 	public int get3bytesInt() {
 		prepareForRead(3);
 		
@@ -550,6 +566,15 @@ public class DynamicByteBuffer {
 				((_data[_position+3]&0x00ff) << 0));
 	}
 	
+	public int peekLEInt() {
+		prepareForRead(4);
+		
+		return (((_data[_position]&0x00ff) << 0) |
+				((_data[_position+1]&0x00ff) << 8) |
+				((_data[_position+2]&0x00ff) << 16) |
+				((_data[_position+3]&0x00ff) << 24));
+	}
+	
 	public int peek3bytesInt() {
 		prepareForRead(3);
 		
@@ -567,6 +592,15 @@ public class DynamicByteBuffer {
 				((_data[index+3]&0x00ff) << 0));
 	}
 
+	public int getLEInt(int index) {
+		prepareForRead(index,4);
+		
+		return (((_data[index]&0x00ff) << 0) |
+				((_data[index+1]&0x00ff) << 8) |
+				((_data[index+2]&0x00ff) << 16) |
+				((_data[index+3]&0x00ff) << 24));
+	}
+	
 	public int get3bytesInt(int index) {
 		prepareForRead(index,3);
 		
@@ -632,6 +666,22 @@ public class DynamicByteBuffer {
 		
 		return l;
 	}
+	
+	public long getLELong() {
+		prepareForRead(8);
+		
+		long l;
+		l = (((long)_data[_position++]&0x00ff) << 0);
+		l |= (((long)_data[_position++]&0x00ff) << 8);
+		l |= (((long)_data[_position++]&0x00ff) << 16);
+		l |= (((long)_data[_position++]&0x00ff) << 24);
+		l |= (((long)_data[_position++]&0x00ff) << 32);
+		l |= (((long)_data[_position++]&0x00ff) << 40);
+		l |= (((long)_data[_position++]&0x00ff) << 48);
+		l |= (((long)_data[_position++]&0x00ff) << 56);
+		
+		return l;
+	}
 
 	public long peekLong() {
 		prepareForRead(8);
@@ -646,6 +696,18 @@ public class DynamicByteBuffer {
 				(((long)_data[_position+7]&0x00ff) << 0));
 	}
 
+	public long peekLELong() {
+		prepareForRead(8);
+		
+		return ((((long)_data[_position]&0x00ff) << 0) |
+				(((long)_data[_position+1]&0x00ff) << 8) |
+				(((long)_data[_position+2]&0x00ff) << 16) |
+				(((long)_data[_position+3]&0x00ff) << 24) |
+				(((long)_data[_position+4]&0x00ff) << 32) |
+				(((long)_data[_position+5]&0x00ff) << 40) |
+				(((long)_data[_position+6]&0x00ff) << 48) |
+				(((long)_data[_position+7]&0x00ff) << 56));
+	}
 	
 	public long getLong(int index) {
 		prepareForRead(index, 8);
@@ -660,6 +722,18 @@ public class DynamicByteBuffer {
 				(((long)_data[index+7]&0x00ff) << 0));
 	}
 
+	public long getLELong(int index) {
+		prepareForRead(index, 8);
+		
+		return ((((long)_data[index]&0x00ff) << 0) |
+				(((long)_data[index+1]&0x00ff) << 8) |
+				(((long)_data[index+2]&0x00ff) << 16) |
+				(((long)_data[index+3]&0x00ff) << 24) |
+				(((long)_data[index+4]&0x00ff) << 32) |
+				(((long)_data[index+5]&0x00ff) << 40) |
+				(((long)_data[index+6]&0x00ff) << 48) |
+				(((long)_data[index+7]&0x00ff) << 56));
+	}
 	
 	public short getShort() {
 		prepareForRead(2);
@@ -671,6 +745,16 @@ public class DynamicByteBuffer {
 		return s;
 	}
 	
+	public short getLEShort() {
+		prepareForRead(2);
+		
+		short s;
+		s = (short)((_data[_position++]&0x00ff) << 0);
+		s |= (short)((_data[_position++]&0x00ff) << 8);
+		
+		return s;
+	}
+	
 	public short peekShort() {
 		prepareForRead(2);
 		
@@ -678,11 +762,25 @@ public class DynamicByteBuffer {
 				((_data[_position+1]&0x00ff) << 0));
 	}
 	
+	public short peekLEShort() {
+		prepareForRead(2);
+		
+		return (short)(((_data[_position]&0x00ff) << 0) |
+				((_data[_position+1]&0x00ff) << 8));
+	}
+	
 	public short getShort(int index) {
 		prepareForRead(index,2);
 		
 		return (short)(((_data[index]&0x00ff) << 8) |
 				((_data[index+1]&0x00ff) << 0));
+	}
+	
+	public short getLEShort(int index) {
+		prepareForRead(index,2);
+		
+		return (short)(((_data[index]&0x00ff) << 0) |
+				((_data[index+1]&0x00ff) << 8));
 	}
 	
 	// get bytes
@@ -876,6 +974,17 @@ public class DynamicByteBuffer {
 		
 		return this;
 	}
+	
+	public DynamicByteBuffer putLEInt(int value) {
+		prepareForWrite(4);
+		
+		_data[_position++] = (byte)(value & 0xff);
+		_data[_position++] = (byte)((value>>8) & 0xff);
+		_data[_position++] = (byte)((value>>16) & 0xff);
+		_data[_position++] = (byte)((value>>24) & 0xff);
+		
+		return this;
+	}
 
 	public DynamicByteBuffer put3bytesInt(int value) {
 		prepareForWrite(3);
@@ -898,6 +1007,16 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
+	public DynamicByteBuffer putLEInt(int index, int value) {
+		prepareForWrite(index,4);
+		
+		_data[index++] = (byte)(value & 0xff);
+		_data[index++] = (byte)((value>>8) & 0xff);
+		_data[index++] = (byte)((value>>16) & 0xff);
+		_data[index++] = (byte)((value>>24) & 0xff);
+		
+		return this;
+	}
 	
 	public DynamicByteBuffer put3bytesInt(int index, int value) {
 		prepareForWrite(index,3);
@@ -964,7 +1083,21 @@ public class DynamicByteBuffer {
 		return this;
 	}
 
-	
+	public DynamicByteBuffer putLELong(long value) {
+		prepareForWrite(8);
+		
+		_data[_position++] = (byte)(value & 0xff);
+		_data[_position++] = (byte)((value>>8) & 0xff);
+		_data[_position++] = (byte)((value>>16) & 0xff);
+		_data[_position++] = (byte)((value>>24) & 0xff);
+		_data[_position++] = (byte)((value>>32) & 0xff);
+		_data[_position++] = (byte)((value>>40) & 0xff);
+		_data[_position++] = (byte)((value>>48) & 0xff);
+		_data[_position++] = (byte)((value>>56) & 0xff);
+		
+		return this;
+	}
+
 	public DynamicByteBuffer putLong(int index, long value) {
 		prepareForWrite(index,8);
 		
@@ -980,7 +1113,21 @@ public class DynamicByteBuffer {
 		return this;
 	}
 
-	
+	public DynamicByteBuffer putLELong(int index, long value) {
+		prepareForWrite(index,8);
+		
+		_data[index++] = (byte)(value & 0xff);
+		_data[index++] = (byte)((value>>8) & 0xff);
+		_data[index++] = (byte)((value>>16) & 0xff);
+		_data[index++] = (byte)((value>>24) & 0xff);
+		_data[index++] = (byte)((value>>32) & 0xff);
+		_data[index++] = (byte)((value>>40) & 0xff);
+		_data[index++] = (byte)((value>>48) & 0xff);
+		_data[index++] = (byte)((value>>56) & 0xff);
+		
+		return this;
+	}
+
 	public DynamicByteBuffer putShort(short value) {
 		prepareForWrite(2);
 		
@@ -990,12 +1137,29 @@ public class DynamicByteBuffer {
 		return this;
 	}
 
-	
+	public DynamicByteBuffer putLEShort(short value) {
+		prepareForWrite(2);
+		
+		_data[_position++] = (byte)(value & 0xff);
+		_data[_position++] = (byte)((value>>8) & 0xff);
+		
+		return this;
+	}
+
 	public DynamicByteBuffer putShort(int index, short value) {
 		prepareForWrite(index,2);
 		
 		_data[index] = (byte)((value>>8) & 0xff);
 		_data[index+1] = (byte)(value & 0xff);
+		
+		return this;
+	}
+	
+	public DynamicByteBuffer putLEShort(int index, short value) {
+		prepareForWrite(index,2);
+		
+		_data[index] = (byte)(value & 0xff);
+		_data[index+1] = (byte)((value>>8) & 0xff);
 		
 		return this;
 	}
@@ -1006,14 +1170,29 @@ public class DynamicByteBuffer {
 		return putLong(Double.doubleToRawLongBits(value));
 	}
 	
+	public DynamicByteBuffer putLEDouble(double value) {
+		//return putLong(Double.doubleToLongBits(value));
+		return putLELong(Double.doubleToRawLongBits(value));
+	}
+	
 	public DynamicByteBuffer putDouble(int index, double value) {
 		//return putLong(index, Double.doubleToLongBits(value));
 		return putLong(index, Double.doubleToRawLongBits(value));
 	}
 
+	public DynamicByteBuffer putLEDouble(int index, double value) {
+		//return putLong(index, Double.doubleToLongBits(value));
+		return putLELong(index, Double.doubleToRawLongBits(value));
+	}
+	
 	public DynamicByteBuffer putFloat(float value) {
 		//return putInt(Float.floatToIntBits(value));
 		return putInt(Float.floatToRawIntBits(value));
+	}
+	
+	public DynamicByteBuffer putLEFloat(float value) {
+		//return putInt(Float.floatToIntBits(value));
+		return putLEInt(Float.floatToRawIntBits(value));
 	}
 	
 	public DynamicByteBuffer putFloat(int index, float value) {
@@ -1021,28 +1200,57 @@ public class DynamicByteBuffer {
 		return putInt(index, Float.floatToRawIntBits(value));
 	}
 	
+	public DynamicByteBuffer putLEFloat(int index, float value) {
+		//return putInt(index, Float.floatToIntBits(value));
+		return putLEInt(index, Float.floatToRawIntBits(value));
+	}
+	
 	public double getDouble() {
 		return Double.longBitsToDouble(getLong());
+	}
+	
+	public double getLEDouble() {
+		return Double.longBitsToDouble(getLELong());
 	}
 	
 	public double peekDouble() {
 		return Double.longBitsToDouble(peekLong());
 	}
 	
+	public double peekLEDouble() {
+		return Double.longBitsToDouble(peekLELong());
+	}
+	
 	public double getDouble(int index) {
 		return Double.longBitsToDouble(getLong(index));
+	}
+	
+	public double getLEDouble(int index) {
+		return Double.longBitsToDouble(getLELong(index));
 	}
 
 	public float getFloat() {
 		return Float.intBitsToFloat(getInt());
 	}
 	
+	public float getLEFloat() {
+		return Float.intBitsToFloat(getLEInt());
+	}
+	
 	public float peekFloat() {
 		return Float.intBitsToFloat(peekInt());
 	}
 	
+	public float peekLEFloat() {
+		return Float.intBitsToFloat(peekLEInt());
+	}
+	
 	public float getFloat(int index) {
 		return Float.intBitsToFloat(getInt(index));
+	}
+	
+	public float getLEFloat(int index) {
+		return Float.intBitsToFloat(getLEInt(index));
 	}
 
 	///
