@@ -137,7 +137,7 @@ public class RockingCache {
 	}
 	
 	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla) {
-		final org.rocksdb.Iterator roIter = _rDB.newIterator();
+		final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
 		
 		roIter.seekToFirst();
 		
