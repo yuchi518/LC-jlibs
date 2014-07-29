@@ -30,6 +30,7 @@ public class MemoryPrinter {
 		
 		//address = (int)(Math.random()*1000);  // test different address
 		
+		if (length < 0) length = memory==null?0:(memory.length-offset);
 		
 		int mark = (address&0x0f);
 		if (mark!=0) {
@@ -53,7 +54,7 @@ public class MemoryPrinter {
 			
 			for (int j=0; j<16; j++) {
 				if (i+j>=mark && j+i<length) {
-					out.printf("%02X ", memory[i+j-mark]);
+					out.printf("%02X ", memory[i+j-mark+offset]);
 				} else {
 					out.print("   ");
 				}
@@ -67,7 +68,7 @@ public class MemoryPrinter {
 			
 			for (int j=0; j<16; j++) {
 				if (i+j>=mark && j+i<length) {
-					byte c = memory[i+j-mark];
+					byte c = memory[i+j-mark+offset];
 					out.printf("%c", (c>=32&&c<=126)?c:'.');
 				} else {
 					out.print(" ");

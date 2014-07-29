@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +24,7 @@ public class RockingCache {
 	protected static Logger log = Logger.getLogger(RockingCache.class.getName());
 
 	protected final File _folder;
-	protected final RocksDB _rDB;
+	protected RocksDB _rDB;
 	public final String name;		// for debug
 
 	protected RockingCache(File folder) {
@@ -42,11 +41,12 @@ public class RockingCache {
 			.setAllowMmapReads(false)		// use true for SSD, else false
 			.setAllowMmapWrites(false)		// use true for SSD, else false
 			.setMaxWriteBufferNumber(4)
-			.setTargetFileSizeBase(1024*1024*2)
-			.setTargetFileSizeMultiplier(2)
-			.setMaxBytesForLevelBase(1024*1024*10)
-			.setMaxBytesForLevelMultiplier(10)
-			.setLevelZeroFileNumCompactionTrigger(2);
+			.setTargetFileSizeBase(1024*1024*10)
+			//.setTargetFileSizeMultiplier(2)
+			//.setMaxBytesForLevelBase(1024*1024*10)
+			//.setMaxBytesForLevelMultiplier(10)
+			//.setLevelZeroFileNumCompactionTrigger(2)
+			;
 		}
 		
 		try {
@@ -125,13 +125,18 @@ public class RockingCache {
 	}
 	
 	public <T extends RockingObject> T get(byte key[], Class<T> cla) {
+		byte value[]=null;
 		try {
-			byte value[] = _rDB.get(key);
+			value = _rDB.get(key);
 			return value==null?null:cla.getConstructor(byte[].class, byte[].class).newInstance(key, value);
 		} catch (RocksDBException | InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
-			log.log(Level.WARNING, "RocksDB can't load data", e);
+			log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
+			
+			MemoryPrinter.printMemory(log, Level.WARNING, "key", key, 0, -1, 0);
+			MemoryPrinter.printMemory(log, Level.WARNING, "value", value, 0, -1, 0);
+			
 			throw new RuntimeException(e);
 		}
 	}
@@ -158,7 +163,11 @@ public class RockingCache {
 				} catch (InstantiationException | IllegalAccessException
 						| IllegalArgumentException | InvocationTargetException
 						| NoSuchMethodException | SecurityException e) {
-					log.log(Level.WARNING, "RocksDB can't load data", e);
+					log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
+					
+					MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
+					MemoryPrinter.printMemory(log, Level.WARNING, "value", vs, 0, -1, 0);
+					
 					throw new RuntimeException(e);
 				}
 				
@@ -194,7 +203,12 @@ public class RockingCache {
 	
 	public void dispose() {
 		// dispose rDB if and only if it was created by self.
-		if (_folder!=null) _rDB.dispose();
+		if (_folder!=null) {
+			if (_rDB!=null) {
+				_rDB.dispose();
+				_rDB = null;
+			}
+		}
 	}
 
 	@Override
