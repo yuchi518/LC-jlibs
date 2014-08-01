@@ -21,7 +21,7 @@ import org.rocksdb.util.Environment;
 public class RocksDB extends RocksObject {
   public static final int NOT_FOUND = -1;
   private static final String[] compressionLibs_ = {
-      "snappy", "zlib", "bzip2", "lz4", "lz4hc"};
+      "snappy", "z", "bzip2", "lz4", "lz4hc"};
 
   /**
    * Loads the necessary library files.
@@ -93,15 +93,21 @@ public class RocksDB extends RocksObject {
     // This allows to use the rocksjni default Options instead of
     // the c++ one.
     Options options = new Options();
-    db.open(options.nativeHandle_, options.cacheSize_, path);
-    db.transferCppRawPointersOwnershipFrom(options);
-    options.dispose();
-    return db;
+    return open(options, path);
   }
 
   /**
    * The factory constructor of RocksDB that opens a RocksDB instance given
    * the path to the database using the specified options and db path.
+   * 
+   * Options instance *should* not be disposed before all DBs using this options
+   * instance have been closed. If user doesn't call options dispose explicitly,
+   * then this options instance will be GC'd automatically.
+   * 
+   * Options instance can be re-used to open multiple DBs if DB statistics is
+   * not used. If DB statistics are required, then its recommended to open DB
+   * with new Options instance as underlying native statistics instance does not
+   * use any locks to prevent concurrent updates.
    */
   public static RocksDB open(Options options, String path)
       throws RocksDBException {
@@ -109,9 +115,15 @@ public class RocksDB extends RocksObject {
     // in RocksDB can prevent Java to GC during the life-time of
     // the currently-created RocksDB.
     RocksDB db = new RocksDB();
-    db.open(options.nativeHandle_, options.cacheSize_, path);
-    db.transferCppRawPointersOwnershipFrom(options);
+    db.open(options.nativeHandle_, options.cacheSize_,
+            options.numShardBits_, path);
+    
+    db.storeOptionsInstance(options);
     return db;
+  }
+  
+  private void storeOptionsInstance(Options options) {
+    options_ = options;
   }
 
   @Override protected void disposeInternal() {
@@ -320,20 +332,10 @@ public class RocksDB extends RocksObject {
     super();
   }
 
-  /**
-   * Transfer the ownership of all c++ raw-pointers from Options
-   * to RocksDB to ensure the life-time of those raw-pointers
-   * will be at least as long as the life-time of any RocksDB
-   * that uses these raw-pointers.
-   */
-  protected void transferCppRawPointersOwnershipFrom(Options opt) {
-    filter_ = opt.filter_;
-    opt.filter_ = null;
-  }
-
   // native methods
   protected native void open(
-      long optionsHandle, long cacheSize, String path) throws RocksDBException;
+      long optionsHandle, long cacheSize, int numShardBits,
+      String path) throws RocksDBException;
   protected native void put(
       long handle, byte[] key, int keyLen,
       byte[] value, int valueLen) throws RocksDBException;
@@ -366,5 +368,5 @@ public class RocksDB extends RocksObject {
   protected native long iterator0(long optHandle);
   private native void disposeInternal(long handle);
 
-  protected Filter filter_;
+  protected Options options_;
 }

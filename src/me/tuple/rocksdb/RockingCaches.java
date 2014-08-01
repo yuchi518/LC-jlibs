@@ -35,10 +35,11 @@ public class RockingCaches {
 			_options = new Options()
 			.setCreateIfMissing(true)
 			.setMaxOpenFiles(-1)
-			.setAllowMmapReads(false)		// use true for SSD, else false
-			.setAllowMmapWrites(false)		// use true for SSD, else false
-			.setMaxWriteBufferNumber(4)
-			.setTargetFileSizeBase(1024*1024*10)
+			//.setAllowMmapReads(true)		// use true for SSD, else false
+			//.setAllowMmapWrites(true)		// use true for SSD, else false
+			.setMaxWriteBufferNumber(3)
+			//.setTargetFileSizeBase(1024*1024*8)
+			//.setKeepLogFileNum(2)
 			//.setTargetFileSizeMultiplier(2)
 			//.setMaxBytesForLevelBase(1024*1024*10)
 			//.setMaxBytesForLevelMultiplier(10)

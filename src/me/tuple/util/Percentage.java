@@ -45,7 +45,7 @@ public class Percentage {
 	 * @param degree
 	 * @return
 	 */
-	public Percentage reset(double total, int degree) {
+	synchronized public Percentage reset(double total, int degree) {
 		this.total = total;
 		this.value = 0;
 		this.percentage = 0;
@@ -56,21 +56,21 @@ public class Percentage {
 		return this;
 	}
 	
-	public void setTotal(double total) {
+	synchronized public void setTotal(double total) {
 		this.total = total;
 		if (total!=0) percentage = (int)(value * amplify / total);
 	}
 	
-	public double total() {
+	synchronized public double total() {
 		return total;
 	}
 	
-	public void setValue(double value) {
+	synchronized public void setValue(double value) {
 		this.value = value;
 		if (total!=0) percentage = (int)(value * amplify / total);
 	}
 	
-	public double value() {
+	synchronized public double value() {
 		return value;
 	}
 	
@@ -78,7 +78,7 @@ public class Percentage {
 	 * Gap between total() & value()
 	 * @return
 	 */
-	public double gap() {
+	synchronized public double gap() {
 		return total-value;
 	}
 	
@@ -86,7 +86,7 @@ public class Percentage {
 	 * This value should be 0 ~ 100.
 	 * @return
 	 */
-	public double percentage() {
+	synchronized public double percentage() {
 		return percentage/degree;
 	}
 	
@@ -95,7 +95,7 @@ public class Percentage {
 	 * After call toString, this value will change to be false.
 	 * @return
 	 */
-	public boolean isChanged() {
+	synchronized public boolean isChanged() {
 		return lastPercentage!=percentage;
 	}
 	
@@ -104,11 +104,11 @@ public class Percentage {
 	 * Return null if isChanged() if false.
 	 * @return
 	 */
-	public String changedString() {
+	synchronized public String changedString() {
 		return isChanged()?this.toString():null;
 	}
 	
-	public double addTotal(double total) {
+	synchronized public double addTotal(double total) {
 		this.setTotal(this.total+total);
 		return this.total;
 	}
@@ -117,12 +117,12 @@ public class Percentage {
 	 * Increase total by 1.
 	 * @return
 	 */
-	public double incTotal() {
+	synchronized public double incTotal() {
 		this.setTotal(this.total+1);
 		return this.total;
 	}
 	
-	public double addValue(double value) {
+	synchronized public double addValue(double value) {
 		this.setValue(this.value+value);
 		return this.value;
 	}
@@ -131,7 +131,7 @@ public class Percentage {
 	 * Increase value by 1.
 	 * @return
 	 */
-	public double incValue() {
+	synchronized public double incValue() {
 		this.setValue(this.value+1);
 		return this.value;
 	}
@@ -141,7 +141,7 @@ public class Percentage {
 	 * After call toString, isChanged = !isChanged
 	 */
 	@Override
-	public String toString() {
+	synchronized public String toString() {
 		lastPercentage = percentage;
 		return total==0?"NAV.-":String.format(format, percentage/degree);
 	}

@@ -38,10 +38,11 @@ public class RockingCache {
 			options = new Options()
 			.setCreateIfMissing(true)
 			.setMaxOpenFiles(-1)
-			.setAllowMmapReads(false)		// use true for SSD, else false
-			.setAllowMmapWrites(false)		// use true for SSD, else false
-			.setMaxWriteBufferNumber(4)
-			.setTargetFileSizeBase(1024*1024*10)
+			//.setAllowMmapReads(true)		// use true for SSD, else false
+			//.setAllowMmapWrites(true)		// use true for SSD, else false
+			.setMaxWriteBufferNumber(3)
+			//.setTargetFileSizeBase(1024*1024*8)
+			//.setKeepLogFileNum(2)
 			//.setTargetFileSizeMultiplier(2)
 			//.setMaxBytesForLevelBase(1024*1024*10)
 			//.setMaxBytesForLevelMultiplier(10)
@@ -69,6 +70,19 @@ public class RockingCache {
 		put(ro.keyBytes(), ro.valueBytes());
 	}
 	
+	int putCount=0;
+	public void put(byte key[], byte value[]) {
+		try {
+			_rDB.put(key, value);
+			if (((++putCount)%1024)==0) {
+				log.log(Level.WARNING, "{0} put count: {1}", new Object[]{name, putCount});
+			}
+		} catch (RocksDBException e) {
+			log.log(Level.WARNING, "RocksDB can't put", e);
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * If use one of putAsync(...) functions, you should not
 	 * change to use put(...) functions. If you want to use
@@ -83,15 +97,6 @@ public class RockingCache {
 	public void putAsync(Collection<? extends RockingObject> ros) {
 		AsyncROs aros = new AsyncROs(ros);
 		this.putAsync(aros);
-	}
-	
-	public void put(byte key[], byte value[]) {
-		try {
-			_rDB.put(key, value);
-		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't put", e);
-			throw new RuntimeException(e);
-		}
 	}
 	
 	public void putAsync(byte key[], byte value[]) {
@@ -142,9 +147,22 @@ public class RockingCache {
 	}
 	
 	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla) {
+		return iterator(cla, null);
+	}
+	
+	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla, long first) {
+		DynamicByteBuffer buff = new DynamicByteBuffer(8);
+		buff.putVarLong(first);
+		byte kb[] = buff.toBytesBeforeCurrentPosition();
+		buff.releaseForReuse();
+		return iterator(cla, kb);
+	}
+	
+	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla, byte first[]) {
 		final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
 		
-		roIter.seekToFirst();
+		if (first==null) roIter.seekToFirst();
+		else roIter.seek(first);
 		
 		return new Iterator<T>() {
 
@@ -261,6 +279,7 @@ public class RockingCache {
 		@Override
 		public void run() {
 			Async T = this;
+			//int sleepCount=0;
 			
 			try {
 				while(true) {
@@ -268,15 +287,17 @@ public class RockingCache {
 					T.process();
 					String perText;
 					
+					/*sleepCount+=size;
+					if (sleepCount>=1024) {
+						// used to avoid crashing (rocksdb, assert fail)
+						sleepCount = 0;
+						Thread.sleep(10);
+					}*/
+					
 					synchronized(RockingCache.this) {
 						asyncPercentage.addValue(size);
 						perText = asyncPercentage.changedString();
-						
-						if (asyncList.size()==0) {
-							break;
-						}
-						
-						//percentage = asyncList.size();
+						if (asyncList.size()==0) break;
 						T = asyncList.remove(0);
 					}
 					
@@ -328,8 +349,17 @@ public class RockingCache {
 		}
 		@Override
 		protected void process() {
+			//int count=0;
 			for (RockingObject ro: ros) {
 				RockingCache.this.put(ro);
+				//count++;
+				/*try {
+					Thread.sleep(0, 100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+				//if (count>)
 			}
 		}
 		@Override
