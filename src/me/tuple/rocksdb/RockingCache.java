@@ -26,7 +26,7 @@ public class RockingCache {
 	protected final File _folder;
 	protected RocksDB _rDB;
 	public final String name;		// for debug
-
+	
 	protected RockingCache(File folder) {
 		this(folder, null);
 	}
@@ -66,17 +66,18 @@ public class RockingCache {
 		this.name = name;
 	}
 	
+	
 	public void put(RockingObject ro) {
 		put(ro.keyBytes(), ro.valueBytes());
 	}
 	
-	int putCount=0;
+	//int putCount=0;
 	public void put(byte key[], byte value[]) {
 		try {
 			_rDB.put(key, value);
-			if (((++putCount)%1024)==0) {
+			/*if (((++putCount)%1024)==0) {
 				log.log(Level.WARNING, "{0} put count: {1}", new Object[]{name, putCount});
-			}
+			}*/
 		} catch (RocksDBException e) {
 			log.log(Level.WARNING, "RocksDB can't put", e);
 			throw new RuntimeException(e);
@@ -95,6 +96,7 @@ public class RockingCache {
 	}
 	
 	public void putAsync(Collection<? extends RockingObject> ros) {
+		if (ros.size()==0) return;
 		AsyncROs aros = new AsyncROs(ros);
 		this.putAsync(aros);
 	}
@@ -266,7 +268,7 @@ public class RockingCache {
 	
 	public long uncompletedAsyncData() {
 		synchronized(this) {
-			return (long)asyncPercentage.gap();
+			return asyncPercentage==null?0:(long)asyncPercentage.gap();
 		}
 	}
 	
@@ -279,7 +281,6 @@ public class RockingCache {
 		@Override
 		public void run() {
 			Async T = this;
-			//int sleepCount=0;
 			
 			try {
 				while(true) {
@@ -316,7 +317,7 @@ public class RockingCache {
 						RockingCache.this.notifyAll();
 						log.log(Level.INFO, "rDB({0}) saved 100%", new Object[]{name});
 					} else {
-						asyncT = asyncList.get(0);
+						asyncT = asyncList.remove(0);
 						ExecutorServices.es(ExecutorServices.DB_NAME).execute(asyncT);
 					}
 				}

@@ -48,6 +48,8 @@ public class ExecutorServices {
 		if (es==null) {
 			if (DEFAULT_NAME.equals(name)) {
 				es = initES(DEFAULT_NAME, Runtime.getRuntime().availableProcessors());
+			//} else if (DB_NAME.equals(name)) {
+			//	es = initES(DB_NAME, 3);
 			} else {
 				es = es(DEFAULT_NAME);
 			}
@@ -76,6 +78,19 @@ public class ExecutorServices {
 	public static void await() {
 		for (ExecutorService es: _ESs.values()) {
 			try {
+				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
+					log.log(Level.INFO, "Await..");
+				}
+			} catch (InterruptedException e) {
+				log.log(Level.WARNING, "Await interrupt", e);
+			}
+		}
+	}
+	
+	public static void shutdownThenAwait() {
+		for (ExecutorService es: _ESs.values()) {
+			try {
+				es.shutdown();
 				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
 					log.log(Level.INFO, "Await..");
 				}

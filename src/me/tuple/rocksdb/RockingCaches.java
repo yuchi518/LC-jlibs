@@ -84,7 +84,7 @@ public class RockingCaches {
 	
 	public <T extends RockingCache> T cache(String name, Class<T> cla) {
 		try {
-			return cla.getConstructor(RocksDB.class).newInstance(db(name));
+			return cla.getConstructor(RocksDB.class,String.class).newInstance(db(name),name);
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
