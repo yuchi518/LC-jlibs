@@ -7,7 +7,7 @@ version := "1.0"
 // append several options to the list of options passed to the Java compiler
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
 
-//scalaVersion := "2.11.1"
+//scalaVersion := "2.11.5"
 
 // disable scala-library dependency
 autoScalaLibrary := false
