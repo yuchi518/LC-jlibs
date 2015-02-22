@@ -1524,6 +1524,15 @@ public class DynamicByteBuffer {
 		long u= getVarLong();
 		return ((u&0x01)==0)?(((u>>1)&0x7FFFFFFFFFFFFFFFL)):((((u>>1)&0x7FFFFFFFFFFFFFFFL)) ^ 0xFFFFFFFFFFFFFFFFL);		
 	}
+
+    public DynamicByteBuffer putUnsignedVarLong(long value) {
+        putVarLong(value);
+        return this;
+    }
+
+    public long getUnsignedVarLong() {
+        return getVarLong();
+    }
 	
 	public DynamicByteBuffer putVarLengthData(byte data[]) {
 		if (data==null) {

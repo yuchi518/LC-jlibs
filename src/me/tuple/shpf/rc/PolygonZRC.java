@@ -1,21 +1,27 @@
 package me.tuple.shpf.rc;
 
+import com.seisw.util.geom.Poly;
 import me.tuple.shpf.RecordContent;
 
 public class PolygonZRC extends RecordContent {
 
-	public PolygonZRC(int recordNumber, byte[] dataWithNoCopy) {
-		super(recordNumber, dataWithNoCopy);
-	}
+    public PolygonZRC(int recordNumber, byte[] dataWithNoCopy) {
+        super(recordNumber, dataWithNoCopy);
+    }
 
-	@Override
-	public int shapeType() {
-		return 15;
-	}
+    @Override
+    public int shapeType() {
+        return 15;
+    }
 
-	@Override
-	public void parse() {
-		throw new java.lang.UnsupportedOperationException("Not implement yet.");
-	}
+    @Override
+    public void parse() {
+        throw new UnsupportedOperationException("Not implement yet.");
+    }
 
+    @Override
+    public byte[] optimizedData() { throw new UnsupportedOperationException("Not implement yet."); }
+
+    @Override
+    public Poly poly() { throw new UnsupportedOperationException("Not implement yet."); }
 }

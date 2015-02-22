@@ -1,6 +1,7 @@
 <classpath>
   <classpathentry output="target/classes" kind="src" path="src"/>
   <classpathentry output="target/test-classes" kind="src" path="test-src"/>
+  <classpathentry kind="lib" path="/Volumes/Develop/lib/rocksdbjni-3.9.1-osx.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="output" path="bin"/>
 </classpath>

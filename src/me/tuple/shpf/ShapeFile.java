@@ -1,8 +1,6 @@
 package me.tuple.shpf;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Iterator;
 
 import me.tuple.shpf.rc.MultiPatchRC;
@@ -25,10 +23,20 @@ import me.tuple.util.Percentage;
 public class ShapeFile implements Iterator<RecordContent> {
 	
 	final InputStreamByteBuffer input;
-	
+	final File shpFile;
+
 	int fileCode, fileLength, version, shapeType;
 	double Xmin, Ymin, Xmax, Ymax, Zmin, Zmax, Mmin, Mmax;
 	public Percentage completedPercentage;
+
+    public ShapeFile(File shpFile) throws FileNotFoundException {
+        if (!shpFile.exists() || !shpFile.isFile()) {
+            throw new FileNotFoundException();
+        }
+        this.input = new InputStreamByteBuffer(new java.io.FileInputStream(shpFile));
+        this.shpFile = shpFile;
+        this.loadFileHeader();
+    }
 	
 	public ShapeFile(FileInputStream in) {
 		this(new InputStreamByteBuffer(new BufferedInputStream(in)));
@@ -36,6 +44,7 @@ public class ShapeFile implements Iterator<RecordContent> {
 	
 	public ShapeFile(InputStreamByteBuffer input) {
 		this.input = input;
+        this.shpFile = null;
 		this.loadFileHeader();
 	}
 

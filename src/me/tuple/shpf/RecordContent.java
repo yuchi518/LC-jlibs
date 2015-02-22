@@ -1,10 +1,12 @@
 package me.tuple.shpf;
 
+import com.seisw.util.geom.Poly;
 import me.tuple.util.DynamicByteBuffer;
 
 public abstract class RecordContent {
-	
-	final public int recordNumber;
+    final public static long BASE = 1000000000L; // Use to covert double to long
+
+    final public int recordNumber;
 	final public byte rawData[];
 	final protected DynamicByteBuffer input;
 	public byte optimizedData[]=null;
@@ -25,9 +27,9 @@ public abstract class RecordContent {
 	// not include first four byte (shape type)
 	public abstract void parse();
 	
-	public byte[] optimizedData() {
-		return optimizedData;
-	}
+	public abstract byte[] optimizedData();
+
+    public abstract Poly poly();
 
 	@Override
 	public int hashCode() {

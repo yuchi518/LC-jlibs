@@ -38,6 +38,10 @@ crossPaths := false
 // Use Scala from a directory on the filesystem instead of retrieving from a repository
 //scalaHome := Some(file("/home/user/scala/trunk/"))
 
+libraryDependencies += "junit" % "junit" % "3.8.1"
+
+unmanagedBase := file("/Volumes/Develop/lib/")
+
 EclipseKeys.withSource := true
 
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
