@@ -8,7 +8,7 @@ import me.tuple.util.DynamicByteBuffer;
 
 public class PolygonRC extends RecordContent {
 
-    public double Xmin, Ymin, Xmax, Ymax;
+    public double MinX, MinY, MaxX, MaxY;
     public int NumParts, NumPoints;
     public int Parts[];
     public double Points[];
@@ -24,22 +24,22 @@ public class PolygonRC extends RecordContent {
 
     @Override
     public void parse() {
-        Xmin = input.getLEDouble();
-        Ymin = input.getLEDouble();
-        Xmax = input.getLEDouble();
-        Ymax = input.getLEDouble();
+        MinX = input.getLEDouble();
+        MinY = input.getLEDouble();
+        MaxX = input.getLEDouble();
+        MaxY = input.getLEDouble();
 
-        if (Xmin > Xmax) {
-            double tmp = Xmin;
-            Xmin = Xmax;
-            Xmax = tmp;
-            System.out.println("Swap Xmin & Xmax");
+        if (MinX > MaxX) {
+            double tmp = MinX;
+            MinX = MaxX;
+            MaxX = tmp;
+            System.out.println("Swap MinX & MaxX");
         }
 
-        if (Ymin > Ymax) {
-            double tmp = Ymin;
-            Ymin = Ymax;
-            Ymax = tmp;
+        if (MinY > MaxY) {
+            double tmp = MinY;
+            MinY = MaxY;
+            MaxY = tmp;
             System.out.println("Swap YMin & YMax");
         }
 
@@ -52,12 +52,12 @@ public class PolygonRC extends RecordContent {
         Points = new double[NumPoints * 2];
         for (int i = 0; i < NumPoints * 2;) {
             Points[i] = input.getLEDouble();
-            /*if (Points[i]<Xmin || Points[i]>Xmax) {
+            /*if (Points[i]<MinX || Points[i]>MaxX) {
                 System.err.println("Out of boundary");
             }*/
             i++;
             Points[i] = input.getLEDouble();
-            /*if (Points[i]<Ymin || Points[i]>Ymax) {
+            /*if (Points[i]<MinY || Points[i]>MaxY) {
                 System.err.println("Out of boundary");
             }*/
             i++;
@@ -65,8 +65,8 @@ public class PolygonRC extends RecordContent {
 
         if (input.hasRemaining()) throw new RuntimeException("Why still have data?");
 
-        if (Xmin >= Xmax || Ymin >= Ymax)
-            System.out.printf("Box (%f,%f,%f,%f) \n", Xmin, Ymin, Xmax, Ymax);
+        if (MinX >= MaxX || MinY >= MaxY)
+            System.out.printf("Box (%f,%f,%f,%f) \n", MinX, MinY, MaxX, MaxY);
 
         ///optimizedData();
     }
@@ -77,10 +77,10 @@ public class PolygonRC extends RecordContent {
             DynamicByteBuffer buff = new DynamicByteBuffer(rawData.length / 2);
 
             buff.putVarLong(this.shapeType());
-            buff.putSignedVarLong((long) (Xmin * BASE));
-            buff.putSignedVarLong((long) (Ymin * BASE));
-            buff.putSignedVarLong((long) (Xmax * BASE) - (long) (Xmin * BASE));
-            buff.putSignedVarLong((long) (Ymax * BASE) - (long) (Ymin * BASE));
+            buff.putSignedVarLong((long) (MinX * BASE));
+            buff.putSignedVarLong((long) (MinY * BASE));
+            buff.putSignedVarLong((long) (MaxX * BASE) - (long) (MinX * BASE));
+            buff.putSignedVarLong((long) (MaxY * BASE) - (long) (MinY * BASE));
 
             buff.putVarLong(NumParts);
             buff.putVarLong(NumPoints);
@@ -91,7 +91,7 @@ public class PolygonRC extends RecordContent {
                 dI = Parts[i];
             }
 
-            long dX = (long) (Xmin * BASE), dY = (long) (Ymin * BASE);
+            long dX = (long) (MinX * BASE), dY = (long) (MinY * BASE);
             for (int i = 0; i < NumPoints * 2; ) {
                 buff.putSignedVarLong((long) (Points[i] * BASE) - dX);
                 dX = (long) (Points[i] * BASE);
@@ -111,7 +111,7 @@ public class PolygonRC extends RecordContent {
 
     @Override
     public Poly poly() {
-        PolyDefault ps = new PolyDefault();
+        Poly ps = new PolyDefault();
 
         if (NumParts==0)
         {
@@ -155,7 +155,9 @@ public class PolygonRC extends RecordContent {
                 if (j>=NumParts)
                 {
                     if (i>=NumPoints*2) {
-                        ps.xor(sp);
+                        //ps = ps.xor(sp);
+                        sp.setIsHole(true);
+                        ps.add(sp);
                         break;
                     }
                     else
@@ -166,7 +168,9 @@ public class PolygonRC extends RecordContent {
                 {
                     if (i>=Parts[j]*2) {
                         // do we make sure these polygons are holes?
-                        ps.xor(sp);
+                        //ps = ps.xor(sp);
+                        sp.setIsHole(true);
+                        ps.add(sp);
                         sp = new PolySimple();
                         j++;
                     }

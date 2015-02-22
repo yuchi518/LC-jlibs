@@ -12,10 +12,10 @@ import java.io.IOException;
  */
 public class ScalingBitmap {
 
-    double fromX, fromY;
-    double toX, toY;
-    double sX, sY;
-    int width, height;
+    final public double fromX, fromY;
+    final public double toX, toY;
+    final public double sX, sY;
+    final public int width, height;
     BufferedImage bufImage;
     Graphics2D graphics;
 
@@ -40,9 +40,14 @@ public class ScalingBitmap {
         graphics.setColor(strokeColor);
     }
 
+    public void setAntialias(boolean antialias)
+    {
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialias?RenderingHints.VALUE_ANTIALIAS_ON:RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+
     public void drawLine(double fx, double fy, double tx, double ty)
     {
-        graphics.draw(new Line2D.Double(fx*sX, fy*sY, tx*sX, ty*sY));
+        graphics.draw(new Line2D.Double(fx * sX, fy * sY, tx * sX, ty * sY));
     }
 
     public void drawLines(double xy[])
@@ -83,6 +88,16 @@ public class ScalingBitmap {
                 graphics.draw(new Line2D.Double(lastX*sX, lastY*sY, firstX*sX, firstY*sY));
             }
         }
+    }
+
+    public void draw(Shape shape)
+    {
+        graphics.draw(shape);
+    }
+
+    public void fill(Shape shape)
+    {
+        graphics.fill(shape);
     }
 
     public void saveToPNGFile(String fileName) throws IOException {

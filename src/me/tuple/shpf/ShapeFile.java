@@ -48,6 +48,14 @@ public class ShapeFile implements Iterator<RecordContent> {
 		this.loadFileHeader();
 	}
 
+    public String getName()
+    {
+        String name = shpFile.getName();
+        if (name.toLowerCase().endsWith(".shp"))
+            name = name.substring(0, name.length()-4);
+        return name;
+    }
+
 	void loadFileHeader() {
 		fileCode = input.getInt();		// == 9994
 		input.getInt();					// unused == 0
