@@ -2,6 +2,7 @@ package me.tuple.draw;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -12,10 +13,10 @@ import java.io.IOException;
  */
 public class ScalingBitmap {
 
-    final public double fromX, fromY;
-    final public double toX, toY;
+    final double fromX, fromY;
+    final double toX, toY;
     final public double sX, sY;
-    final public int width, height;
+    final int width, height;
     BufferedImage bufImage;
     Graphics2D graphics;
 
@@ -92,11 +93,13 @@ public class ScalingBitmap {
 
     public void draw(Shape shape)
     {
+        //shape = AffineTransform.getScaleInstance(sX, sY).createTransformedShape(shape);
         graphics.draw(shape);
     }
 
     public void fill(Shape shape)
     {
+        //shape = AffineTransform.getScaleInstance(sX, sY).createTransformedShape(shape);
         graphics.fill(shape);
     }
 

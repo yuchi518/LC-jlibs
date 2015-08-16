@@ -2,12 +2,12 @@ name := "wLibrary_j"
 
 version := "1.0"
 
-//scalacOptions += "-target:jvm-1.7"
+//scalacOptions += "-target:jvm-1.8"
 
 // append several options to the list of options passed to the Java compiler
-javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
-//scalaVersion := "2.11.5"
+//scalaVersion := "2.11.7"
 
 // disable scala-library dependency
 autoScalaLibrary := false
@@ -38,7 +38,7 @@ crossPaths := false
 // Use Scala from a directory on the filesystem instead of retrieving from a repository
 //scalaHome := Some(file("/home/user/scala/trunk/"))
 
-libraryDependencies += "junit" % "junit" % "3.8.1"
+libraryDependencies += "junit" % "junit" % "3.8.2"
 
 unmanagedBase := file("/Volumes/Develop/lib/")
 
