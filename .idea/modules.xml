@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/wLibrary_j.iml" filepath="$PROJECT_DIR$/wLibrary_j.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LC-jlibs.iml" filepath="$PROJECT_DIR$/LC-jlibs.iml" />
     </modules>
   </component>
 </project>

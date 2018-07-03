@@ -2,99 +2,59 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="121c582d-1b25-49c5-9655-884befb97926" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sbt.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/json/JSONPointer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/json/JSONPointerException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/json/JSONPropertyIgnore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/json/JSONPropertyName.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/json/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/json/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wLibrary_j.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sbt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/crypto/CCipher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/crypto/CCipher_AESKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_AESKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/crypto/CCipher_RSAPrivateKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPrivateKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/crypto/CCipher_RSAPublicKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPublicKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/draw/ScalingBitmap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/draw/ScalingBitmap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/rocksdb/RockingCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/rocksdb/RockingCaches.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCaches.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/rocksdb/RockingObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/rocksdb/RockingPropertiesCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/rocksdb/RockingSetCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingSetCache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/RecordContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/RecordContent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/ShapeFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/ShapeFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/MultiPatchRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPatchRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/MultiPointMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointMRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/MultiPointRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/MultiPointZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointZRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/NullRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/NullRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PointMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointMRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PointRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PointZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointZRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PolyLineMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineMRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PolyLineRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PolyLineZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineZRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PolygonMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonMRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PolygonRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/shpf/rc/PolygonZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonZRC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/DynamicByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/DynamicByteBuffer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/EmptyIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/EmptyIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/ExecutorServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/ExecutorServices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/IPUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/IPUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/InputStreamByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/InputStreamByteBuffer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/IterableChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/IterableChain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/LimitLinesDocumentListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/LimitLinesDocumentListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/MappedByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/MappedByteBuffer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/MemoryPrinter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/MemoryPrinter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/MessageConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/MessageConsole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/OutputStreamByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/OutputStreamByteBuffer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/Packages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/Packages.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/Percentage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/Percentage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/PositionInputStream.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/PositionInputStream.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/SingleIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/SingleIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/SizeAware.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/SizeAware.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/SizeAwareIterative.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/SizeAwareIterative.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/TaskMonitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/TaskMonitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/TieredIndexTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/TieredIndexTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/UsedMemoryPercentage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/UsedMemoryPercentage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/tuple/util/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/Version.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/CDL.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/CDL.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/Cookie.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/Cookie.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/CookieList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/CookieList.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/HTTP.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/HTTP.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/HTTPTokener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/HTTPTokener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONArray.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONArray.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONML.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONML.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONString.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONString.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONStringer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONStringer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONTokener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONTokener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/JSONWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/JSONWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/Kim.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/Property.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/Property.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/README" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/XML.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/XML.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/XMLTokener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/json/XMLTokener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/BitInputStream.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/BitOutputStream.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/BitReader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/BitWriter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/Compressor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/Decompressor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/Huff.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/JSONzip.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/Keep.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/MapKeep.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/None.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/PostMortem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/README" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/json/zip/TrieKeep.java" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Changes.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_AESKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_AESKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPrivateKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPrivateKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPublicKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPublicKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/draw/ScalingBitmap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/draw/ScalingBitmap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCaches.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCaches.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingSetCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingSetCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/RecordContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/RecordContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/ShapeFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/ShapeFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPatchRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPatchRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointMRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointZRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/NullRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/NullRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointMRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointZRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineMRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineZRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonMRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonMRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonZRC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonZRC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/DynamicByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/DynamicByteBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/EmptyIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/EmptyIterator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/ExecutorServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/ExecutorServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/IPUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/IPUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/InputStreamByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/InputStreamByteBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/IterableChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/IterableChain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/LimitLinesDocumentListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/LimitLinesDocumentListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/MappedByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/MappedByteBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/MemoryPrinter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/MemoryPrinter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/MessageConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/MessageConsole.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/OutputStreamByteBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/OutputStreamByteBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/Packages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/Packages.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/Percentage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/Percentage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/PositionInputStream.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/PositionInputStream.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/SingleIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/SingleIterator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/SizeAware.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/SizeAware.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/SizeAwareIterative.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/SizeAwareIterative.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/TaskMonitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/TaskMonitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/TieredIndexTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/TieredIndexTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/UsedMemoryPercentage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/UsedMemoryPercentage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lets/cool/util/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/lets/cool/util/Version.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wLibrary_j.iml" beforeDir="false" afterPath="$PROJECT_DIR$/LC-jlibs.iml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -106,47 +66,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="JSONPointer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/json/JSONPointer.java">
+      <file leaf-file-name="ScreenManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/uk/co/geolib/geoview/ScreenManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="248">
-              <caret line="53" column="13" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
+            <state relative-caret-position="60">
+              <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RockingObject.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java">
+      <file leaf-file-name="Clip.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/seisw/util/geom/Clip.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RockingPropertiesCache.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RockingCache.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCache.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RockingSetCache.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingSetCache.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+            <state relative-caret-position="241">
+              <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
+              <folding>
+                <element signature="e#0#72791#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -157,10 +93,66 @@
     <findStrings>
       <find>org.json</find>
       <find>org.json.zip</find>
+      <find>project</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/lets/cool/util/Version.java" />
+        <option value="$PROJECT_DIR$/LICENSE" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/UsedMemoryPercentage.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/TieredIndexTable.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/TaskMonitor.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/SizeAwareIterative.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/SizeAware.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/SingleIterator.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/PositionInputStream.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/Percentage.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/Packages.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/OutputStreamByteBuffer.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/MessageConsole.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/MemoryPrinter.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/MappedByteBuffer.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/LimitLinesDocumentListener.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/IterableChain.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/IPUtils.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/InputStreamByteBuffer.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/ExecutorServices.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/EmptyIterator.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/util/DynamicByteBuffer.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/ShapeFile.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/RecordContent.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineZRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineMRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonZRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonMRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointZRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/PointMRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/NullRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointZRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointMRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPatchRC.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCache.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCaches.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/rocksdb/RockingSetCache.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/draw/ScalingBitmap.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPublicKey.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPrivateKey.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/crypto/CCipher_AESKey.java" />
+        <option value="$PROJECT_DIR$/src/lets/cool/crypto/CCipher.java" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -184,38 +176,14 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="AndroidView" />
       <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="wLibrary_j" type="b2602c69:ProjectViewProjectNode" />
-              <item name="wLibrary_J" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="wLibrary_j" type="b2602c69:ProjectViewProjectNode" />
-              <item name="wLibrary_J" type="462c0819:PsiDirectoryNode" />
-              <item name="spec" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="wLibrary_j" type="b2602c69:ProjectViewProjectNode" />
-              <item name="wLibrary_J" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="wLibrary_j" type="b2602c69:ProjectViewProjectNode" />
-              <item name="wLibrary_J" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="cool" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="wLibrary_j" type="b2602c69:ProjectViewProjectNode" />
-              <item name="wLibrary_J" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="cool" type="462c0819:PsiDirectoryNode" />
-              <item name="rocksdb" type="462c0819:PsiDirectoryNode" />
+              <item name="LC-jlibs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="wLibrary_j" type="b2602c69:ProjectViewProjectNode" />
@@ -225,6 +193,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -304,15 +273,15 @@
       <updated>1530502222351</updated>
       <workItem from="1530502226201" duration="3314000" />
       <workItem from="1530578673188" duration="1263000" />
+      <workItem from="1530583028372" duration="698000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4577000" />
+    <option name="totallyTimeSpent" value="5275000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1200" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1920" height="1200" extended-state="0" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="Tool Output" order="7" />
@@ -349,9 +318,8 @@
     <layout-to-restore>
       <window_info id="Designer" order="2" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Image Layers" order="3" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
@@ -359,17 +327,16 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="6" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Tool Output" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="10" visible="true" weight="0.32942328" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="12" />
       <window_info anchor="right" id="Maven Projects" order="5" />
       <window_info anchor="bottom" id="ANTLR Preview" order="13" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info anchor="right" id="SciView" order="6" />
       <window_info anchor="right" id="Database" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -377,6 +344,8 @@
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info anchor="right" id="Theme Preview" order="9" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
     </layout-to-restore>
   </component>
@@ -387,124 +356,507 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/seisw/util/geom/demo/AboutDialog.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/UsedMemoryPercentage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1800">
-          <caret line="166" column="14" selection-start-line="166" selection-start-column="14" selection-end-line="166" selection-end-column="14" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
           <folding>
-            <element signature="e#5926#5927#0" expanded="true" />
-            <element signature="e#5954#5955#0" expanded="true" />
+            <element signature="e#0#1551#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/seisw/util/geom/PolySimple.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/TieredIndexTable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
           <folding>
-            <element signature="e#0#11058#0" expanded="true" />
+            <element signature="e#0#9032#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/googlecode/javaewah/BitCounter.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/TaskMonitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="19" selection-start-line="14" selection-start-column="19" selection-end-line="14" selection-end-column="19" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2722#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.sbt" />
-    <entry file="file://$PROJECT_DIR$/src/com/seisw/util/geom/PolySimple.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/SizeAwareIterative.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
           <folding>
-            <element signature="e#0#11058#0" expanded="true" />
+            <element signature="e#0#928#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/SizeAware.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#913#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/SingleIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1171#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/PositionInputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2169#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/Percentage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#3938#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/Packages.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1900#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/OutputStreamByteBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#3251#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/MessageConsole.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#6894#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/MemoryPrinter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2971#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/MappedByteBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2518#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/LimitLinesDocumentListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#4216#0" expanded="true" />
+            <element signature="e#2801#2802#0" expanded="true" />
+            <element signature="e#2826#2827#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/IterableChain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2913#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/IPUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2274#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/InputStreamByteBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#4043#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/ExecutorServices.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#3831#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/util/EmptyIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1207#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/lets/cool/util/DynamicByteBuffer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/seisw/util/geom/demo/AboutDialog.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="56" column="23" lean-forward="true" selection-start-line="56" selection-start-column="23" selection-end-line="56" selection-end-column="23" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
           <folding>
-            <element signature="e#5926#5927#0" expanded="true" />
-            <element signature="e#5954#5955#0" expanded="true" />
+            <element signature="e#0#45312#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/json/zip/BitInputStream.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/ShapeFile.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="35" column="13" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="13" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#4706#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/json/zip/JSONzip.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/RecordContent.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-571">
-          <caret line="48" column="22" selection-start-line="48" selection-start-column="22" selection-end-line="48" selection-end-column="22" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2111#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/json/zip/README">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/json/CookieList.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineZRC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1500#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/json/CDL.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineRC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3915">
-          <caret line="261" column="5" selection-start-line="261" selection-start-column="5" selection-end-line="261" selection-end-column="5" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1509#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/json/JSONPointer.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PolyLineMRC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="53" column="13" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1512#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonZRC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1497#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java">
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonRC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#6069#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PolygonMRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1510#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PointZRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1506#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PointRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1819#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/PointMRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1506#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/NullRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1501#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointZRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1515#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1513#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPointMRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1515#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/shpf/rc/MultiPatchRC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1513#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCache.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#10462#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingCaches.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#5468#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#1447#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingPropertiesCache.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#6815#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/lets/cool/rocksdb/RockingSetCache.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2204#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/draw/ScalingBitmap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#4396#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPublicKey.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2818#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/crypto/CCipher_RSAPrivateKey.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2652#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/crypto/CCipher_AESKey.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#2656#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lets/cool/crypto/CCipher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#3452#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/roaringbitmap/ArrayContainer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="13" column="19" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#20480#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/uk/co/geolib/geodemo/ControlPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/uk/co/geolib/geoview/GeoDraw.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/uk/co/geolib/geoview/ScreenManager.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/seisw/util/geom/Clip.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#72791#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
