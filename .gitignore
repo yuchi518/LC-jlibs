@@ -1,2 +1,13 @@
 project/target
 target
+/bin/
+/.DS_Store
+/spec/.DS_Store
+/src/.DS_Store
+/src/com/seisw/.DS_Store
+/src/com/seisw/util/.DS_Store
+/src/com/seisw/util/geom/.DS_Store
+/src/org/json/.DS_Store
+/src/uk/.DS_Store
+/src/uk/co/.DS_Store
+/src/uk/co/geolib/.DS_Store
