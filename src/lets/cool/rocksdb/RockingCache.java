@@ -244,7 +244,7 @@ public class RockingCache {
 		// dispose rDB if and only if it was created by self.
 		if (_folder!=null) {
 			if (_rDB!=null) {
-				_rDB.dispose();
+				_rDB.close();
 				_rDB = null;
 			}
 		}

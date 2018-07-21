@@ -190,7 +190,7 @@ public class RockingCaches {
 			rDB.close();
 		}
 		_rDBs.clear();
-		_options.dispose();
+		_options.close();
 	}
 
 	@Override
