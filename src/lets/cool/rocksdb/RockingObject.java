@@ -28,7 +28,7 @@ public abstract class RockingObject {
 	}
 	
 	public RockingObject(byte[] keyBytes, byte[] valueBytes) {
-		
+
 	}
 	
 	public abstract byte[] keyBytes();

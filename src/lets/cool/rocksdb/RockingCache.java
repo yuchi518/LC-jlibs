@@ -20,12 +20,7 @@
 package lets.cool.rocksdb;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,50 +137,25 @@ public class RockingCache {
 		return get(kb);
 	}
 	
-	public <T extends RockingObject> T get(long longId, Class<T> cla) {
-		DynamicByteBuffer buff = new DynamicByteBuffer(8);
-		buff.putVarLong(longId);
-		byte kb[] = buff.toBytesBeforeCurrentPosition();
-		buff.releaseForReuse();
-		return get(kb, cla);
+	public Iterator<Map.Entry<byte[],byte[]>> iterator() {
+		return iterator(null);
 	}
 	
-	public <T extends RockingObject> T get(byte key[], Class<T> cla) {
-		byte value[]=null;
-		try {
-			value = _rDB.get(key);
-			return value==null?null:cla.getConstructor(byte[].class, byte[].class).newInstance(key, value);
-		} catch (RocksDBException | InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
-			
-			MemoryPrinter.printMemory(log, Level.WARNING, "key", key, 0, -1, 0);
-			MemoryPrinter.printMemory(log, Level.WARNING, "value", value, 0, -1, 0);
-			
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla) {
-		return iterator(cla, null);
-	}
-	
-	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla, long first) {
+	public Iterator<Map.Entry<byte[],byte[]>> iterator(long first) {
 		DynamicByteBuffer buff = new DynamicByteBuffer(8);
 		buff.putVarLong(first);
 		byte kb[] = buff.toBytesBeforeCurrentPosition();
 		buff.releaseForReuse();
-		return iterator(cla, kb);
+		return iterator(kb);
 	}
 	
-	public <T extends RockingObject> Iterator<T> iterator(final Class<T> cla, byte first[]) {
+	public Iterator<Map.Entry<byte[],byte[]>> iterator(byte first[]) {
 		final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
 		
 		if (first==null) roIter.seekToFirst();
 		else roIter.seek(first);
 		
-		return new Iterator<T>() {
+		return new Iterator<Map.Entry<byte[],byte[]>>() {
 
 			@Override
 			public boolean hasNext() {
@@ -193,23 +163,12 @@ public class RockingCache {
 			}
 
 			@Override
-			public T next() {
+			public Map.Entry<byte[],byte[]> next() {
 				byte ks[] = roIter.key();
 				byte vs[] = roIter.value();
-				T t;
-				try {
-					t = cla.getConstructor(byte[].class, byte[].class).newInstance(ks, vs);
-				} catch (InstantiationException | IllegalAccessException
-						| IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-					log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
-					
-					MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
-					MemoryPrinter.printMemory(log, Level.WARNING, "value", vs, 0, -1, 0);
-					
-					throw new RuntimeException(e);
-				}
-				
+
+				Map.Entry<byte[],byte[]> t = new AbstractMap.SimpleEntry<>(ks, vs);
+
 				roIter.next();
 				
 				return t;
@@ -227,8 +186,7 @@ public class RockingCache {
 	public boolean checkVersion(byte hashCode[]) {
 		byte hashKey[] = "_._version_hash_code_._".getBytes();
 		byte value[] = get(hashKey);
-		
-		
+
 		if (value==null) {
 			put(hashKey, hashCode);
 			return true;

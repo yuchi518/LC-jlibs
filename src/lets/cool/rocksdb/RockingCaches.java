@@ -52,18 +52,18 @@ public class RockingCaches {
 		_rDBs = new HashMap<String, RocksDB>();
 		if (options==null) {
 			_options = new Options()
-			.setCreateIfMissing(true)
-			.setMaxOpenFiles(-1)
-			//.setAllowMmapReads(true)		// use true for SSD, else false
-			//.setAllowMmapWrites(true)		// use true for SSD, else false
-			.setMaxWriteBufferNumber(3)
-			//.setTargetFileSizeBase(1024*1024*8)
-			//.setKeepLogFileNum(2)
-			//.setTargetFileSizeMultiplier(2)
-			//.setMaxBytesForLevelBase(1024*1024*10)
-			//.setMaxBytesForLevelMultiplier(10)
-			//.setLevelZeroFileNumCompactionTrigger(2)
-			;
+					.setCreateIfMissing(true)
+                    .setMaxOpenFiles(-1)
+                    //.setAllowMmapReads(true)		// use true for SSD, else false
+                    //.setAllowMmapWrites(true)		// use true for SSD, else false
+                    .setMaxWriteBufferNumber(3)
+                    //.setTargetFileSizeBase(1024*1024*8)
+                    //.setKeepLogFileNum(2)
+                    //.setTargetFileSizeMultiplier(2)
+                    //.setMaxBytesForLevelBase(1024*1024*10)
+                    //.setMaxBytesForLevelMultiplier(10)
+                    //.setLevelZeroFileNumCompactionTrigger(2)
+                    ;
 		} else {
 			_options = options;
 		}
@@ -100,16 +100,27 @@ public class RockingCaches {
 	public RockingCache cache(String name) {
 		return new RockingCache(db(name), name);
 	}
-	
-	public <T extends RockingCache> T cache(String name, Class<T> cla) {
+
+    /**
+     *
+     * @param name The name of database
+     * @param subClass The sub class for cache
+     * @param <S>
+     * @return
+     */
+	public <S extends RockingCache> S cache(String name, Class<S> subClass) {
 		try {
-			return cla.getConstructor(RocksDB.class,String.class).newInstance(db(name),name);
+			return subClass.getConstructor(RocksDB.class,String.class).newInstance(db(name),name);
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			log.log(Level.WARNING, "Unsupported class", e);
 		}
 		return null;
+	}
+
+	public <T extends RockingObject> RockingObjectsCache<T> objectsCache(String name, Class<T> forClass) {
+		return new RockingObjectsCache<>(forClass, db(name), name);
 	}
 	
 	/**
