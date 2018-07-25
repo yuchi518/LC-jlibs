@@ -150,9 +150,7 @@ public class RockingPropertiesCache extends RockingCache {
 		setLong(key, value?1:0);
 	}
 	
-	public void set(String key, boolean value) {
-		setLong(key, value?1:0);
-	}
+	public void set(String key, boolean value) { setLong(key, value?1:0); }
 	
 	public boolean is(byte key[]) {
 		return getLong(key,0)!=0;

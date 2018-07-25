@@ -49,7 +49,7 @@ public class RockingCaches {
 	public RockingCaches(File folder, Options options) {
 		_folder = folder;
 		_folder.mkdirs();
-		_rDBs = new HashMap<String, RocksDB>();
+		_rDBs = new HashMap<>();
 		if (options==null) {
 			_options = new Options()
 					.setCreateIfMissing(true)

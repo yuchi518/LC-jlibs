@@ -37,9 +37,10 @@ public class RockingCache {
 
 	protected static Logger log = Logger.getLogger(RockingCache.class.getName());
 
-	protected final File _folder;
+    public final String name;		// for debug
+    protected final File _folder;
 	protected RocksDB _rDB;
-	public final String name;		// for debug
+	protected boolean readonly;
 	
 	protected RockingCache(File folder) {
 		this(folder, null);
@@ -70,24 +71,32 @@ public class RockingCache {
 			log.log(Level.WARNING, "RocksDB can't create", e);
 			throw new RuntimeException(e);
 		}
-		
+
 		name = _folder.getName();
+		readonly = true;
 	}
 	
 	protected RockingCache(RocksDB rDB, String name) {
 		_folder = null;
 		_rDB = rDB;
 		this.name = name;
+        readonly = true;
 	}
-	
-	
-	public void put(RockingObject ro) {
-		put(ro.keyBytes(), ro.valueBytes());
+
+    /**
+     * TODO: This is soft readonly function, we should implement a real readonly function to disable database directly.
+     */
+    public void setReadonly(boolean readonly) { this.readonly = readonly; }
+    public boolean isReadonly() { return readonly; }
+
+    public void put(RockingObject ro) {
+        put(ro.keyBytes(), ro.valueBytes());
 	}
 	
 	//int putCount=0;
 	public void put(byte key[], byte value[]) {
-		try {
+        if (readonly) throw new UnsupportedOperationException("Readonly mode");
+        try {
 			_rDB.put(key, value);
 			/*if (((++putCount)%1024)==0) {
 				log.log(Level.WARNING, "{0} put count: {1}", new Object[]{name, putCount});
