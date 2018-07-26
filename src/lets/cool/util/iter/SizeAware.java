@@ -17,10 +17,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package lets.cool.util;
+package lets.cool.util.iter;
 
-public interface SizeAwareIterative<T> extends SizeAware, Iterable<T> {
-
+public interface SizeAware {
+	int size();
 }
 
 

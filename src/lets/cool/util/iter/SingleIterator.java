@@ -17,31 +17,38 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package lets.cool.util;
+package lets.cool.util.iter;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
-public class EmptyIterator<T> implements Iterator<T>, SizeAware {
-
-	@Override
-	public boolean hasNext() {
-		return false;
+public class SingleIterator<E> implements Iterator<E> {
+	
+	E e;
+	public SingleIterator(E e) {
+		this.e = e;
 	}
 
 	@Override
-	public T next() {
-		throw new NoSuchElementException();
+	public boolean hasNext() {
+		return e!=null;
+	}
+
+	@Override
+	public E next() {
+		E tE = e;
+		e = null;
+		return tE;
 	}
 
 	@Override
 	public void remove() {
-		
+			
 	}
 
-	@Override
-	public int size() {
-		return 0;
-	}
-	
 }
+
+
+
+
+
+

@@ -17,36 +17,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package lets.cool.util;
+package lets.cool.util.iter;
 
-import java.util.Iterator;
-
-public class SingleIterator<E> implements Iterator<E> {
-	
-	E e;
-	public SingleIterator(E e) {
-		this.e = e;
-	}
-
-	@Override
-	public boolean hasNext() {
-		return e!=null;
-	}
-
-	@Override
-	public E next() {
-		E tE = e;
-		e = null;
-		return tE;
-	}
-
-	@Override
-	public void remove() {
-			
-	}
-
+public interface ProgressAwareIterable<T> extends Iterable<T> {
+    ProgressAwareIterator<T> iterator();
 }
-
 
 
 

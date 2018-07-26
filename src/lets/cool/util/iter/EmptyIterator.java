@@ -17,13 +17,43 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package lets.cool.util;
+package lets.cool.util.iter;
 
-public interface SizeAware {
-	public abstract int size();
+import java.util.NoSuchElementException;
+
+public class EmptyIterator<T> implements CountingIterator<T> {
+
+	@Override
+	public boolean hasNext() {
+		return false;
+	}
+
+	@Override
+	public T next() {
+		throw new NoSuchElementException();
+	}
+
+	@Override
+	public void remove() {
+		
+	}
+
+	@Override
+	public int size() {
+		return 0;
+	}
+
+    @Override
+    public int index() {
+        return 0;
+    }
+
+    /**
+     * Aways 100%
+     * @return progress percentage
+     */
+    @Override
+    public double progressPercentage() {
+        return 100.0;
+    }
 }
-
-
-
-
-
