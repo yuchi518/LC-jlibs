@@ -19,16 +19,11 @@
 
 package lets.cool.rocksdb;
 
-import lets.cool.util.DynamicByteBuffer;
-import lets.cool.util.MemoryPrinter;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
@@ -40,99 +35,65 @@ public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
 	protected RockingObjectsCache(Class<T> cla, File folder) {
 		this(cla, folder,null);
 	}
+
 	protected RockingObjectsCache(Class<T> cla, File folder, Options options) {
 		super(folder, options);
 		_targetClass = cla;
+		setObjectUnique(true);
 	}
 
 	protected RockingObjectsCache(Class<T> cla, RocksDB rDB, String name) {
 	    super(rDB, name);
         _targetClass = cla;
-	}
-
-	public T getObject(long longId) {
-		DynamicByteBuffer buff = new DynamicByteBuffer(8);
-		buff.putVarLong(longId);
-		byte kb[] = buff.toBytesBeforeCurrentPosition();
-		buff.releaseForReuse();
-		return getObject(kb);
-	}
-
-	public T getObject(byte key[]) {
-		byte value[]=null;
-        try {
-			value = _rDB.get(key);
-			return value==null ? null : _targetClass.getConstructor(byte[].class, byte[].class).newInstance(key, value);
-		} catch (RocksDBException | InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			log.log(Level.WARNING, "RocksDB can't load data ("+_targetClass+")", e);
-
-			MemoryPrinter.printMemory(log, Level.WARNING, "key", key, 0, -1, 0);
-			MemoryPrinter.printMemory(log, Level.WARNING, "value", value, 0, -1, 0);
-
-			throw new RuntimeException(e);
-		}
+		setObjectUnique(true);
 	}
 
     /**
-     * Iterate objects
+     *
+     * @param longId
      * @return
+     * @see RockingCache#getObject(long, Class)
      */
-	public Iterator<T> iteratorObjects() {
-		return iteratorObjects(null);
+	public T getObject(long longId) {
+		return getObject(longId, _targetClass);
 	}
 
+    /**
+     *
+     * @param key
+     * @return
+     * @see RockingCache#getObject(RockingKey, Class)
+     */
+	public T getObject(RockingKey key) {
+		return getObject(key, _targetClass);
+	}
+
+	/**
+	 * @return
+     * @see RockingCache#iteratorObjects(Class)
+     */
+    public Iterator<T> iteratorObjects() {
+		return iteratorObjects(_targetClass);
+	}
+
+    /**
+     *
+     * @param first
+     * @return
+     * @see RockingCache#iteratorObjects(long, Class)
+     */
 	public Iterator<T> iteratorObjects(long first) {
-		DynamicByteBuffer buff = new DynamicByteBuffer(8);
-		buff.putVarLong(first);
-		byte kb[] = buff.toBytesBeforeCurrentPosition();
-		buff.releaseForReuse();
-		return iteratorObjects(kb);
+		return iteratorObjects(first, _targetClass);
 	}
 
-	public Iterator<T> iteratorObjects(byte first[]) {
-		final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
-
-		if (first==null) roIter.seekToFirst();
-		else roIter.seek(first);
-
-		return new Iterator<T>() {
-
-			@Override
-			public boolean hasNext() {
-				return roIter.isValid();
-			}
-
-			@Override
-			public T next() {
-				byte ks[] = roIter.key();
-				byte vs[] = roIter.value();
-				T t;
-				try {
-					t = _targetClass.getConstructor(byte[].class, byte[].class).newInstance(ks, vs);
-				} catch (InstantiationException | IllegalAccessException
-						| IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-					log.log(Level.WARNING, "RocksDB can't load data ("+_targetClass+")", e);
-
-					MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
-					MemoryPrinter.printMemory(log, Level.WARNING, "value", vs, 0, -1, 0);
-
-					throw new RuntimeException(e);
-				}
-
-				roIter.next();
-
-				return t;
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException("Not support");
-			}
-			
-		};
+    /**
+     *
+     * @param first
+     * @return
+     * @see RockingCache#iteratorObjects(RockingKey, Class)
+     */
+	public Iterator<T> iteratorObjects(RockingKey first) {
+		return iteratorObjects(first, _targetClass);
 	}
 }
 

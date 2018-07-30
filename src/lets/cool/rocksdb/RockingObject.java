@@ -21,31 +21,68 @@ package lets.cool.rocksdb;
 
 import lets.cool.util.DynamicByteBuffer;
 
-public abstract class RockingObject {
+import java.util.Objects;
 
-	public RockingObject() {
-		
-	}
-	
-	public RockingObject(byte[] keyBytes, byte[] valueBytes) {
+public abstract class RockingObject<T extends RockingKey> {
 
+    /**
+     * Key should not be modified after RockingObject initialized and it should not be kept in outside,
+     * it will affect the life-cycle in cache.
+     */
+	final public T key;
+
+    /**
+     * To avoid key modified/accessed from outside, we should clone the key inside, but it waste memory and impact
+     * performance. We preferred not to clone it by default, user should clone it in outside.
+     * @param key
+     */
+	public RockingObject(T key) {
+        this.key = key;
 	}
-	
-	public abstract byte[] keyBytes();
+
+    //public abstract RockingObject(byte[] keyBytes, byte[] valueBytes);
+
+    /**
+     * The reference returned by key() should not be kept in outside, it will affect the life-cycle in cache.
+     * @return
+     */
+    final public T key() {
+        return key;
+    }
+
+	final public byte[] keyBytes() {
+	    return key.toBytes();
+    }
+
 	public abstract byte[] valueBytes();
-	
-	
-	/// HELPER FUNCTIONS
-	
-	public static byte[] vBytesFromLong(long l) {
-		DynamicByteBuffer buf = new DynamicByteBuffer(9);
-		buf.putVarLong(l);
-		return buf.toBytesBeforeCurrentPosition();
-	}
-	
-	public static long longFromvBytes(byte[] bs) {
-		DynamicByteBuffer buf = new DynamicByteBuffer(bs, true);
-		return buf.getVarLong();
-	}
-	
+
+
+    public static byte[] bytesFromLong(long l) {
+        DynamicByteBuffer buf = new DynamicByteBuffer(9);
+        buf.putVarLong(l);
+        byte bytes[] = buf.toBytesBeforeCurrentPosition();
+        buf.releaseForReuse();;
+        return bytes;
+    }
+
+    public static long longFromBytes(byte[] bs) {
+        DynamicByteBuffer buf = new DynamicByteBuffer(bs, true);
+        long l = buf.getVarLong();
+        buf.releaseForReuse();
+        return l;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RockingObject<?> that = (RockingObject<?>) o;
+        return Objects.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
+    }
 }

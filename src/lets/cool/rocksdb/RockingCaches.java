@@ -137,63 +137,6 @@ public class RockingCaches {
 	}
 	
 	/**
-	 * Use 'ro.getClass().getPackage().getName() + "." + ro.getClass().getName()' as cache folder name.
-	 * @param ro
-	 */
-	public void put(RockingObject ro) {
-		put(ro.getClass().getPackage().getName() + "." + ro.getClass().getName(), ro.keyBytes(), ro.valueBytes());
-	}
-	
-	/**
-	 * User name as cache folderName
-	 * @param name
-	 * @param ro
-	 */
-	public void put(String name, RockingObject ro) {
-		put(name, ro.keyBytes(), ro.valueBytes());
-	}
-	
-	public void put(String name, byte key[], byte value[]) {
-		try {
-			db(name).put(key, value);
-		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't put", e);
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public byte[] get(String name, byte key[]) {
-		try {
-			return db(name).get(key);
-		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't load data", e);
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 * User cla.getName as cache folder name.
-	 * @param key
-	 * @param cla
-	 * @return
-	 */
-	public <T extends RockingObject> T get(byte key[], Class<T> cla) {
-		return get(cla.getName(), key, cla);
-	}
-	
-	public <T extends RockingObject> T get(String name, byte key[], Class<T> cla) {
-		try {
-			byte value[] = db(name).get(key);
-			return value==null?null:cla.getConstructor(byte[].class, byte[].class).newInstance(key, value);
-		} catch (RocksDBException | InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			log.log(Level.WARNING, "RocksDB can't load data", e);
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
 	 * Call this before application termination.
 	 */
 	public void dispose() {

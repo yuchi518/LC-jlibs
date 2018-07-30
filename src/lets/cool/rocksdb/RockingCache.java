@@ -20,14 +20,13 @@
 package lets.cool.rocksdb;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import lets.cool.util.DynamicByteBuffer;
-import lets.cool.util.ExecutorServices;
-import lets.cool.util.MemoryPrinter;
-import lets.cool.util.Percentage;
+import lets.cool.util.*;
 
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
@@ -41,10 +40,13 @@ public class RockingCache {
     protected final File _folder;
 	protected RocksDB _rDB;
 	protected boolean readonly;
+	protected WeakHashMap<RockingKey, WeakReference<RockingObject>> uniqueObjects;
+	protected int cacheHit = 0, cacheError = 0, cacheMiss = 0;
 	
 	protected RockingCache(File folder) {
 		this(folder, null);
 	}
+
 	protected RockingCache(File folder, Options options) {
 		_folder = folder;
 		_folder.mkdirs();
@@ -74,6 +76,7 @@ public class RockingCache {
 
 		name = _folder.getName();
 		readonly = true;
+		uniqueObjects = null;
 	}
 	
 	protected RockingCache(RocksDB rDB, String name) {
@@ -81,6 +84,7 @@ public class RockingCache {
 		_rDB = rDB;
 		this.name = name;
         readonly = true;
+		uniqueObjects = null;
 	}
 
     /**
@@ -89,22 +93,79 @@ public class RockingCache {
     public void setReadonly(boolean readonly) { this.readonly = readonly; }
     public boolean isReadonly() { return readonly; }
 
-    public void put(RockingObject ro) {
-        put(ro.keyBytes(), ro.valueBytes());
-	}
-	
-	//int putCount=0;
-	public void put(byte key[], byte value[]) {
+	/**
+	 * ObjectUnique will try to keep only one RockingObject for each key in runtime.
+     * When you enable ObjectUnique, you should only use object-relative functions,
+     * because byte array is hard to track in runtime.
+     *
+     * You should enable ObjectUnique feature as early as possible, don't try to change
+     * it frequently in runtime.
+     *
+     * Following functions are object-relative:
+     * {@link #getObject(RockingKey, Class)}
+     * {@link #getObject(long, Class)}
+     * {@link #put(RockingObject)}
+     * {@link #putAsync(RockingObject)}
+     * {@link #putAsync(Collection)}
+     * {@link #iteratorObjects(Class)}
+     * {@link #iteratorObjects(RockingKey, Class)}
+     * {@link #iteratorObjects(long, Class)}
+     *
+	 * @param enabled
+	 */
+	public void setObjectUnique(boolean enabled) {
+        uniqueObjects = enabled ? new WeakHashMap<>() : null;
+    }
+    public boolean isObjectUnique() {
+        return uniqueObjects != null;
+    }
+
+    public int sizeOfCachedObjects() {
+	    return uniqueObjects == null ? 0 : uniqueObjects.size();
+    }
+
+    public String cacheStatus() {
+	    return String.format("Hit:%d, Miss:%d, Error:%d\n", cacheHit, cacheMiss, cacheError);
+    }
+
+    private void _put(byte key[], byte value[]) {
         if (readonly) throw new UnsupportedOperationException("Readonly mode");
         try {
-			_rDB.put(key, value);
-			/*if (((++putCount)%1024)==0) {
-				log.log(Level.WARNING, "{0} put count: {1}", new Object[]{name, putCount});
-			}*/
-		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't put", e);
-			throw new RuntimeException(e);
-		}
+            _rDB.put(key, value);
+        } catch (RocksDBException e) {
+            log.log(Level.WARNING, "RocksDB can't put", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void _pushToCache(RockingObject ro) {
+        if (uniqueObjects != null) {
+            synchronized(uniqueObjects) {
+                WeakReference<RockingObject> ref = uniqueObjects.get(ro.key);
+                if (ref != null) {
+                    RockingObject refRO = ref.get();
+                    if (refRO != null) {
+                        if (refRO != ro) {
+                            log.log(Level.WARNING, "Multiple rocking objects {0} and {1}", new Object[]{refRO, ro});
+                            cacheError++;
+                        } else {
+                            return;
+                        }
+                    }
+                }
+                uniqueObjects.put(ro.key, new WeakReference<>(ro));
+            }
+        }
+    }
+
+    public void put(RockingObject ro) {
+        _pushToCache(ro);
+        _put(ro.keyBytes(), ro.valueBytes());
+	}
+	
+	public void put(byte key[], byte value[]) {
+        if (uniqueObjects != null) throw new UnsupportedOperationException("ObjectUnique mode");
+        _put(key, value);
 	}
 	
 	/**
@@ -114,16 +175,31 @@ public class RockingCache {
 	 * @param ro
 	 */
 	public void putAsync(RockingObject ro) {
+        _pushToCache(ro);
 		AsyncRO aro = new AsyncRO(ro);
 		this.putAsync(aro);
 	}
-	
+
+	/**
+	 * If use one of putAsync(...) functions, you should not
+	 * change to use put(...) functions. If you want to use
+	 * put(...) functions, use it after calling waitAsync().
+	 * @param ros
+	 */
 	public void putAsync(Collection<? extends RockingObject> ros) {
 		if (ros.size()==0) return;
+		if (uniqueObjects != null) ros.forEach(this::_pushToCache);
 		AsyncROs aros = new AsyncROs(ros);
 		this.putAsync(aros);
 	}
-	
+
+	/**
+	 * If use one of putAsync(...) functions, you should not
+	 * change to use put(...) functions. If you want to use
+	 * put(...) functions, use it after calling waitAsync().
+	 * @param key
+	 * @param value
+	 */
 	public void putAsync(byte key[], byte value[]) {
 		AsyncKbVb akv = new AsyncKbVb(key, value);
 		this.putAsync(akv);
@@ -139,10 +215,7 @@ public class RockingCache {
 	}
 	
 	public byte[] get(long longId) {
-		DynamicByteBuffer buff = new DynamicByteBuffer(8);
-		buff.putVarLong(longId);
-		byte kb[] = buff.toBytesBeforeCurrentPosition();
-		buff.releaseForReuse();
+		byte kb[] = RockingObject.bytesFromLong(longId);
 		return get(kb);
 	}
 	
@@ -151,10 +224,7 @@ public class RockingCache {
 	}
 	
 	public Iterator<Map.Entry<byte[],byte[]>> iterator(long first) {
-		DynamicByteBuffer buff = new DynamicByteBuffer(8);
-		buff.putVarLong(first);
-		byte kb[] = buff.toBytesBeforeCurrentPosition();
-		buff.releaseForReuse();
+		byte kb[] = RockingObject.bytesFromLong(first);
 		return iterator(kb);
 	}
 	
@@ -190,8 +260,128 @@ public class RockingCache {
 			
 		};
 	}
-	
-	
+
+    public <T extends RockingObject> T getObject(long longId, Class<T> cla) {
+        byte kb[] = RockingObject.bytesFromLong(longId);
+        return getObject(new RockingKey.LongID(longId), cla);
+    }
+
+    public <T extends RockingObject> T getObject(RockingKey key, Class<T> cla) {
+        byte vb[]=null;
+        try {
+            if (uniqueObjects != null) {
+                synchronized (uniqueObjects) {
+                    WeakReference<RockingObject> ref = uniqueObjects.get(key);
+                    if (ref != null) {
+                        RockingObject refRO = ref.get();
+                        if (refRO != null) {
+                            cacheHit ++;
+                            return (T)refRO;
+                        }
+                    }
+                    cacheMiss ++;
+                    byte kb[] = key.toBytes();
+                    vb = _rDB.get(kb);
+                    T ro = vb==null ? null : cla.getConstructor(byte[].class, byte[].class).newInstance(kb, vb);
+                    if (ro != null) {
+                        uniqueObjects.put(ro.key, new WeakReference<>(ro));
+                    }
+                    return ro;
+                }
+            } else {
+                byte kb[] = key.toBytes();
+                vb = _rDB.get(kb);
+                return vb==null ? null : cla.getConstructor(byte[].class, byte[].class).newInstance(kb, vb);
+            }
+        } catch (RocksDBException | InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
+
+            MemoryPrinter.printMemory(log, Level.WARNING, "key", key.toBytes(), 0, -1, 0);
+            MemoryPrinter.printMemory(log, Level.WARNING, "value", vb, 0, -1, 0);
+
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Iterate objects
+     * @return
+     */
+    public <T extends RockingObject> Iterator<T> iteratorObjects(Class<T> cla) {
+        return iteratorObjects(null, cla);
+    }
+
+    public <T extends RockingObject> Iterator<T> iteratorObjects(long first, Class<T> cla) {
+        return iteratorObjects(new RockingKey.LongID(first), cla);
+    }
+
+    public <T extends RockingObject> Iterator<T> iteratorObjects(RockingKey first, Class<T> cla) {
+        final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
+
+        if (first==null) roIter.seekToFirst();
+        else roIter.seek(first.toBytes());
+
+        return new Iterator<T>() {
+
+            @Override
+            public boolean hasNext() {
+                return roIter.isValid();
+            }
+
+            @Override
+            public T next() {
+                byte ks[] = roIter.key();
+                byte vs[] = null;
+                T t = null;
+                try {
+                    if (uniqueObjects != null) {
+                        synchronized (uniqueObjects) {
+                            WeakReference<RockingObject> ref = uniqueObjects.get(ks);
+                            if (ref != null) {
+                                RockingObject refRO = ref.get();
+                                if (refRO != null) {
+                                    t = (T)refRO;
+                                    cacheHit ++;
+                                }
+                            }
+                            if (t == null) {
+                                cacheMiss ++;
+
+                                vs = roIter.value();
+                                t = cla.getConstructor(byte[].class, byte[].class).newInstance(ks, vs);
+                                uniqueObjects.put(t.key, new WeakReference<>(t));
+                            }
+                        }
+                    } else {
+                        vs = roIter.value();
+                        t = cla.getConstructor(byte[].class, byte[].class).newInstance(ks, vs);
+                    }
+                } catch (InstantiationException | IllegalAccessException
+                        | IllegalArgumentException | InvocationTargetException
+                        | NoSuchMethodException | SecurityException e) {
+                    log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
+
+                    if (ks != null) MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
+                    if (vs != null) MemoryPrinter.printMemory(log, Level.WARNING, "value", vs, 0, -1, 0);
+
+                    throw new RuntimeException(e);
+                }
+
+                roIter.next();
+
+                return t;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not support");
+            }
+
+        };
+    }
+
 	public boolean checkVersion(byte hashCode[]) {
 		byte hashKey[] = "_._version_hash_code_._".getBytes();
 		byte value[] = get(hashKey);
@@ -237,14 +427,13 @@ public class RockingCache {
 		}
 	}
 	
-	protected void putAsync(Async a) {
+	private void putAsync(Async a) {
 		synchronized(this) {
 			if (asyncT==null) {
 				asyncPercentage = new Percentage(a.size(),0);
-				asyncList = new ArrayList<Async>();
+				asyncList = new ArrayList<>();
 				asyncT = a;
 				ExecutorServices.es(ExecutorServices.DB_NAME).execute(a);
-				//new Thread(asyncT).start();
 			} else {
 				asyncPercentage.addTotal(a.size());
 				asyncList.add(a);
@@ -321,7 +510,7 @@ public class RockingCache {
 		}
 		@Override
 		protected void process() {
-			RockingCache.this.put(ro);
+			RockingCache.this._put(ro.keyBytes(), ro.valueBytes());
 		}
 		@Override
 		protected int size() {
@@ -338,7 +527,7 @@ public class RockingCache {
 		protected void process() {
 			//int count=0;
 			for (RockingObject ro: ros) {
-				RockingCache.this.put(ro);
+				RockingCache.this._put(ro.keyBytes(), ro.valueBytes());
 				//count++;
 				/*try {
 					Thread.sleep(0, 100);
@@ -364,7 +553,7 @@ public class RockingCache {
 		}
 		@Override
 		protected void process() {
-			RockingCache.this.put(key, value);
+			RockingCache.this._put(key, value);
 		}
 		@Override
 		protected int size() {
