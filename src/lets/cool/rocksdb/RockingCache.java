@@ -129,7 +129,9 @@ public class RockingCache {
     }
 
     private void _put(byte key[], byte value[]) {
-        if (readonly) throw new UnsupportedOperationException("Readonly mode");
+        if (readonly) {
+            throw new UnsupportedOperationException(this.name + ": Readonly mode");
+        }
         try {
             _rDB.put(key, value);
         } catch (RocksDBException e) {

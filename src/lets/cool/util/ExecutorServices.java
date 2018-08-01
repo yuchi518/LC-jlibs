@@ -20,11 +20,7 @@
 package lets.cool.util;
 
 import java.util.HashMap;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,17 +33,17 @@ public class ExecutorServices {
 	final public static String CORE_NAME 		= "core";			// use to run program main flow
 	final public static String IO_NAME			= "io";				// use to read/save file.
 	final public static String NET_NAME			= "net";			// use to communicate with internet service.			
-	
-	
-	final private static HashMap<String, ExecutorService> _ESs;// = new HashMap<>();
+
+    final private static DefaultThreadFactory defaultFactory = new DefaultThreadFactory();
+    final private static HashMap<String, ExecutorService> _ESs;// = new HashMap<>();
 	
 	static {
-		_ESs = new HashMap<String, ExecutorService>();
+		_ESs = new HashMap<>();
 		//log.log(Level.SEVERE, "What!!{0}", new Object[]{_ESs});
 	}
 	
 	synchronized public static ExecutorService initES(String name, int numberOfThreads) {
-		ExecutorService es = Executors.newFixedThreadPool(numberOfThreads);
+		ExecutorService es = Executors.newFixedThreadPool(numberOfThreads, defaultFactory);
 		_ESs.put(name, es);
 		log.log(Level.INFO, "ExecutorService({0}) created with {1} threads.", new Object[]{name, numberOfThreads});
 		return es;
@@ -78,9 +74,8 @@ public class ExecutorServices {
 	}
 	
 	public static <V> CompletionService<V> cs(String name) {
-		return new ExecutorCompletionService<V>(es(name));
+		return new ExecutorCompletionService<>(es(name));
 	}
-	
 	
 	public static void shutdown() {
 		for (ExecutorService es: _ESs.values()) {
@@ -118,6 +113,11 @@ public class ExecutorServices {
 			}
 		}
 	}
+
+	public static void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+	    defaultFactory.setUncaughtExceptionHandler(handler);
+    }
+
 }
 
 
