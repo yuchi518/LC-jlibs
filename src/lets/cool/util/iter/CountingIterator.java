@@ -97,8 +97,11 @@ public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIte
          * @return If true, go to next phase. Use for verification.
          */
         protected boolean nextStep() {
+            //System.err.printf("Phase:%d/%d, Step:%d/%d\n", indexOfPhases, sizeOfPhases, indexOfSteps, sizeOfSteps);
             if (++indexOfSteps >= this.sizeOfSteps) {
                 this.indexOfPhases++;
+
+                //if (indexOfPhases >= 8 ) System.exit(111);
                 this.indexOfSteps = 0;
                 return true;
             }
@@ -120,7 +123,8 @@ public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIte
 
         @Override
         public double progressPercentage() {
-            return 0;
+            if (indexOfPhases >= sizeOfPhases) return 100;
+            return (100.0*indexOfPhases/sizeOfPhases) + (sizeOfSteps==0?0:(100.0*indexOfSteps/sizeOfPhases/sizeOfSteps));
         }
 
         @Override
