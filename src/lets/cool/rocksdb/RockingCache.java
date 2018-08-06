@@ -87,6 +87,18 @@ public class RockingCache {
 		uniqueObjects = null;
 	}
 
+	public long getApproximateNumOfEntries() {
+		long l = 0;
+
+		try {
+			l = _rDB.getLongProperty("rocksdb.estimate-num-keys");
+		} catch (RocksDBException e) {
+			e.printStackTrace();
+		}
+
+		return l;
+	}
+
     /**
      * TODO: This is soft readonly function, we should implement a real readonly function to disable database directly.
      */
@@ -264,7 +276,6 @@ public class RockingCache {
 	}
 
     public <T extends RockingObject> T getObject(long longId, Class<T> cla) {
-        byte kb[] = RockingObject.bytesFromLong(longId);
         return getObject(new RockingKey.LongID(longId), cla);
     }
 
@@ -278,7 +289,7 @@ public class RockingCache {
                         RockingObject refRO = ref.get();
                         if (refRO != null) {
                             cacheHit ++;
-                            return (T)refRO;
+                            return cla.cast(refRO);
                         }
                     }
                     cacheMiss ++;
@@ -458,12 +469,19 @@ public class RockingCache {
 		@Override
 		public void run() {
 			Async T = this;
+			long max_dT = 0;
 			
 			try {
 				while(true) {
 					int size = T.size();
+					long dT = System.currentTimeMillis();
 					T.process();
-					String perText;
+					dT = (System.currentTimeMillis() - dT)/size;
+					if (dT > max_dT) {
+					    max_dT = dT;
+                    }
+
+					String perText, valText;
 					
 					/*sleepCount+=size;
 					if (sleepCount>=1024) {
@@ -475,12 +493,14 @@ public class RockingCache {
 					synchronized(RockingCache.this) {
 						asyncPercentage.addValue(size);
 						perText = asyncPercentage.changedString();
+						valText = " = " + (int)asyncPercentage.value() + "/" + (int)asyncPercentage.total();
 						if (asyncList.size()==0) break;
 						T = asyncList.remove(0);
 					}
 					
 					if (perText!=null) {
-						log.log(Level.INFO, "rDB({0}) saving {1}", new Object[]{name, perText});
+						log.log(Level.INFO, "rDB({0}) saving {1}, dT={2}ms", new Object[]{name, perText+valText, max_dT});
+						max_dT = 0;
 					}
 					
 				}
@@ -507,13 +527,16 @@ public class RockingCache {
 	
 	protected class AsyncRO extends Async {
 		final RockingObject ro;
+
 		AsyncRO(RockingObject ro) {
 			this.ro = ro;
 		}
+
 		@Override
 		protected void process() {
 			RockingCache.this._put(ro.keyBytes(), ro.valueBytes());
 		}
+
 		@Override
 		protected int size() {
 			return 1;
@@ -522,9 +545,11 @@ public class RockingCache {
 	
 	protected class AsyncROs extends Async {
 		final Collection<? extends RockingObject> ros;
+
 		AsyncROs(Collection<? extends RockingObject> ros) {
 			this.ros = ros;
 		}
+
 		@Override
 		protected void process() {
 			//int count=0;
@@ -549,14 +574,17 @@ public class RockingCache {
 	protected class AsyncKbVb extends Async {
 		final byte key[];
 		final byte value[];
+
 		AsyncKbVb(byte key[], byte value[]) {
 			this.key = key;
 			this.value = value;
 		}
+
 		@Override
 		protected void process() {
 			RockingCache.this._put(key, value);
 		}
+
 		@Override
 		protected int size() {
 			return 1;

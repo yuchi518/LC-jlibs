@@ -32,7 +32,8 @@ public class ExecutorServices {
 	final public static String DB_NAME 			= "db";				// use to communicate with database
 	final public static String CORE_NAME 		= "core";			// use to run program main flow
 	final public static String IO_NAME			= "io";				// use to read/save file.
-	final public static String NET_NAME			= "net";			// use to communicate with internet service.			
+	final public static String NET_NAME			= "net";			// use to communicate with internet service.
+	final public static String PIPELINE         = "pipeline";       // use for Pipeline flow
 
     final private static DefaultThreadFactory defaultFactory = new DefaultThreadFactory();
     final private static HashMap<String, ExecutorService> _ESs;// = new HashMap<>();
