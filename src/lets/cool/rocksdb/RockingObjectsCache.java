@@ -26,25 +26,28 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
+public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject> extends RockingCache {
 
 	protected static Logger log = Logger.getLogger(RockingObjectsCache.class.getName());
 
-	final protected Class<T> _targetClass;
+	final protected Class<TO> _objectClass;
+	final protected Class<TK> _keyClass;
 
-	protected RockingObjectsCache(Class<T> cla, File folder) {
-		this(cla, folder,null);
+	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder) {
+		this(kcla, cla, folder,null);
 	}
 
-	protected RockingObjectsCache(Class<T> cla, File folder, Options options) {
+	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder, Options options) {
 		super(folder, options);
-		_targetClass = cla;
+		_keyClass = kcla;
+		_objectClass = cla;
 		setObjectUnique(true);
 	}
 
-	protected RockingObjectsCache(Class<T> cla, RocksDB rDB, String name) {
+	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, RocksDB rDB, String name) {
 	    super(rDB, name);
-        _targetClass = cla;
+		_keyClass = kcla;
+		_objectClass = cla;
 		setObjectUnique(true);
 	}
 
@@ -54,8 +57,8 @@ public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
      * @return
      * @see RockingCache#getObject(long, Class)
      */
-	public T getObject(long longId) {
-		return getObject(longId, _targetClass);
+	public TO getObject(long longId) {
+		return getObject(longId, _objectClass);
 	}
 
     /**
@@ -64,16 +67,16 @@ public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
      * @return
      * @see RockingCache#getObject(RockingKey, Class)
      */
-	public T getObject(RockingKey key) {
-		return getObject(key, _targetClass);
+	public TO getObject(RockingKey key) {
+		return getObject(key, _objectClass);
 	}
 
 	/**
 	 * @return
      * @see RockingCache#iteratorObjects(Class)
      */
-    public Iterator<T> iteratorObjects() {
-		return iteratorObjects(_targetClass);
+    public Iterator<TO> iteratorObjects() {
+		return iteratorObjects(_objectClass);
 	}
 
     /**
@@ -82,8 +85,8 @@ public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
      * @return
      * @see RockingCache#iteratorObjects(long, Class)
      */
-	public Iterator<T> iteratorObjects(long first) {
-		return iteratorObjects(first, _targetClass);
+	public Iterator<TO> iteratorObjects(long first) {
+		return iteratorObjects(first, _objectClass);
 	}
 
     /**
@@ -92,9 +95,37 @@ public class RockingObjectsCache<T extends RockingObject> extends RockingCache {
      * @return
      * @see RockingCache#iteratorObjects(RockingKey, Class)
      */
-	public Iterator<T> iteratorObjects(RockingKey first) {
-		return iteratorObjects(first, _targetClass);
+	public Iterator<TO> iteratorObjects(RockingKey first) {
+		return iteratorObjects(first, _objectClass);
 	}
+
+    /**
+     * @return
+     * @see RockingCache#iteratorKeys(Class)
+     */
+    public Iterator<TK> iteratorKeys() {
+        return iteratorKeys(_keyClass);
+    }
+
+    /**
+     *
+     * @param first
+     * @return
+     * @see RockingCache#iteratorKeys(long, Class)
+     */
+    public Iterator<TK> iteratorKeys(long first) {
+        return iteratorKeys(first, _keyClass);
+    }
+
+    /**
+     *
+     * @param first
+     * @return
+     * @see RockingCache#iteratorKeys(RockingKey, Class)
+     */
+    public Iterator<TK> iteratorKeys(RockingKey first) {
+        return iteratorKeys(first, _keyClass);
+    }
 }
 
 

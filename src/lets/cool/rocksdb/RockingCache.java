@@ -275,6 +275,45 @@ public class RockingCache {
 		};
 	}
 
+	public Iterator<byte[]> iteratorByteKeys() {
+		return iteratorByteKeys(null);
+	}
+
+	public Iterator<byte[]> iteratorByteKeys(long first) {
+		byte kb[] = RockingObject.bytesFromLong(first);
+		return iteratorByteKeys(kb);
+	}
+
+	public Iterator<byte[]> iteratorByteKeys(byte first[]) {
+		final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
+
+		if (first==null) roIter.seekToFirst();
+		else roIter.seek(first);
+
+		return new Iterator<byte[]>() {
+
+			@Override
+			public boolean hasNext() {
+				return roIter.isValid();
+			}
+
+			@Override
+			public byte[] next() {
+				byte ks[] = roIter.key();
+
+				roIter.next();
+
+				return ks;
+			}
+
+			@Override
+			public void remove() {
+				throw new java.lang.UnsupportedOperationException("Not support");
+			}
+
+		};
+	}
+
     public <T extends RockingObject> T getObject(long longId, Class<T> cla) {
         return getObject(new RockingKey.LongID(longId), cla);
     }
@@ -378,6 +417,63 @@ public class RockingCache {
 
                     if (ks != null) MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
                     if (vs != null) MemoryPrinter.printMemory(log, Level.WARNING, "value", vs, 0, -1, 0);
+
+                    throw new RuntimeException(e);
+                }
+
+                roIter.next();
+
+                return t;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not support");
+            }
+
+        };
+    }
+
+
+    /**
+     * Iterate keys
+     * @return
+     */
+    public <T extends RockingKey> Iterator<T> iteratorKeys(Class<T> cla) {
+        return iteratorKeys(null, cla);
+    }
+
+    // this function is redundant
+    public <T extends RockingKey> Iterator<T> iteratorKeys(long first, Class<T> cla) {
+        return iteratorKeys(new RockingKey.LongID(first), cla);
+    }
+
+    public <T extends RockingKey> Iterator<T> iteratorKeys(RockingKey first, Class<T> cla) {
+        final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
+
+        if (first==null) roIter.seekToFirst();
+        else roIter.seek(first.toBytes());
+
+        return new Iterator<T>() {
+
+            @Override
+            public boolean hasNext() {
+                return roIter.isValid();
+            }
+
+            @Override
+            public T next() {
+                byte ks[] = roIter.key();
+                T t;
+
+                try {
+                    t = cla.getConstructor(byte[].class).newInstance(ks);
+                } catch (InstantiationException | IllegalAccessException
+                        | IllegalArgumentException | InvocationTargetException
+                        | NoSuchMethodException | SecurityException e) {
+                    log.log(Level.WARNING, "RocksDB can't load key ("+cla+")", e);
+
+                    if (ks != null) MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
 
                     throw new RuntimeException(e);
                 }

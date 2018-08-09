@@ -119,8 +119,8 @@ public class RockingCaches {
 		return null;
 	}
 
-	public <T extends RockingObject> RockingObjectsCache<T> objectsCache(String name, Class<T> forClass) {
-		return new RockingObjectsCache<>(forClass, db(name), name);
+	public <TK extends RockingKey, TO extends RockingObject> RockingObjectsCache<TK, TO> objectsCache(String name, Class<TK> kcla, Class<TO> cla) {
+		return new RockingObjectsCache<>(kcla, cla, db(name), name);
 	}
 	
 	/**
