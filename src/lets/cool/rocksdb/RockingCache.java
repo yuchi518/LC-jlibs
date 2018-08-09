@@ -275,16 +275,16 @@ public class RockingCache {
 		};
 	}
 
-	public Iterator<byte[]> iteratorByteKeys() {
-		return iteratorByteKeys(null);
+	public Iterator<byte[]> iteratorKeys() {
+		return iteratorKeys(null);
 	}
 
-	public Iterator<byte[]> iteratorByteKeys(long first) {
+	public Iterator<byte[]> iteratorKeys(long first) {
 		byte kb[] = RockingObject.bytesFromLong(first);
-		return iteratorByteKeys(kb);
+		return iteratorKeys(kb);
 	}
 
-	public Iterator<byte[]> iteratorByteKeys(byte first[]) {
+	public Iterator<byte[]> iteratorKeys(byte first[]) {
 		final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
 
 		if (first==null) roIter.seekToFirst();
@@ -439,16 +439,16 @@ public class RockingCache {
      * Iterate keys
      * @return
      */
-    public <T extends RockingKey> Iterator<T> iteratorKeys(Class<T> cla) {
-        return iteratorKeys(null, cla);
+    public <T extends RockingKey> Iterator<T> iteratorObjectiveKeys(Class<T> cla) {
+        return iteratorObjectiveKeys(null, cla);
     }
 
     // this function is redundant
-    public <T extends RockingKey> Iterator<T> iteratorKeys(long first, Class<T> cla) {
-        return iteratorKeys(new RockingKey.LongID(first), cla);
+    public <T extends RockingKey> Iterator<T> iteratorObjectiveKeys(long first, Class<T> cla) {
+        return iteratorObjectiveKeys(new RockingKey.LongID(first), cla);
     }
 
-    public <T extends RockingKey> Iterator<T> iteratorKeys(RockingKey first, Class<T> cla) {
+    public <T extends RockingKey> Iterator<T> iteratorObjectiveKeys(RockingKey first, Class<T> cla) {
         final org.rocksdb.RocksIterator roIter = _rDB.newIterator();
 
         if (first==null) roIter.seekToFirst();

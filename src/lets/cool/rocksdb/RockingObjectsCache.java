@@ -101,30 +101,30 @@ public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject
 
     /**
      * @return
-     * @see RockingCache#iteratorKeys(Class)
+     * @see RockingCache#iteratorObjectiveKeys(Class)
      */
-    public Iterator<TK> iteratorKeys() {
-        return iteratorKeys(_keyClass);
+    public Iterator<TK> iteratorObjectiveKeys() {
+        return iteratorObjectiveKeys(_keyClass);
     }
 
     /**
      *
      * @param first
      * @return
-     * @see RockingCache#iteratorKeys(long, Class)
+     * @see RockingCache#iteratorObjectiveKeys(long, Class)
      */
-    public Iterator<TK> iteratorKeys(long first) {
-        return iteratorKeys(first, _keyClass);
+    public Iterator<TK> iteratorObjectiveKeys(long first) {
+        return iteratorObjectiveKeys(first, _keyClass);
     }
 
     /**
      *
      * @param first
      * @return
-     * @see RockingCache#iteratorKeys(RockingKey, Class)
+     * @see RockingCache#iteratorObjectiveKeys(RockingKey, Class)
      */
-    public Iterator<TK> iteratorKeys(RockingKey first) {
-        return iteratorKeys(first, _keyClass);
+    public Iterator<TK> iteratorObjectiveKeys(RockingKey first) {
+        return iteratorObjectiveKeys(first, _keyClass);
     }
 }
 
