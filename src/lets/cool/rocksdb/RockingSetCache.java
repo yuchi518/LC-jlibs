@@ -20,6 +20,7 @@
 package lets.cool.rocksdb;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 import lets.cool.util.DynamicByteBuffer;
 
@@ -33,8 +34,8 @@ public class RockingSetCache extends RockingCache {
 		super(folder);
 	}
 
-	public RockingSetCache(File folder, Options options) {
-		super(folder, options);
+	public RockingSetCache(File folder, Consumer<Options> optionsConsumer) {
+		super(folder, optionsConsumer);
 	}
 	
 	protected RockingSetCache(RocksDB rDB, String name) {

@@ -24,6 +24,7 @@ import org.rocksdb.RocksDB;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject> extends RockingCache {
@@ -37,8 +38,8 @@ public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject
 		this(kcla, cla, folder,null);
 	}
 
-	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder, Options options) {
-		super(folder, options);
+	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder, Consumer<Options> optionsConsumer) {
+		super(folder, optionsConsumer);
 		_keyClass = kcla;
 		_objectClass = cla;
 		setObjectUnique(true);

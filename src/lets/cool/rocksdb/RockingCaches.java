@@ -23,9 +23,11 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.rocksdb.CompressionType;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -46,35 +48,29 @@ public class RockingCaches {
 	public RockingCaches(File folder) {
 		this(folder, null);
 	}
-	public RockingCaches(File folder, Options options) {
+	public RockingCaches(File folder, Consumer<Options> optionsConsumer) {
 		_folder = folder;
 		_folder.mkdirs();
 		_rDBs = new HashMap<>();
-		if (options==null) {
-			_options = new Options()
-					.setCreateIfMissing(true)
-                    .setMaxOpenFiles(-1)
-                    //.setAllowMmapReads(true)		// use true for SSD, else false
-                    //.setAllowMmapWrites(true)		// use true for SSD, else false
-                    .setMaxWriteBufferNumber(3)
-                    //.setTargetFileSizeBase(1024*1024*8)
-                    //.setKeepLogFileNum(2)
-                    //.setTargetFileSizeMultiplier(2)
-                    //.setMaxBytesForLevelBase(1024*1024*10)
-                    //.setMaxBytesForLevelMultiplier(10)
-                    //.setLevelZeroFileNumCompactionTrigger(2)
-                    ;
-		} else {
-			_options = options;
+		_options = RockingCache.defaultOptions();
+
+		if (optionsConsumer!=null) {
+			optionsConsumer.accept(_options);
 		}
 	}
 	
 	public RocksDB db(String name) {
 		return db(name, null);
 	}
-	public RocksDB db(String name, Options options) {
+	public RocksDB db(String name, Consumer<Options> optionsConsumer) {
 		RocksDB rDB = _rDBs.get(name);
 		if (rDB!=null) return rDB;
+
+		Options options = new Options(_options);
+
+		if (optionsConsumer!=null) {
+			optionsConsumer.accept(options);
+		}
 		
 		synchronized(_rDBs) {
 			// try again
@@ -85,7 +81,7 @@ public class RockingCaches {
 			folder.mkdirs();
 			
 			try {
-				rDB = RocksDB.open(options==null?_options:options, folder.getAbsolutePath());
+				rDB = RocksDB.open(options, folder.getAbsolutePath());
 			} catch (RocksDBException e) {
 				log.log(Level.WARNING, "RocksDB can't create", e);
 				throw new RuntimeException(e);

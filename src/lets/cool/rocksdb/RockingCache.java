@@ -23,11 +23,13 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import lets.cool.util.*;
 
+import org.rocksdb.CompressionType;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -36,9 +38,27 @@ public class RockingCache {
 
 	protected static Logger log = Logger.getLogger(RockingCache.class.getName());
 
+	public static Options defaultOptions() {
+	    return new Options()
+                .setCreateIfMissing(false)
+                .setMaxOpenFiles(-1)
+                //.setAllowMmapReads(true)		// use true for SSD, else false
+                //.setAllowMmapWrites(true)		// use true for SSD, else false
+                .setMaxWriteBufferNumber(3)
+                //.setTargetFileSizeBase(1024*1024*8)
+                //.setKeepLogFileNum(2)
+                .setTargetFileSizeMultiplier(2)
+                //.setMaxBytesForLevelBase(1024*1024*10)
+                //.setMaxBytesForLevelMultiplier(10)
+                //.setLevelZeroFileNumCompactionTrigger(2)
+                .setCompressionType(CompressionType.SNAPPY_COMPRESSION)
+                ;
+    }
+
     public final String name;		// for debug
     protected final File _folder;
 	protected RocksDB _rDB;
+	protected Options _options;
 	protected boolean readonly;
 	protected WeakHashMap<RockingKey, WeakReference<RockingObject>> uniqueObjects;
 	protected int cacheHit = 0, cacheError = 0, cacheMiss = 0;
@@ -47,28 +67,18 @@ public class RockingCache {
 		this(folder, null);
 	}
 
-	protected RockingCache(File folder, Options options) {
+	protected RockingCache(File folder, Consumer<Options> optionsConsumer) {
 		_folder = folder;
 		_folder.mkdirs();
+
+		_options = defaultOptions();
 		
-		if (options==null) {
-			options = new Options()
-			.setCreateIfMissing(true)
-			.setMaxOpenFiles(-1)
-			//.setAllowMmapReads(true)		// use true for SSD, else false
-			//.setAllowMmapWrites(true)		// use true for SSD, else false
-			.setMaxWriteBufferNumber(3)
-			//.setTargetFileSizeBase(1024*1024*8)
-			//.setKeepLogFileNum(2)
-			.setTargetFileSizeMultiplier(2)
-			//.setMaxBytesForLevelBase(1024*1024*10)
-			//.setMaxBytesForLevelMultiplier(10)
-			//.setLevelZeroFileNumCompactionTrigger(2)
-			;
+		if (optionsConsumer!=null) {
+			optionsConsumer.accept(_options);
 		}
 		
 		try {
-			_rDB = RocksDB.open(options, _folder.getAbsolutePath());
+			_rDB = RocksDB.open(_options, _folder.getAbsolutePath());
 		} catch (RocksDBException e) {
 			log.log(Level.WARNING, "RocksDB can't create", e);
 			throw new RuntimeException(e);
