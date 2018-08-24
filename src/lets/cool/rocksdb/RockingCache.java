@@ -147,7 +147,7 @@ public class RockingCache {
     }
 
     public String cacheStatus() {
-	    return String.format("Hit:%d, Miss:%d, Error:%d\n", cacheHit, cacheMiss, cacheError);
+	    return String.format("Hit:%d, Miss:%d, Error:%d", cacheHit, cacheMiss, cacheError);
     }
 
     private void _put(byte key[], byte value[]) {

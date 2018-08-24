@@ -96,7 +96,7 @@ public class OutputStreamByteBuffer extends DynamicByteBuffer {
 	
 	@Override
 	protected void checkFullDataAlgorithmSupport() {throw new UnsupportedOperationException();}
-	
+
 	/**
 	 * Call this to close internal stream, it will also call flushAllForWrite() first.
 	 * Don't do anything anymore.
