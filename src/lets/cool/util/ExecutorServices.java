@@ -42,9 +42,17 @@ public class ExecutorServices {
 		_ESs = new HashMap<>();
 		//log.log(Level.SEVERE, "What!!{0}", new Object[]{_ESs});
 	}
-	
-	synchronized public static ExecutorService initES(String name, int numberOfThreads) {
-		ExecutorService es = Executors.newFixedThreadPool(numberOfThreads, defaultFactory);
+
+	public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
+		return new ThreadPoolExecutor(nThreads, nThreads,
+				0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<>(),
+				threadFactory);
+	}
+
+	synchronized public static ExecutorService initiateExecutorService(String name, int numberOfThreads) {
+		//ExecutorService es = Executors.newFixedThreadPool(numberOfThreads, defaultFactory);
+        ExecutorService es = newFixedThreadPool(numberOfThreads, defaultFactory);
 		_ESs.put(name, es);
 		log.log(Level.INFO, "ExecutorService({0}) created with {1} threads.", new Object[]{name, numberOfThreads});
 		return es;
@@ -63,9 +71,9 @@ public class ExecutorServices {
 		
 		if (es==null) {
 			if (DEFAULT_NAME.equals(name)) {
-				es = initES(DEFAULT_NAME, Runtime.getRuntime().availableProcessors());
+				es = initiateExecutorService(DEFAULT_NAME, Runtime.getRuntime().availableProcessors());
 			//} else if (DB_NAME.equals(name)) {
-			//	es = initES(DB_NAME, 3);
+			//	es = initiateExecutorService(DB_NAME, 3);
 			} else {
 				es = es(DEFAULT_NAME);
 			}
@@ -77,6 +85,42 @@ public class ExecutorServices {
 	public static <V> CompletionService<V> cs(String name) {
 		return new ExecutorCompletionService<>(es(name));
 	}
+
+    public static boolean isIdle() {
+        for (ExecutorService es: _ESs.values()) {
+            if (((ThreadPoolExecutor)es).getActiveCount() != 0 ||
+                    ((ThreadPoolExecutor)es).getTaskCount() != ((ThreadPoolExecutor)es).getCompletedTaskCount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param timeout_millis = 0, check and return immediately. > 0, check N times (N milliseconds). < 0, await infinitely if not idle
+     * @return return false after
+     */
+    public static boolean awaitIdle(long timeout_millis) {
+	    long time = 0;
+
+	    while (!isIdle()) {
+            time ++;
+            if ((time % 60000) == 0)    // about 1 minute
+                log.log(Level.INFO, "Await Idle..");
+
+            if (timeout_millis >= 0) {
+                if (time > timeout_millis) return false;
+            }
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                log.log(Level.WARNING, "Await interrupt", e);
+            }
+        }
+        return true;
+    }
 	
 	public static void shutdown() {
 		for (ExecutorService es: _ESs.values()) {
@@ -90,11 +134,11 @@ public class ExecutorServices {
 		}
 	}
 	
-	public static void await() {
+	public static void awaitTermination() {
 		for (ExecutorService es: _ESs.values()) {
 			try {
 				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
-					log.log(Level.INFO, "Await..");
+					log.log(Level.INFO, "Await Termination..");
 				}
 			} catch (InterruptedException e) {
 				log.log(Level.WARNING, "Await interrupt", e);
@@ -102,12 +146,12 @@ public class ExecutorServices {
 		}
 	}
 	
-	public static void shutdownThenAwait() {
+	public static void shutdownThenAwaitTermination() {
 		for (ExecutorService es: _ESs.values()) {
 			try {
 				es.shutdown();
 				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
-					log.log(Level.INFO, "Await..");
+					log.log(Level.INFO, "Await Termination..");
 				}
 			} catch (InterruptedException e) {
 				log.log(Level.WARNING, "Await interrupt", e);

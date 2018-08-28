@@ -19,14 +19,16 @@
 
 package lets.cool.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipFile {
+public class FileUtil {
 
     public static void pack(String sourceDirPath, String zipFilePath, Boolean keepFirstDir) throws IOException {
 
@@ -50,5 +52,31 @@ public class ZipFile {
                         }
                     });
         }
+    }
+
+    public static void delete(String deletePath) throws IOException {
+        Files.walk(Paths.get(deletePath))
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
+    }
+
+    public static long size(String path) throws IOException {
+        return Files.walk(Paths.get(path))
+                .filter(p -> p.toFile().isFile())
+                .mapToLong(p -> p.toFile().length())
+                .sum();
+    }
+
+    public static String human_size(String path) throws IOException {
+        long size = size(path);
+        if (size < 1024)
+            return String.format("%dB", size);
+        else if (size < 1024*1024)
+            return String.format("%5.1fKB", 10*size/1024/10.0);
+        else if (size < 1024*1024*1024)
+            return String.format("%5.1fMB", 10*size/1024/1024/10.0);
+        else
+            return String.format("%5.1fGB", 10*size/1024/1024/1024/10.0);
     }
 }
