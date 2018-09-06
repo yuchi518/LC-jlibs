@@ -25,12 +25,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.EWAHIterator;
 import com.googlecode.javaewah.RunningLengthWord;
+import lets.cool.util.logging.Logr;
 
 /**
  * Note:
@@ -42,7 +41,7 @@ import com.googlecode.javaewah.RunningLengthWord;
  */
 public class TieredIndexTable<E> {
 
-	final protected static Logger log = Logger.getLogger(TieredIndexTable.class.getName());
+	final protected static Logr log = Logr.logger();
 	
 	final protected Comparator<? super E> _comparator;
 	final protected int _numberOfTiers;
@@ -85,7 +84,7 @@ public class TieredIndexTable<E> {
 		StringBuffer output = new StringBuffer();
 		printMap(_rootMap, 0, output);
 		
-		log.log(Level.INFO, "<====== {0} \n{1}\n ======>", new Object[]{title, output});
+		log.info("<====== {0} \n{1}\n ======>", new Object[]{title, output});
 		//System.out.println(output);
 	}
 	

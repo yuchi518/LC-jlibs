@@ -19,15 +19,15 @@
 
 package lets.cool.util;
 
+import lets.cool.util.logging.Logr;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MappedByteBuffer {
 
-	static Logger log  = Logger.getLogger(MappedByteBuffer.class.getName());
+	static Logr log = Logr.logger();
 	
 	final int BUFFER_SIZE;
 	final int PAGE_SIZE;
@@ -58,7 +58,7 @@ public class MappedByteBuffer {
 		try {
 			raFile = new RandomAccessFile(file, "rwd");
 		} catch (FileNotFoundException e) {
-			log.log(Level.SEVERE, "File can't access.", e);
+			log.error("File can't access.", e);
 			throw new RuntimeException(e);
 		}
 		

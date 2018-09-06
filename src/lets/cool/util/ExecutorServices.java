@@ -19,14 +19,14 @@
 
 package lets.cool.util;
 
+import lets.cool.util.logging.Logr;
+
 import java.util.HashMap;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ExecutorServices {
 	
-	protected static Logger log = Logger.getLogger(ExecutorServices.class.getName());
+	protected static Logr log = Logr.logger();
 	
 	final public static String DEFAULT_NAME 	= "default";
 	final public static String DB_NAME 			= "db";				// use to communicate with database
@@ -40,7 +40,7 @@ public class ExecutorServices {
 	
 	static {
 		_ESs = new HashMap<>();
-		//log.log(Level.SEVERE, "What!!{0}", new Object[]{_ESs});
+		//log.error"What!!{0}", new Object[]{_ESs});
 	}
 
 	public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
@@ -54,7 +54,7 @@ public class ExecutorServices {
 		//ExecutorService es = Executors.newFixedThreadPool(numberOfThreads, defaultFactory);
         ExecutorService es = newFixedThreadPool(numberOfThreads, defaultFactory);
 		_ESs.put(name, es);
-		log.log(Level.INFO, "ExecutorService({0}) created with {1} threads.", new Object[]{name, numberOfThreads});
+		log.info("ExecutorService({0}) created with {1} threads.", new Object[]{name, numberOfThreads});
 		return es;
 	}
 	
@@ -107,7 +107,7 @@ public class ExecutorServices {
 	    while (!isIdle()) {
             time ++;
             if ((time % 60000) == 0)    // about 1 minute
-                log.log(Level.INFO, "Await Idle..");
+                log.info("Await Idle..");
 
             if (timeout_millis >= 0) {
                 if (time > timeout_millis) return false;
@@ -116,7 +116,7 @@ public class ExecutorServices {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
-                log.log(Level.WARNING, "Await interrupt", e);
+                log.warn("Await interrupt", e);
             }
         }
         return true;
@@ -138,10 +138,10 @@ public class ExecutorServices {
 		for (ExecutorService es: _ESs.values()) {
 			try {
 				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
-					log.log(Level.INFO, "Await Termination..");
+					log.info("Await Termination..");
 				}
 			} catch (InterruptedException e) {
-				log.log(Level.WARNING, "Await interrupt", e);
+				log.warn("Await interrupt", e);
 			}
 		}
 	}
@@ -151,10 +151,10 @@ public class ExecutorServices {
 			try {
 				es.shutdown();
 				while(!es.awaitTermination(1, TimeUnit.MINUTES)) {
-					log.log(Level.INFO, "Await Termination..");
+					log.info("Await Termination..");
 				}
 			} catch (InterruptedException e) {
-				log.log(Level.WARNING, "Await interrupt", e);
+				log.warn("Await interrupt", e);
 			}
 		}
 	}

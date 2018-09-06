@@ -24,10 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.rocksdb.CompressionType;
+import lets.cool.util.logging.Logr;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -39,7 +37,7 @@ import org.rocksdb.RocksDBException;
  */
 public class RockingCaches {
 
-	protected static Logger log = Logger.getLogger(RockingCaches.class.getName());
+	protected static Logr log = Logr.logger();
 	
 	protected final File _folder;
 	protected final Map<String, RocksDB> _rDBs;
@@ -83,7 +81,7 @@ public class RockingCaches {
 			try {
 				rDB = RocksDB.open(options, folder.getAbsolutePath());
 			} catch (RocksDBException e) {
-				log.log(Level.WARNING, "RocksDB can't create", e);
+				log.warn("RocksDB can't create", e);
 				throw new RuntimeException(e);
 			}
 			
@@ -110,7 +108,7 @@ public class RockingCaches {
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
-			log.log(Level.WARNING, "Unsupported class", e);
+			log.warn("Unsupported class", e);
 		}
 		return null;
 	}

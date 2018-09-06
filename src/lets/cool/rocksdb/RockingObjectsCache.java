@@ -19,17 +19,17 @@
 
 package lets.cool.rocksdb;
 
+import lets.cool.util.logging.Logr;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject> extends RockingCache {
 
-	protected static Logger log = Logger.getLogger(RockingObjectsCache.class.getName());
+	protected static Logr log = Logr.logger();
 
 	final protected Class<TO> _objectClass;
 	final protected Class<TK> _keyClass;

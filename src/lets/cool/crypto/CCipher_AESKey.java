@@ -19,13 +19,12 @@
 
 package lets.cool.crypto;
 
-import java.util.logging.Level;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import lets.cool.util.MemoryPrinter;
+import lets.cool.util.logging.Level;
 
 public class CCipher_AESKey extends CCipher {
 	SecretKeySpec _spec;
@@ -52,7 +51,7 @@ public class CCipher_AESKey extends CCipher {
 			
 			return b;
 		} catch (Exception e) {
-			log.log(Level.WARNING, "CCipher_AESKey encrypt", e);
+			log.warn("CCipher_AESKey encrypt", e);
 		}
 		return null;
 	}
@@ -72,7 +71,7 @@ public class CCipher_AESKey extends CCipher {
 			
 			return b;
 		} catch (Exception e) {
-			log.log(Level.WARNING, "CCipher_AESKey decrypt", e);
+			log.warn("CCipher_AESKey decrypt", e);
 		}
 		return null;
 	}

@@ -19,6 +19,8 @@
 
 package lets.cool.util;
 
+import lets.cool.util.logging.Logr;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,8 +30,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.SortedMap;
@@ -38,8 +38,7 @@ import java.util.TreeMap;
 //import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class DynamicByteBuffer {
-	static Logger log  = Logger.getLogger(DynamicByteBuffer.class.getName());
-	
+	static Logr log = Logr.logger();
 	
 	/**
 	 * TO-DO: automatically free cached memory block
@@ -869,7 +868,7 @@ public class DynamicByteBuffer {
 		try {
 			s = new String(_data, _position, _limit-_position, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported decoded", e);
+			log.warn("Not supported decoded", e);
 			s = new String(_data, _position, _limit-_position);
 		}
 		
@@ -887,7 +886,7 @@ public class DynamicByteBuffer {
 		try {
 			s = new String(_data, _position, length, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported decoded", e);
+			log.warn("Not supported decoded", e);
 			s = new String(_data, _position, length);
 		}
 		
@@ -909,7 +908,7 @@ public class DynamicByteBuffer {
 		try {
 			s = new String(_data, _position, length, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported decoded", e);
+			log.warn("Not supported decoded", e);
 			s = new String(_data, _position, length);
 		}
 		
@@ -932,7 +931,7 @@ public class DynamicByteBuffer {
 		try {
 			s = new String(_data, _position, length, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported decoded", e);
+			log.warn("Not supported decoded", e);
 			s = new String(_data, _position, length);
 		}
 		
@@ -1335,7 +1334,7 @@ public class DynamicByteBuffer {
 		try {
 			return putLastBytes(s==null?null:s.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported encoded", e);
+			log.warn("Not supported encoded", e);
 			return putLastBytes(s.getBytes());
 		}
 	}
@@ -1344,7 +1343,7 @@ public class DynamicByteBuffer {
 		try {
 			return putBytesWithOneByteLength(s==null?null:s.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported encoded", e);
+			log.warn("Not supported encoded", e);
 			return putBytesWithOneByteLength(s.getBytes());
 		}
 	}
@@ -1353,7 +1352,7 @@ public class DynamicByteBuffer {
 		try {
 			return putBytesWithTwoBytesLength(s==null?null:s.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported encoded", e);
+			log.warn("Not supported encoded", e);
 			return putBytesWithTwoBytesLength(s.getBytes());
 		}
 	}
@@ -1587,7 +1586,7 @@ public class DynamicByteBuffer {
 		try {
 			data = s.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING, "Not supported encoded", e);
+			log.warn("Not supported encoded", e);
 			data = s.getBytes();
 		}
 		

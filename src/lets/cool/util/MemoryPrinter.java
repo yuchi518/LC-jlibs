@@ -19,14 +19,15 @@
 
 package lets.cool.util;
 
+import lets.cool.util.logging.Level;
+import lets.cool.util.logging.Logr;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MemoryPrinter {
-	public static void printMemory(Logger log, Level level, String info, final byte[] memory, int offset, int length, int address)
+	public static void printMemory(Logr log, Level level, String info, final byte[] memory, int offset, int length, int address)
 	{
 		//log.
 		if (log.isLoggable(level)) {

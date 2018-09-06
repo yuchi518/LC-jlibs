@@ -24,11 +24,11 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.logging.Level;
 
 import javax.crypto.Cipher;
 
 import lets.cool.util.MemoryPrinter;
+import lets.cool.util.logging.Level;
 
 public class CCipher_RSAPublicKey extends CCipher {
 	Key _publicKey;
@@ -57,7 +57,7 @@ public class CCipher_RSAPublicKey extends CCipher {
 			return super.encrypt(cipher, blockSize, plaindata, offset, length);
 			//return cipher.doFinal(plaindata, offset, length);
 		} catch (Exception e) {
-			log.log(Level.WARNING, "RSAPublicKey encrypt", e);
+			log.warn("RSAPublicKey encrypt", e);
 		}
 		
 		return null;
@@ -77,7 +77,7 @@ public class CCipher_RSAPublicKey extends CCipher {
 			return super.decrypt(cipher, blockSize, cipherdata, offset, length);
 			
 		} catch (Exception e) {
-			log.log(Level.WARNING, "RSAPublicKey decrypt", e);
+			log.warn("RSAPublicKey decrypt", e);
 		}
 		
 		return null;

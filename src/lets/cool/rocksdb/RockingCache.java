@@ -24,10 +24,10 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import lets.cool.util.*;
+import lets.cool.util.logging.Level;
+import lets.cool.util.logging.Logr;
 
 import org.rocksdb.CompressionType;
 import org.rocksdb.Options;
@@ -36,7 +36,7 @@ import org.rocksdb.RocksDBException;
 
 public class RockingCache {
 
-	protected static Logger log = Logger.getLogger(RockingCache.class.getName());
+	protected static Logr log = Logr.logger();
 
 	public static Options defaultOptions() {
 	    return new Options()
@@ -80,7 +80,7 @@ public class RockingCache {
 		try {
 			_rDB = RocksDB.open(_options, _folder.getAbsolutePath());
 		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't create", e);
+			log.warn("RocksDB can't create", e);
 			throw new RuntimeException(e);
 		}
 
@@ -157,7 +157,7 @@ public class RockingCache {
         try {
             _rDB.put(key, value);
         } catch (RocksDBException e) {
-            log.log(Level.WARNING, "RocksDB can't put", e);
+            log.warn("RocksDB can't put", e);
             throw new RuntimeException(e);
         }
     }
@@ -170,7 +170,7 @@ public class RockingCache {
                     RockingObject refRO = ref.get();
                     if (refRO != null) {
                         if (refRO != ro) {
-                            log.log(Level.WARNING, "Multiple rocking objects {0} and {1}", new Object[]{refRO, ro});
+                            log.warn("Multiple rocking objects {0} and {1}", new Object[]{refRO, ro});
                             cacheError++;
                         } else {
                             return;
@@ -233,7 +233,7 @@ public class RockingCache {
 		try {
 			return _rDB.get(key);
 		} catch (RocksDBException e) {
-			log.log(Level.WARNING, "RocksDB can't load data", e);
+			log.warn("RocksDB can't load data", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -358,10 +358,10 @@ public class RockingCache {
         } catch (RocksDBException | InstantiationException | IllegalAccessException
                 | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
-            log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
+            log.warn("RocksDB can't load data ("+cla+")", e);
 
-            MemoryPrinter.printMemory(log, Level.WARNING, "key", key.toBytes(), 0, -1, 0);
-            MemoryPrinter.printMemory(log, Level.WARNING, "value", vb, 0, -1, 0);
+            MemoryPrinter.printMemory(log, Level.WARN, "key", key.toBytes(), 0, -1, 0);
+            MemoryPrinter.printMemory(log, Level.WARN, "value", vb, 0, -1, 0);
 
             throw new RuntimeException(e);
         }
@@ -423,10 +423,10 @@ public class RockingCache {
                 } catch (InstantiationException | IllegalAccessException
                         | IllegalArgumentException | InvocationTargetException
                         | NoSuchMethodException | SecurityException e) {
-                    log.log(Level.WARNING, "RocksDB can't load data ("+cla+")", e);
+                    log.warn("RocksDB can't load data ("+cla+")", e);
 
-                    if (ks != null) MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
-                    if (vs != null) MemoryPrinter.printMemory(log, Level.WARNING, "value", vs, 0, -1, 0);
+                    if (ks != null) MemoryPrinter.printMemory(log, Level.WARN, "key", ks, 0, -1, 0);
+                    if (vs != null) MemoryPrinter.printMemory(log, Level.WARN, "value", vs, 0, -1, 0);
 
                     throw new RuntimeException(e);
                 }
@@ -481,9 +481,9 @@ public class RockingCache {
                 } catch (InstantiationException | IllegalAccessException
                         | IllegalArgumentException | InvocationTargetException
                         | NoSuchMethodException | SecurityException e) {
-                    log.log(Level.WARNING, "RocksDB can't load key ("+cla+")", e);
+                    log.warn("RocksDB can't load key ("+cla+")", e);
 
-                    if (ks != null) MemoryPrinter.printMemory(log, Level.WARNING, "key", ks, 0, -1, 0);
+                    if (ks != null) MemoryPrinter.printMemory(log, Level.WARN, "key", ks, 0, -1, 0);
 
                     throw new RuntimeException(e);
                 }
@@ -605,20 +605,20 @@ public class RockingCache {
 					}
 					
 					if (perText!=null) {
-						log.log(Level.INFO, "rDB({0}) saving {1}, dT={2}ms", new Object[]{name, perText+valText, max_dT});
+						log.info("rDB({0}) saving {1}, dT={2}ms", new Object[]{name, perText+valText, max_dT});
 						max_dT = 0;
 					}
 					
 				}
 			} catch(Exception e) {
-				log.log(Level.WARNING, "rDB exception", e);
+				log.warn("rDB exception", e);
 			} finally {
 				synchronized(RockingCache.this) {
 					if (asyncList.size()==0) {
 						asyncT = null;
 						asyncList = null;
 						RockingCache.this.notifyAll();
-						log.log(Level.INFO, "rDB({0}) saved 100%", new Object[]{name});
+						log.info("rDB({0}) saved 100%", new Object[]{name});
 					} else {
 						asyncT = asyncList.remove(0);
 						ExecutorServices.es(ExecutorServices.DB_NAME).execute(asyncT);

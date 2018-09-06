@@ -55,7 +55,7 @@ public class CCipher_RSAPrivateKey extends CCipher {
 			return super.encrypt(cipher, blockSize, plaindata, offset, length);
 			//return cipher.doFinal(plaindata, offset, length);
 		} catch (Exception e) {
-			log.log(Level.WARNING, "RSAPrivateKey encrypt", e);
+			log.warn("RSAPrivateKey encrypt", e);
 		}
 		
 		return null;
@@ -75,7 +75,7 @@ public class CCipher_RSAPrivateKey extends CCipher {
 			return super.decrypt(cipher, blockSize, cipherdata, offset, length);
 			
 		} catch (Exception e) {
-			log.log(Level.WARNING, "RSAPrivateKey decrypt", e);
+			log.warn("RSAPrivateKey decrypt", e);
 		}
 		
 		return null;

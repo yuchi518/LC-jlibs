@@ -20,8 +20,6 @@
 package lets.cool.crypto;
 
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -29,9 +27,11 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
 import lets.cool.util.MemoryPrinter;
+import lets.cool.util.logging.Level;
+import lets.cool.util.logging.Logr;
 
 public abstract class CCipher {
-	protected static Logger log  = Logger.getLogger(CCipher.class.getName());
+	protected static Logr log = Logr.logger();
 	
 	public byte[] encrypt(byte plaindata[]) {
 		return encrypt(plaindata, 0, plaindata.length);
