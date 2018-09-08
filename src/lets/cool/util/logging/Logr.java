@@ -19,17 +19,15 @@
 
 package lets.cool.util.logging;
 
-import sun.rmi.runtime.Log;
-
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.*;
 
 public class Logr {
 
     static HashMap<String, Logr> _logrs = new HashMap<>();
-    static String pauseAllBut = null;
+    static String pauseAllButExcludedNames = null;
+    static Level defaultLevel = Level.CONFIG;
 
     public static Logr logger() {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -47,7 +45,7 @@ public class Logr {
                     final Logr f_logr = logr;
                     _logrs.put(name, logr);
                     logr.logger.setUseParentHandlers(false);
-                    logr.logger.setLevel(Level.TRACE.level);
+                    logr.logger.setLevel(defaultLevel.level);
                     logr.logger.setFilter(record -> f_logr.isLoggable(record));
                     logr.logger.addHandler(new ConsoleHandler() {
                         public void publish(LogRecord record) {
@@ -71,7 +69,7 @@ public class Logr {
 
     public static void pauseAll() {
         synchronized (_logrs) {
-            pauseAllBut = "";
+            pauseAllButExcludedNames = "";
         }
     }
 
@@ -79,20 +77,30 @@ public class Logr {
         pauseAllBut(onlyOne.logger.getName());
     }
 
-    public static void pauseAllBut(String onlyOneName) {
+    public static void pauseAllBut(String ... excludedNames) {
         synchronized (_logrs) {
-            pauseAllBut = onlyOneName;
+            pauseAllButExcludedNames =  String.join(",", excludedNames) + ",";
         }
     }
-
-
 
     public static void continueAll() {
         synchronized (_logrs) {
-            pauseAllBut = null;
+            pauseAllButExcludedNames = null;
         }
     }
 
+    public static void setDefaultLevel(Level level) {
+        defaultLevel = level;
+    }
+
+    public static void setLevelToAllLogrs(Level level) {
+        setDefaultLevel(level);
+        synchronized (_logrs) {
+            for (Logr logr: _logrs.values()) {
+                logr.setLevel(level);
+            }
+        }
+    }
 
     final protected Logger logger;
     protected boolean paused;
@@ -119,7 +127,7 @@ public class Logr {
     }
 
     boolean isLoggable(LogRecord record) {
-        return (pauseAllBut==null || this.logger.getName().equals(pauseAllBut)) && !paused;
+        return (pauseAllButExcludedNames ==null || pauseAllButExcludedNames.contains(this.logger.getName()+",")) && !paused;
     }
 
     void publish(LogRecord record, Formatter formatter) {
@@ -128,11 +136,11 @@ public class Logr {
         {
             case Level.ERROR_NAME:
             case Level.WARN_NAME:
-            case Level.NOTICE_NAME:
-            case Level.CONFIG_NAME: {
+            case Level.NOTICE_NAME: {
                 System.err.println(msg);
                 break;
             }
+            case Level.CONFIG_NAME:
             case Level.INFO_NAME:
             case Level.DEBUG_NAME:
             case Level.TRACE_NAME: {
