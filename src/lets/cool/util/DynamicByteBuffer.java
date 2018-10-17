@@ -1435,7 +1435,7 @@ public class DynamicByteBuffer {
 		
 	}
 	
-	public DynamicByteBuffer putVarLong(long value) {
+	protected DynamicByteBuffer putVarLong(long value) {
 		if (value>=0 && value<=0x7F) {								// 0 ~ 0x7F
 			put((byte)value);
 		} else if (value>=0 && value <= (0x3FFF+0x80)) {
@@ -1474,7 +1474,7 @@ public class DynamicByteBuffer {
 		return this;
 	}
 	
-	public long getVarLong() {
+	protected long getVarLong() {
 		byte b = get();
 		if ((b&0x80)==0) {
 			return (b&0x7F);
@@ -1533,7 +1533,7 @@ public class DynamicByteBuffer {
 	}
 	
 	public long getSignedVarLong() {
-		long u= getVarLong();
+		long u = getVarLong();
 		return ((u&0x01)==0)?(((u>>1)&0x7FFFFFFFFFFFFFFFL)):((((u>>1)&0x7FFFFFFFFFFFFFFFL)) ^ 0xFFFFFFFFFFFFFFFFL);		
 	}
 
@@ -1548,9 +1548,9 @@ public class DynamicByteBuffer {
 	
 	public DynamicByteBuffer putVarLengthData(byte data[]) {
 		if (data==null) {
-			putVarLong(0);
+			putUnsignedVarLong(0);
 		} else {
-			putVarLong(data.length);
+			putUnsignedVarLong(data.length);
 			putLastBytes(data);
 		}
 		return this;
@@ -1558,7 +1558,7 @@ public class DynamicByteBuffer {
 	
 	public DynamicByteBuffer putVarLengthData(ByteBuffer buffer) {
 		int l = buffer.remaining();
-		putVarLong(l);
+		putUnsignedVarLong(l);
 		
 		prepareForWrite(l);
 		
@@ -1571,13 +1571,13 @@ public class DynamicByteBuffer {
 	}
 	
 	public byte[] getVarLengthData() {
-		long length = getVarLong();
+		long length = getUnsignedVarLong();
 		return getBytesWithFixedLength((int)length);
 	}
 	
 	public DynamicByteBuffer putVarLengthString(String s) {
 		if (s==null) {
-			putVarLong(0);
+			putUnsignedVarLong(0);
 			return this;
 		}
 		
@@ -1590,14 +1590,14 @@ public class DynamicByteBuffer {
 			data = s.getBytes();
 		}
 		
-		putVarLong(data.length);
+		putUnsignedVarLong(data.length);
 		putLastBytes(data);
 		
 		return this;
 	}
 	
 	public String getVarLengthString() {
-		int len = (int)getVarLong();
+		int len = (int)getUnsignedVarLong();
 		
 		return getStringWithFixedLength(len);
 	}

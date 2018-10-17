@@ -44,14 +44,14 @@ public class RockingSetCache extends RockingCache {
 	
 	public void set(long key) {
 		DynamicByteBuffer buf = new DynamicByteBuffer(9);
-		buf.putVarLong(key);
+		buf.putUnsignedVarLong(key);
 		super.put(buf.toBytesBeforeCurrentPosition(), TRUE_BYTE);
 		buf.releaseForReuse();
 	}
 	
 	public boolean contains(long key) {
 		DynamicByteBuffer buf = new DynamicByteBuffer(9);
-		buf.putVarLong(key);
+		buf.putUnsignedVarLong(key);
 		byte b[] = super.get(buf.toBytesBeforeCurrentPosition());
 		buf.releaseForReuse();
 		return b!=null && b.length==1 && b[0]!=0;

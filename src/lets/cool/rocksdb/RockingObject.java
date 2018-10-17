@@ -59,7 +59,7 @@ public abstract class RockingObject<T extends RockingKey> {
 
     public static byte[] bytesFromLong(long l) {
         DynamicByteBuffer buf = new DynamicByteBuffer(9);
-        buf.putVarLong(l);
+        buf.putUnsignedVarLong(l);
         byte bytes[] = buf.toBytesBeforeCurrentPosition();
         buf.releaseForReuse();;
         return bytes;
@@ -67,7 +67,7 @@ public abstract class RockingObject<T extends RockingKey> {
 
     public static long longFromBytes(byte[] bs) {
         DynamicByteBuffer buf = new DynamicByteBuffer(bs, true);
-        long l = buf.getVarLong();
+        long l = buf.getUnsignedVarLong();
         buf.releaseForReuse();
         return l;
     }

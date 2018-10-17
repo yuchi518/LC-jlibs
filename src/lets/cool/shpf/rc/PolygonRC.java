@@ -95,14 +95,14 @@ public class PolygonRC extends RecordContent {
         if (optimizedData == null) {
             DynamicByteBuffer buff = new DynamicByteBuffer(rawData.length / 2);
 
-            buff.putVarLong(this.shapeType());
+            buff.putUnsignedVarLong(this.shapeType());
             buff.putSignedVarLong((long) (MinX * BASE));
             buff.putSignedVarLong((long) (MinY * BASE));
             buff.putSignedVarLong((long) (MaxX * BASE) - (long) (MinX * BASE));
             buff.putSignedVarLong((long) (MaxY * BASE) - (long) (MinY * BASE));
 
-            buff.putVarLong(NumParts);
-            buff.putVarLong(NumPoints);
+            buff.putUnsignedVarLong(NumParts);
+            buff.putUnsignedVarLong(NumPoints);
 
             int dI = 0;
             for (int i = 0; i < NumParts; i++) {

@@ -93,7 +93,7 @@ public class RockingPropertiesCache extends RockingCache {
 	
 	public void setLong(byte key[], long value) {
 		DynamicByteBuffer buf = new DynamicByteBuffer(16);
-		buf.putVarLong(value);
+		buf.putUnsignedVarLong(value);
 		byte vb[] = buf.toBytesBeforeCurrentPosition();
 		buf.releaseForReuse();
 		
@@ -110,7 +110,7 @@ public class RockingPropertiesCache extends RockingCache {
 		if (vb==null) return defaultValue;
 		
 		DynamicByteBuffer buf = new DynamicByteBuffer(vb, true);
-		return buf.getVarLong();
+		return buf.getUnsignedVarLong();
 	}
 	
 	public long getLong(byte key[]) {
