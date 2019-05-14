@@ -19,15 +19,22 @@
 
 package lets.cool.util.logging;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.function.Supplier;
 import java.util.logging.*;
 
+/*
+ *  TODO: 搞清楚 Logger 與 Handler (ConsoleHandler, FileHandler) 設定 Log level 的優先順序，
+ *   目前執行時期改變 Level 可能會有不可預期的行為模式出現。
+ */
 public class Logr {
 
     static HashMap<String, Logr> _logrs = new HashMap<>();
     static String pauseAllButExcludedNames = null;
-    static Level defaultLevel = Level.CONFIG;
+    static Level defaultLevel = Level.INFO;
+    static HashSet<Handler> fileHandlers = new HashSet<>();
 
     public static Logr logger() {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -47,11 +54,20 @@ public class Logr {
                     logr.logger.setUseParentHandlers(false);
                     logr.logger.setLevel(defaultLevel.level);
                     logr.logger.setFilter(record -> f_logr.isLoggable(record));
-                    logr.logger.addHandler(new ConsoleHandler() {
-                        public void publish(LogRecord record) {
-                            f_logr.publish(record, this.getFormatter());
-                        }
-                    });
+
+                    if (fileHandlers.size()==0) {
+                        Handler handler = new ConsoleHandler() {
+                            public void publish(LogRecord record) {
+                                f_logr.publish(record, this.getFormatter());
+                            }
+                        };
+                        handler.setLevel(defaultLevel.level);
+                        fileHandlers.add(handler);
+                    }
+
+                    for (Handler handler: fileHandlers) {
+                        logr.logger.addHandler(handler);
+                    }
                 }
 
                 logr.configf("Logr for %s enabled\n", name);
@@ -99,6 +115,35 @@ public class Logr {
             for (Logr logr: _logrs.values()) {
                 logr.setLevel(level);
             }
+        }
+    }
+
+    public static FileHandler setLogFilename(String filename, boolean append) {
+        try {
+            FileHandler fileHandler = new FileHandler(filename, append);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fileHandler.setFormatter(formatter);
+            fileHandler.setLevel(defaultLevel.level);
+            fileHandlers.add(fileHandler);
+
+            synchronized (_logrs) {
+                for (Logr logr: _logrs.values()) {
+                    logr.logger.addHandler(fileHandler);
+                }
+            }
+            return fileHandler;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void removeHandler(Handler handler) {
+        synchronized (_logrs) {
+            for (Logr logr: _logrs.values()) {
+                logr.logger.removeHandler(handler);
+            }
+            fileHandlers.remove(handler);
         }
     }
 
@@ -229,6 +274,10 @@ public class Logr {
         log(Level.ERROR, msg);
     }
 
+    public void error(Object obj) {
+        log(Level.ERROR, obj.toString());
+    }
+
     public void error(Supplier<String> msgSupplier) {
         log(Level.ERROR, msgSupplier);
     }
@@ -257,6 +306,10 @@ public class Logr {
 
     public void warn(String msg) {
         log(Level.WARN, msg);
+    }
+
+    public void warn(Object obj) {
+        log(Level.WARN, obj.toString());
     }
 
     public void warn(Supplier<String> msgSupplier) {
@@ -289,6 +342,10 @@ public class Logr {
         log(Level.NOTICE, msg);
     }
 
+    public void notice(Object obj) {
+        log(Level.NOTICE, obj.toString());
+    }
+
     public void notice(Supplier<String> msgSupplier) {
         log(Level.NOTICE, msgSupplier);
     }
@@ -317,6 +374,10 @@ public class Logr {
 
     public void config(String msg) {
         log(Level.CONFIG, msg);
+    }
+
+    public void config(Object obj) {
+        log(Level.CONFIG, obj.toString());
     }
 
     public void config(Supplier<String> msgSupplier) {
@@ -349,6 +410,10 @@ public class Logr {
         log(Level.INFO, msg);
     }
 
+    public void info(Object obj) {
+        log(Level.INFO, obj.toString());
+    }
+
     public void info(Supplier<String> msgSupplier) {
         log(Level.INFO, msgSupplier);
     }
@@ -379,6 +444,10 @@ public class Logr {
         log(Level.DEBUG, msg);
     }
 
+    public void debug(Object obj) {
+        log(Level.DEBUG, obj.toString());
+    }
+
     public void debug(Supplier<String> msgSupplier) {
         log(Level.DEBUG, msgSupplier);
     }
@@ -407,6 +476,10 @@ public class Logr {
 
     public void trace(String msg) {
         log(Level.TRACE, msg);
+    }
+
+    public void trace(Object obj) {
+        log(Level.TRACE, obj.toString());
     }
 
     public void trace(Supplier<String> msgSupplier) {

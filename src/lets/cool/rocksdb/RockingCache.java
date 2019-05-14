@@ -605,7 +605,7 @@ public class RockingCache {
 					}
 					
 					if (perText!=null) {
-						log.info("rDB({0}) saving {1}, dT={2}ms", new Object[]{name, perText+valText, max_dT});
+						log.trace("rDB({0}) saving {1}, dT={2}ms", new Object[]{name, perText+valText, max_dT});
 						max_dT = 0;
 					}
 					
@@ -618,7 +618,7 @@ public class RockingCache {
 						asyncT = null;
 						asyncList = null;
 						RockingCache.this.notifyAll();
-						log.info("rDB({0}) saved 100%", new Object[]{name});
+						log.trace("rDB({0}) saved 100%", new Object[]{name});
 					} else {
 						asyncT = asyncList.remove(0);
 						ExecutorServices.es(ExecutorServices.DB_NAME).execute(asyncT);
