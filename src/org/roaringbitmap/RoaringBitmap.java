@@ -20,6 +20,8 @@ import org.roaringbitmap.buffer.MappeableContainerPointer;
 import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
 import static org.roaringbitmap.RoaringBitmapWriter.writer;
+import static org.roaringbitmap.Util.lowbitsAsInteger;
+import static org.roaringbitmap.Util.toIntUnsigned;
 
 
 /**
@@ -191,25 +193,38 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
   }
 
   /**
-   * Generate a new bitmap that has the same cardinality as x, but with
+   * Generate a new bitmap, but with
    * all its values incremented by offset.
+   * The parameter offset can be
+   * negative. Values that would fall outside
+   * of the valid 32-bit range are discarded
+   * so that the result can have lower cardinality.
    *
    * @param x source bitmap
    * @param offset increment
    * @return a new bitmap
    */
-  public static RoaringBitmap addOffset(final RoaringBitmap x, int offset) {
-    int container_offset = offset >>> 16;
-    int in_container_offset = offset % (1<<16);
+  public static RoaringBitmap addOffset(final RoaringBitmap x, long offset) {
+    // we need "offset" to be a long because we want to support values
+    // between -0xFFFFFFFF up to +-0xFFFFFFFF
+    long container_offset_long = offset < 0 
+        ? (offset - (1<<16) + 1)  / (1<<16) : offset / (1 << 16);
+    if((container_offset_long <= -(1<<16) ) || (container_offset_long >= (1<<16) )) {
+      return new RoaringBitmap(); // it is necessarily going to be empty
+    }
+    // next cast is necessarily safe, the result is between -0xFFFF and 0xFFFF
+    int container_offset = (int) container_offset_long;
+    // next case is safe
+    int in_container_offset = (int)(offset - container_offset_long * (1L<<16));
     if(in_container_offset == 0) {
-      RoaringBitmap answer = x.clone();
-      for(int pos = 0; pos < answer.highLowContainer.size(); pos++) {
-        int key = Util.toIntUnsigned(answer.highLowContainer.getKeyAtIndex(pos));
+      RoaringBitmap answer = new RoaringBitmap();
+      for(int pos = 0; pos < x.highLowContainer.size(); pos++) {
+        int key = Util.toIntUnsigned(x.highLowContainer.getKeyAtIndex(pos));
         key += container_offset;
-        if(key > 0xFFFF) {
-          throw new IllegalArgumentException("Offset too large.");
+        if((key >= 0) || (key <= 0xFFFF))  {
+          answer.highLowContainer.append((short)key, 
+              x.highLowContainer.getContainerAtIndex(pos).clone());
         }
-        answer.highLowContainer.keys[pos] = (short) key;
       }
       return answer;
     } else {
@@ -217,18 +232,17 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
       for(int pos = 0; pos < x.highLowContainer.size(); pos++) {
         int key = Util.toIntUnsigned(x.highLowContainer.getKeyAtIndex(pos));
         key += container_offset;
-        if(key > 0xFFFF) {
-          throw new IllegalArgumentException("Offset too large.");
-        }
         Container c = x.highLowContainer.getContainerAtIndex(pos);
         Container[] offsetted = Util.addOffset(c,
                 (short)in_container_offset);
-        if( !offsetted[0].isEmpty()) {
+        boolean keyok = (key >= 0) && (key <= 0xFFFF);
+        boolean keypok = (key + 1 >= 0) && (key + 1 <= 0xFFFF);
+        if( !offsetted[0].isEmpty() && keyok) {
           int current_size = answer.highLowContainer.size();
           int lastkey = 0;
           if(current_size > 0) {
-            lastkey = answer.highLowContainer.getKeyAtIndex(
-                    current_size - 1);
+            lastkey = Util.toIntUnsigned(answer.highLowContainer.getKeyAtIndex(
+                    current_size - 1));
           }
           if((current_size > 0) && (lastkey == key)) {
             Container prev = answer.highLowContainer
@@ -240,10 +254,7 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
             answer.highLowContainer.append((short)key, offsetted[0]);
           }
         }
-        if( !offsetted[1].isEmpty()) {
-          if(key == 0xFFFF) {
-            throw new IllegalArgumentException("Offset too large.");
-          }
+        if( !offsetted[1].isEmpty()  && keypok) {
           answer.highLowContainer.append((short)(key + 1), offsetted[1]);
         }
       }
@@ -1121,15 +1132,21 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
    */
   public boolean intersects(long minimum, long supremum) {
     rangeSanityCheck(minimum, supremum);
-    short minKey = Util.highbits(minimum);
-    short supKey = Util.highbits(supremum);
-    int len = highLowContainer.size;
+    int minKey = (int)(minimum >>> 16);
+    int supKey = (int)(supremum >>> 16);
+    int length = highLowContainer.size;
     short[] keys = highLowContainer.keys;
-    // seek to start
-    int index = Util.unsignedBinarySearch(keys, 0, len, minKey);
+    int offset = lowbitsAsInteger(minimum);
+    int limit = lowbitsAsInteger(supremum);
+    int index = Util.unsignedBinarySearch(keys, 0, length, (short)minKey);
     int pos = index >= 0 ? index : -index - 1;
-    short offset = Util.lowbits(minimum);
-    while (pos < len && Util.compareUnsigned(supKey, keys[pos]) > 0) {
+    if (pos < length && supKey == toIntUnsigned(keys[pos])) {
+      if (supKey > minKey) {
+        offset = 0;
+      }
+      return highLowContainer.getContainerAtIndex(pos).intersects(offset, limit);
+    }
+    while (pos < length && supKey > toIntUnsigned(keys[pos])) {
       Container container = highLowContainer.getContainerAtIndex(pos);
       if (container.intersects(offset, 1 << 16)) {
         return true;
@@ -1137,10 +1154,9 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
       offset = 0;
       ++pos;
     }
-    return pos < len
-            && supKey == keys[pos]
+    return pos < length && supKey == keys[pos]
             && highLowContainer.getContainerAtIndex(pos)
-                               .intersects(0, (int)((supremum - 1) & 0xFFFF) + 1);
+            .intersects(offset, limit);
   }
 
 

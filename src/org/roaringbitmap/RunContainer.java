@@ -1473,9 +1473,15 @@ public final class RunContainer extends Container implements Cloneable {
 
   @Override
   public boolean intersects(int minimum, int supremum) {
+    if((minimum < 0) || (supremum < minimum) || (supremum > (1<<16))) {
+      throw new RuntimeException("This should never happen (bug).");
+    }
     for (int i = 0; i < numberOfRuns(); ++i) {
-      if (Util.compareUnsigned(getValue(i), (short)minimum) >= 0
-              && Util.toIntUnsigned(getValue(i)) < supremum) {
+      short runFirstValue = getValue(i);
+      short runLastValue = (short) (runFirstValue + getLength(i));
+
+      if (Util.toIntUnsigned(runFirstValue) < supremum
+          && Util.compareUnsigned(runLastValue, (short)minimum) >= 0){
         return true;
       }
     }

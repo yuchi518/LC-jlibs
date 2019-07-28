@@ -12,3 +12,4 @@ target
 /src/uk/co/.DS_Store
 /src/uk/co/geolib/.DS_Store
 /out/
+*.DS_Store
