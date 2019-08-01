@@ -29,10 +29,7 @@ import lets.cool.util.*;
 import lets.cool.util.logging.Level;
 import lets.cool.util.logging.Logr;
 
-import org.rocksdb.CompressionType;
-import org.rocksdb.Options;
-import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
+import org.rocksdb.*;
 
 public class RockingCache {
 
@@ -520,7 +517,12 @@ public class RockingCache {
 		// dispose rDB if and only if it was created by self.
 		if (_folder!=null) {
 			if (_rDB!=null) {
-				_rDB.close();
+				try {
+					_rDB.flush(new FlushOptions().setWaitForFlush(true).setAllowWriteStall(false));
+					_rDB.closeE();
+				} catch (Exception ex) {
+					log.error(ex);
+				}
 				_rDB = null;
 			}
 		}
