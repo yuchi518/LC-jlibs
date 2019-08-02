@@ -70,7 +70,7 @@ public class FileUtil {
 
     public static String human_size(String path) throws IOException {
         long size = size(path);
-        return humanReadableByteCount(size, true);
+        return humanReadableByteCount(size, false);
         /*if (size < 1024)
             return String.format("%dB", size);
         else if (size < 1024*1024)
