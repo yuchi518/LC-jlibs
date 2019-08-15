@@ -458,7 +458,7 @@ public class DynamicByteBuffer {
 	 * @param size
 	 */
 	protected void prepareForWrite(int index, int size) {
-		/*if (_position<0) {
+		/*if (index<0) {
 			throw new IndexOutOfBoundsException();
 		}*/
 		
