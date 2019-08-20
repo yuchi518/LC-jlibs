@@ -28,6 +28,9 @@ public abstract class RockingKey implements Comparable<RockingKey> {
         return Arrays.compare(toBytes(), o.toBytes());
     }
 
+    /**
+     * LongID 以 variable length 編碼，導致 bytes[] 的排序與 Long 的排序不同，須注意使用。
+     */
     public static class LongID extends RockingKey {
 
         final public long id;
@@ -51,6 +54,14 @@ public abstract class RockingKey implements Comparable<RockingKey> {
             if (!(o instanceof LongID)) return false;
             LongID longID = (LongID) o;
             return id == longID.id;
+        }
+
+        @Override
+        public int compareTo(RockingKey o) {
+            if (o instanceof LongID) {
+                return Long.compare(id, ((LongID)o).id);
+            }
+            return super.compareTo(o);
         }
 
         @Override
