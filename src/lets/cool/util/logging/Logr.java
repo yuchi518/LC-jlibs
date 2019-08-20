@@ -19,6 +19,8 @@
 
 package lets.cool.util.logging;
 
+import org.checkerframework.checker.formatter.qual.FormatMethod;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -262,6 +264,7 @@ public class Logr {
         this.logger.logp(level.level, clr.sourceClassName, clr.sourceMethodName, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void logf(Level level, String format, Object ... args) {
         String msg = String.format(format, args);
         Caller clr = inferCaller();
@@ -298,6 +301,7 @@ public class Logr {
         log(Level.ERROR, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void errorf(String format, Object ... args) {
         logf(Level.ERROR, format, args);
     }
@@ -332,6 +336,7 @@ public class Logr {
         log(Level.WARN, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void warnf(String format, Object ... args) {
         logf(Level.WARN, format, args);
     }
@@ -366,6 +371,7 @@ public class Logr {
         log(Level.NOTICE, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void noticef(String format, Object ... args) {
         logf(Level.NOTICE, format, args);
     }
@@ -400,6 +406,7 @@ public class Logr {
         log(Level.CONFIG, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void configf(String format, Object ... args) {
         logf(Level.CONFIG, format, args);
     }
@@ -434,6 +441,7 @@ public class Logr {
         log(Level.INFO, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void infof(String format, Object ... args) {
         logf(Level.INFO, format, args);
     }
@@ -468,6 +476,7 @@ public class Logr {
         log(Level.DEBUG, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void debugf(String format, Object ... args) {
         logf(Level.DEBUG, format, args);
     }
@@ -502,6 +511,7 @@ public class Logr {
         log(Level.TRACE, thrown, msgSupplier);
     }
 
+    @FormatMethod
     public void tracef(String format, Object ... args) {
         logf(Level.TRACE, format, args);
     }

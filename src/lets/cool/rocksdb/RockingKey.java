@@ -1,11 +1,32 @@
 package lets.cool.rocksdb;
 
+import java.util.Arrays;
 import java.util.Objects;
 
-public abstract class RockingKey {
+public abstract class RockingKey implements Comparable<RockingKey> {
 
     public abstract byte[] toBytes();
 
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(toBytes());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this==obj ||
+                ((this.getClass() == obj.getClass()) && Arrays.equals(toBytes(), ((RockingKey) obj).toBytes()));
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(toBytes());
+    }
+
+    @Override
+    public int compareTo(RockingKey o) {
+        return Arrays.compare(toBytes(), o.toBytes());
+    }
 
     public static class LongID extends RockingKey {
 
@@ -43,4 +64,20 @@ public abstract class RockingKey {
         }
     }
 
+    public static class BytesID extends RockingKey {
+
+        final public byte[] id;
+
+        public BytesID(byte[] id) {
+            this(id, true);
+        }
+        public BytesID(byte[] id, boolean clone) {
+            this.id = clone ? id.clone() : id;
+        }
+
+        @Override
+        public byte[] toBytes() {
+            return id;
+        }
+    }
 }

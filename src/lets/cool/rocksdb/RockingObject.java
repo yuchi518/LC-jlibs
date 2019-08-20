@@ -23,7 +23,7 @@ import lets.cool.util.DynamicByteBuffer;
 
 import java.util.Objects;
 
-public abstract class RockingObject<T extends RockingKey> {
+public abstract class RockingObject<T extends RockingKey> implements Comparable<RockingObject> {
 
     /**
      * Key should not be modified after RockingObject initialized and it should not be kept in outside,
@@ -73,6 +73,12 @@ public abstract class RockingObject<T extends RockingKey> {
     }
 
 
+    /**
+     * 類別須完全一致才可以使用key作比較。
+     * 如果子類別與子類別的子類別可視為相同物件，則子類別需要複寫此函式。
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,6 +89,40 @@ public abstract class RockingObject<T extends RockingKey> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(key);
+        return Objects.hashCode(key);
+    }
+
+    /**
+     * 類別須完全一致才可以使用key作比較。
+     * 如果子類別與子類別的子類別可視為相同物件，則子類別需要複寫此函式。
+     * @param o
+     * @return
+     */
+    @Override
+    public int compareTo(RockingObject o) {
+        Class mC = this.getClass();
+        Class oC = o.getClass();
+        int r = mC == oC ? 0 : mC.toString().compareTo(oC.toString());
+        return r!=0 ? r : key.compareTo(o.key);
+    }
+
+
+    public static class BytesObject extends RockingObject<RockingKey.BytesID> {
+
+        final public byte[] data;
+
+        public BytesObject(byte[] keyBytes, byte[] valueBytes) {
+            this(keyBytes, valueBytes, true);
+        }
+
+        public BytesObject(byte[] keyBytes, byte[] valueBytes, boolean clone) {
+            super(new RockingKey.BytesID(keyBytes, clone));
+            this.data = clone ? valueBytes.clone() : valueBytes;
+        }
+
+        @Override
+        public byte[] valueBytes() {
+            return data;
+        }
     }
 }

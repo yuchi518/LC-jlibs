@@ -568,7 +568,6 @@ public class RockingCache {
 		}
 	}
 	
-	//private Async asyncT = null;
 	private Async asyncT = null;
 	private List<Async> asyncList = null;
 	private Percentage asyncPercentage = null;
@@ -589,28 +588,21 @@ public class RockingCache {
 					    max_dT = dT;
                     }
 
-					String perText, valText;
-					
-					/*sleepCount+=size;
-					if (sleepCount>=1024) {
-						// used to avoid crashing (rocksdb, assert fail)
-						sleepCount = 0;
-						Thread.sleep(10);
-					}*/
-					
+					String perText;
+					double value, total;
 					synchronized(RockingCache.this) {
 						asyncPercentage.addValue(size);
 						perText = asyncPercentage.changedString();
-						valText = " = " + (int)asyncPercentage.value() + "/" + (int)asyncPercentage.total();
+						value = asyncPercentage.value();
+						total = asyncPercentage.total();
 						if (asyncList.size()==0) break;
 						T = asyncList.remove(0);
 					}
 					
 					if (perText!=null) {
-						log.trace("rDB({0}) saving {1}, dT={2}ms", new Object[]{name, perText+valText, max_dT});
+						log.tracef("rDB(%s) saving %s=%d/%d, dT=%d", name, perText, (long)value, (long)total, dT);
 						max_dT = 0;
 					}
-					
 				}
 			} catch(Exception e) {
 				log.warn("rDB exception", e);
@@ -620,7 +612,7 @@ public class RockingCache {
 						asyncT = null;
 						asyncList = null;
 						RockingCache.this.notifyAll();
-						log.trace("rDB({0}) saved 100%", new Object[]{name});
+						log.tracef("rDB(%s) saved 100%%", name);
 					} else {
 						asyncT = asyncList.remove(0);
 						ExecutorServices.es(ExecutorServices.DB_NAME).execute(asyncT);
@@ -660,17 +652,8 @@ public class RockingCache {
 
 		@Override
 		protected void process() {
-			//int count=0;
 			for (RockingObject ro: ros) {
 				RockingCache.this._put(ro.keyBytes(), ro.valueBytes());
-				//count++;
-				/*try {
-					Thread.sleep(0, 100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
-				//if (count>)
 			}
 		}
 		@Override

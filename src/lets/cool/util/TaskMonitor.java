@@ -51,9 +51,9 @@ public class TaskMonitor {
 	}
 	
 	
-	public String name;
-	public long usedMemory;
-	public long elapsedTime;
+	final public String name;
+	protected long usedMemory;
+	protected long elapsedTime;
 	int _cnt=0;
 	
 	protected long lastUsedMemory;
@@ -91,14 +91,40 @@ public class TaskMonitor {
 		return this;
 	}
 
+	public long elapsedTime() {
+		return (_cnt == 0) ? elapsedTime : elapsedTime + (System.currentTimeMillis() - lastUsedTime);
+	}
+
+	public String elapsedTimeText() {
+		long time = this.elapsedTime();
+		if (time < 60*1000) {
+			return String.format("%02d.%03ds", time/1000%60, time%1000);
+		} else if (time < 60*60*1000) {
+			return String.format("%02dm:%02ds", time/1000/60, time/1000%60);
+		} else {
+			return String.format("%02dh:%02dm", time/1000/60/60, time/1000/60%60);
+		}
+	}
+
+	public String elapsedTimeDetailText() {
+		long time = this.elapsedTime();
+		if (time < 60*1000) {
+			return String.format("%02d.%03ds", time/1000%60, time%1000);
+		} else if (time < 60*60*1000) {
+			return String.format("%02dm:%02d.%03ds", time/1000/60, time/1000%60, time%1000);
+		} else {
+			return String.format("%02dh:%02dm:%02d.%03ds", time/1000/60/60, time/1000/60%60, time/1000%60, time%1000);
+		}
+	}
+
 	
 	public String toString() {
 		long total = rt.totalMemory();
 		long free = rt.freeMemory();
 		long max = rt.maxMemory();
 		long used = total - free;
-		return String.format("%s(%02d:%02d.%03d, %.1fMB used, %.1fMB total used, %.1fMB max)",
-				name, elapsedTime/1000/60, elapsedTime/1000%60, elapsedTime%1000, usedMemory/1024/1024.0, used/1024/1024.0, max/1024/1024.0);
+		return String.format("%s(%s, %.1fMB used, %.1fMB total used, %.1fMB max)",
+				name, this.elapsedTimeDetailText(), usedMemory/1024/1024.0, used/1024/1024.0, max/1024/1024.0);
 	}
 	
 }
