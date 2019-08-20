@@ -1,5 +1,7 @@
 package org.roaringbitmap;
 
+import java.util.Arrays;
+
 /**
  * Shim over JDK11 methods in Arrays to support multi-release
  */
@@ -16,16 +18,6 @@ public class ArraysShim {
    * @return true if the arrays are equal in the specified ranges
    */
   public static boolean equals(short[] x, int xmin, int xmax, short[] y, int ymin, int ymax) {
-    int xlen = xmax - xmin;
-    int ylen = ymax - ymin;
-    if (xlen != ylen) {
-      return false;
-    }
-    for (int i = xmin, j = ymin; i < xmax && j < ymax; ++i, ++j) {
-      if (x[i] != y[j]) {
-        return false;
-      }
-    }
-    return true;
+    return Arrays.equals(x, xmin, xmax, y, ymin, ymax);
   }
 }
