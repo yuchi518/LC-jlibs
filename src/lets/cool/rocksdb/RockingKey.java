@@ -25,7 +25,9 @@ public abstract class RockingKey implements Comparable<RockingKey> {
 
     @Override
     public int compareTo(RockingKey o) {
-        return Arrays.compare(toBytes(), o.toBytes());
+        Class mC = this.getClass();
+        Class oC = o.getClass();
+        return mC==oC ? Arrays.compare(toBytes(), o.toBytes()) : mC.toString().compareTo(oC.toString());
     }
 
     /**

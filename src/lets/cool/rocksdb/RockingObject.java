@@ -102,8 +102,7 @@ public abstract class RockingObject<T extends RockingKey> implements Comparable<
     public int compareTo(RockingObject o) {
         Class mC = this.getClass();
         Class oC = o.getClass();
-        int r = mC == oC ? 0 : mC.toString().compareTo(oC.toString());
-        return r!=0 ? r : key.compareTo(o.key);
+        return mC==oC ? key.compareTo(o.key) : mC.toString().compareTo(oC.toString());
     }
 
 

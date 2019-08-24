@@ -21,6 +21,8 @@ package lets.cool.util.iter;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIterator<T>, ProgressAwareIterator<T> {
 
@@ -52,6 +54,48 @@ public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIte
         public T next() {
             index++;
             return iterator.next();
+        }
+
+        @Override
+        public int size() {
+            return this.size;
+        }
+
+        @Override
+        public int index() {
+            return this.index;
+        }
+
+        @Override
+        public double progressPercentage() {
+            return this.size==0?0:(this.index*100.0/this.size);
+        }
+    }
+
+    class ReverseImpl<T> implements CountingIterator<T> {
+        protected int index;
+        protected int size;
+        protected ListIterator<T> reverseIterator;
+
+        public ReverseImpl(List<T> list) {
+            this(list.size(), list.listIterator(list.size()));
+        }
+
+        public ReverseImpl(int size, ListIterator<T> reverseIterator) {
+            this.index = 0;
+            this.size = size;
+            this.reverseIterator = reverseIterator;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return this.size!=0 && reverseIterator.hasPrevious();
+        }
+
+        @Override
+        public T next() {
+            index++;
+            return reverseIterator.previous();
         }
 
         @Override
