@@ -1392,22 +1392,26 @@ public class DynamicByteBuffer {
 		
 		public IndexAnd4bitsType(long v, byte t) {
 			value = v;
-			RPCValueType = t;
+			type = t;
 		}
 		
 		public long value;
-		public byte RPCValueType;
+		public byte type;
+	}
+
+	public DynamicByteBuffer putIndexAnd4bitsType(long value, byte type) {
+		return  putIndexAnd4bitsType(new IndexAnd4bitsType(value, type));
 	}
 	
 	public DynamicByteBuffer putIndexAnd4bitsType(IndexAnd4bitsType vat) {
 		if (vat.value>=0 && vat.value <= 0x07) {													// 0 ~ 0x07
-			put((byte)((vat.RPCValueType<<4) | vat.value));
+			put((byte)((vat.type <<4) | vat.value));
 		} else if (vat.value>=0 && vat.value <= 0x03FF+(0x08)) {									// 0x08 ~ 0x3FF+0x08
-			putShort((short)((vat.RPCValueType<<12) | 0x0800 | (vat.value-0x08)));
+			putShort((short)((vat.type <<12) | 0x0800 | (vat.value-0x08)));
 		} else if (vat.value>=0 && vat.value <= 0x01FFFFL+0x0408L) {									// 0x0408 ~ 0x01FFFF+0x0408
-			put3bytesInt((int)((vat.RPCValueType<<20) | 0x0C0000 | (vat.value-0x0408L)));
+			put3bytesInt((int)((vat.type <<20) | 0x0C0000 | (vat.value-0x0408L)));
 		} else if (vat.value>=0 && vat.value <= 0x00FFFFFFL+0x020408L) {								// 0x020408 ~ 0x00FFFFFF+0x020408
-			putInt((int)((vat.RPCValueType<<28) | 0x0E000000L | (vat.value-0x020408L)));
+			putInt((int)((vat.type <<28) | 0x0E000000L | (vat.value-0x020408L)));
 		} else {
 			//throw new RuntimeException("Type value(%lld) to long", value);
 			//EXCEPTIONv(@"Type value(%lld) to long", value);
@@ -1418,7 +1422,7 @@ public class DynamicByteBuffer {
 	public IndexAnd4bitsType getIndexAnd4bitsType() {
 		byte t = get();
 		IndexAnd4bitsType vat = new IndexAnd4bitsType();
-		vat.RPCValueType = (byte)((t >> 4) & 0x0F);
+		vat.type = (byte)((t >> 4) & 0x0F);
 		if ((t&0x08)==0) {
 			vat.value = t & 0x07;
 		} else if ((t&0x04)==0) {
