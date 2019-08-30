@@ -19,8 +19,7 @@
 
 package lets.cool.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 public class OutputStreamByteBuffer extends DynamicByteBuffer {
 
@@ -33,6 +32,14 @@ public class OutputStreamByteBuffer extends DynamicByteBuffer {
 	public OutputStreamByteBuffer(OutputStream output, int capacity) {
 		super(capacity);
 		outputStream = output; 
+	}
+
+	public OutputStreamByteBuffer(String path, int capacity) throws FileNotFoundException {
+		this(new BufferedOutputStream(new FileOutputStream(path)), capacity);
+	}
+
+	public OutputStreamByteBuffer(File file, int capacity) throws FileNotFoundException {
+		this(new BufferedOutputStream(new FileOutputStream(file)), capacity);
 	}
 
 	@Override
