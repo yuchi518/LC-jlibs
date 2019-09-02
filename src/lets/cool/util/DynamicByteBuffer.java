@@ -38,7 +38,7 @@ import java.util.TreeMap;
 //import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class DynamicByteBuffer {
-	static Logr log = Logr.logger();
+	final protected static Logr log = Logr.logger();
 	
 	/**
 	 * TO-DO: automatically free cached memory block

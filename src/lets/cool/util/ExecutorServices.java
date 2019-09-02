@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.concurrent.*;
 
 public class ExecutorServices {
-	
-	protected static Logr log = Logr.logger();
+
+	final protected static Logr log = Logr.logger();
 	
 	final public static String DEFAULT_NAME 	= "default";
 	final public static String DB_NAME 			= "db";				// use to communicate with database

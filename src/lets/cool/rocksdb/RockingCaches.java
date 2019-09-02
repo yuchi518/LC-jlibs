@@ -37,7 +37,7 @@ import org.rocksdb.RocksDBException;
  */
 public class RockingCaches {
 
-	protected static Logr log = Logr.logger();
+	final protected static Logr log = Logr.logger();
 	
 	protected final File _folder;
 	protected final Map<String, RocksDB> _rDBs;

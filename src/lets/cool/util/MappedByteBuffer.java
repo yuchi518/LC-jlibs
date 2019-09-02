@@ -27,7 +27,7 @@ import java.io.RandomAccessFile;
 
 public class MappedByteBuffer {
 
-	static Logr log = Logr.logger();
+	final protected static Logr log = Logr.logger();
 	
 	final int BUFFER_SIZE;
 	final int PAGE_SIZE;

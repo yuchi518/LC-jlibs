@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 
 public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject> extends RockingCache {
 
-	protected static Logr log = Logr.logger();
+	final protected static Logr log = Logr.logger();
 
 	final protected Class<TO> _objectClass;
 	final protected Class<TK> _keyClass;

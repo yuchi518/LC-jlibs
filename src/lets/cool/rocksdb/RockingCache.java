@@ -33,7 +33,7 @@ import org.rocksdb.*;
 
 public class RockingCache {
 
-	protected static Logr log = Logr.logger();
+	final protected static Logr log = Logr.logger();
 
 	public static Options defaultOptions() {
 	    return new Options()

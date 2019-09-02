@@ -31,7 +31,7 @@ import lets.cool.util.logging.Level;
 import lets.cool.util.logging.Logr;
 
 public abstract class CCipher {
-	protected static Logr log = Logr.logger();
+	final protected static Logr log = Logr.logger();
 	
 	public byte[] encrypt(byte plaindata[]) {
 		return encrypt(plaindata, 0, plaindata.length);
