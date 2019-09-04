@@ -1413,8 +1413,7 @@ public class DynamicByteBuffer {
 		} else if (vat.value>=0 && vat.value <= 0x00FFFFFFL+0x020408L) {								// 0x020408 ~ 0x00FFFFFF+0x020408
 			putInt((int)((vat.type <<28) | 0x0E000000L | (vat.value-0x020408L)));
 		} else {
-			//throw new RuntimeException("Type value(%lld) to long", value);
-			//EXCEPTIONv(@"Type value(%lld) to long", value);
+			throw new IllegalArgumentException("Type(" + vat.type + ") or Value(" + vat.value + ") is out of range.");
 		}
 		return this;
 	}
