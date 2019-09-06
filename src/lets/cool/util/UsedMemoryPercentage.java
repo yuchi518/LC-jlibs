@@ -19,6 +19,8 @@
 
 package lets.cool.util;
 
+import static lets.cool.util.HumanReadableText.byteCount;
+
 public class UsedMemoryPercentage extends Percentage {
 
 	Runtime rt;
@@ -42,7 +44,8 @@ public class UsedMemoryPercentage extends Percentage {
 		setValue(usedMemory());
 		return isChanged();
 	}
-	
+
+	// Value of -Xmx
 	public long maxMemory() {
 		return rt.maxMemory();
 	}
@@ -54,9 +57,17 @@ public class UsedMemoryPercentage extends Percentage {
 	public long usedMemory() {
 		return rt.totalMemory()-rt.freeMemory();
 	}
-	
+
+	// Value of -Xms ~ -Xmx
 	public long totalMemory() {
 		return rt.totalMemory();
+	}
+
+	public String usageText() {
+		return String.format("%s/%s = %s",
+				byteCount(usedMemory(), false),
+				byteCount(maxMemory(), false),
+				this.toString());
 	}
 
 }

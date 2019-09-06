@@ -28,9 +28,7 @@ import java.util.Map;
 public class TaskMonitor {
 
 	static Map<String, TaskMonitor> _monitors = new HashMap<>();
-	static List<TaskMonitor> _orders = new ArrayList<>();
-	static Runtime rt = Runtime.getRuntime();
-	
+
 	public static TaskMonitor monitor(String name) {
 		
 		synchronized(_monitors) {
@@ -38,38 +36,55 @@ public class TaskMonitor {
 			if (monitor==null) {
 				monitor = new TaskMonitor(name);
 				_monitors.put(name, monitor);
-				_orders.add(monitor);
 			}
 			return monitor;
 		}
-		
 	}
-	
 	
 	public static Collection<TaskMonitor> allMonitors() {
-		return _orders;
+		return _monitors.values();
+	}
+
+	public enum UpdateEvent {
+		NONE(0), PROGRESS(1), MEMORY(2), BOTH(3);
+
+		final public int flag;
+		UpdateEvent(int flag) {
+			this.flag = flag;
+		}
+
+		public boolean isProgressUpdated() {
+			return (this.flag & PROGRESS.flag) != 0;
+		}
+
+		public boolean isMemoryUpdated() {
+			return (this.flag & MEMORY.flag) != 0;
+		}
 	}
 	
-	
 	final public String name;
-	protected long usedMemory;
-	protected long elapsedTime;
-	int _cnt=0;
-	
-	protected long lastUsedMemory;
-	protected long lastUsedTime;
-	
-	private TaskMonitor(String name) {
+	final public String upperName;
+	final private UsedMemoryPercentage memory;
+	final private Percentage progress;
+
+	private long usedMemory;
+	private long elapsedTime;
+	private int _cnt=0;
+
+	private long lastUsedMemory;
+	private long lastUsedTime;
+
+	public TaskMonitor(String name) {
 		this.name = name;
+		this.upperName = name.toUpperCase();
+		this.memory = new UsedMemoryPercentage();
+		this.progress = new Percentage(1);
 	}
 	
 	public TaskMonitor start() {
 		if (_cnt++ > 0) return this;
 		
-		long total = rt.totalMemory();
-		long free = rt.freeMemory();
-		//long max = rt.maxMemory();
-		long used = total - free;
+		long used = memory.usedMemory();
 		
 		lastUsedMemory = used;
 		lastUsedTime = System.currentTimeMillis();
@@ -80,10 +95,7 @@ public class TaskMonitor {
 	public TaskMonitor stop() {
 		if (--_cnt > 0) return this;
 		
-		long total = rt.totalMemory();
-		long free = rt.freeMemory();
-		//long max = rt.maxMemory();
-		long used = total - free;
+		long used = memory.usedMemory();
 		
 		usedMemory += used-lastUsedMemory;
 		elapsedTime += System.currentTimeMillis()-lastUsedTime;
@@ -96,37 +108,76 @@ public class TaskMonitor {
 	}
 
 	public String elapsedTimeText() {
-		long time = this.elapsedTime();
-		if (time < 60*1000) {
-			return String.format("%02d.%03ds", time/1000%60, time%1000);
-		} else if (time < 60*60*1000) {
-			return String.format("%02dm:%02ds", time/1000/60, time/1000%60);
-		} else {
-			return String.format("%02dh:%02dm", time/1000/60/60, time/1000/60%60);
-		}
+		return HumanReadableText.elapsedTime(this.elapsedTime());
 	}
 
 	public String elapsedTimeDetailText() {
-		long time = this.elapsedTime();
-		if (time < 60*1000) {
-			return String.format("%02d.%03ds", time/1000%60, time%1000);
-		} else if (time < 60*60*1000) {
-			return String.format("%02dm:%02d.%03ds", time/1000/60, time/1000%60, time%1000);
+		return HumanReadableText.elapsedTimeDetail(this.elapsedTime());
+	}
+
+	public UpdateEvent checkEvent() {
+		if (progress.isChanged()) {
+			return memory.update() ? UpdateEvent.BOTH : UpdateEvent.PROGRESS;
 		} else {
-			return String.format("%02dh:%02dm:%02d.%03ds", time/1000/60/60, time/1000/60%60, time/1000%60, time%1000);
+			return memory.update() ? UpdateEvent.MEMORY : UpdateEvent.NONE;
 		}
 	}
 
-	
-	public String toString() {
-		long total = rt.totalMemory();
-		long free = rt.freeMemory();
-		long max = rt.maxMemory();
-		long used = total - free;
-		return String.format("%s(%s, %.1fMB used, %.1fMB total used, %.1fMB max)",
-				name, this.elapsedTimeDetailText(), usedMemory/1024/1024.0, used/1024/1024.0, max/1024/1024.0);
+	public UpdateEvent update() {
+		return memory.update() ? UpdateEvent.MEMORY : UpdateEvent.NONE;
+	}
+
+	public UpdateEvent updateIncrementalProgress(double value) {
+		progress.addValue(value);
+		return checkEvent();
+	}
+
+	public UpdateEvent updateIncrementalProgress(double value, double total) {
+		progress.addValue(value);
+		progress.addTotal(total);
+		return checkEvent();
+	}
+
+	public UpdateEvent updateProgress(double value) {
+		progress.setValue(value);
+		return checkEvent();
+	}
+
+	public UpdateEvent updateProgress(double value, double total) {
+		progress.setValue(value);
+		progress.setTotal(total);
+		return checkEvent();
+	}
+
+	public void resetProgressTotal(double progressTotal) {
+		progress.reset(progressTotal, 1);
+	}
+
+	public double memoryPercentage() {
+		return memory.percentage();
+	}
+
+	public double progressPercentage() {
+		return progress.percentage();
+	}
+
+	public String memoryUsage() {
+		return memory.usageText();
+	}
+
+	public String progressText() {
+		return progress.toString();
 	}
 	
+	public String toString() {
+		return String.format("[%s]-%s(%s), Mem: %s",
+				upperName, this.elapsedTimeDetailText(), progressText(), memoryUsage()/*usedMemory==0 ? "NAV" : HumanReadableText.byteCount(usedMemory)*/);
+	}
+
+	public String usageText() {
+		return String.format("[%s]-%s(%s), Mem: %s",
+				upperName, elapsedTimeText(), progressText(), memoryUsage());
+	}
 }
 
 

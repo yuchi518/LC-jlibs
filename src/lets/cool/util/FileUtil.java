@@ -70,22 +70,7 @@ public class FileUtil {
 
     public static String human_size(String path) throws IOException {
         long size = size(path);
-        return humanReadableByteCount(size, false);
-        /*if (size < 1024)
-            return String.format("%dB", size);
-        else if (size < 1024*1024)
-            return String.format("%5.1fKB", 10*size/1024/10.0);
-        else if (size < 1024*1024*1024)
-            return String.format("%5.1fMB", 10*size/1024/1024/10.0);
-        else
-            return String.format("%5.1fGB", 10*size/1024/1024/1024/10.0);*/
+        return HumanReadableText.byteCount(size, false);
     }
 
-    public static String humanReadableByteCount(long bytes, boolean si) {
-        int unit = si ? 1000 : 1024;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-    }
 }

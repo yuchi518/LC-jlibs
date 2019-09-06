@@ -71,7 +71,7 @@ public class Percentage {
 		this.lastPercentage = 0;
 		this.degree = Math.pow(10, degree);
 		this.amplify = 100 * this.degree;
-		this.format = degree<=0?"%3.0f%%":("%3."+degree+"f%%");
+		this.format = degree<=0?"%3.0f%%":("%0" + (2+degree) + "."+degree+"f%%");
 		return this;
 	}
 	

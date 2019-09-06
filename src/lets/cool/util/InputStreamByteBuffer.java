@@ -25,6 +25,7 @@ import java.io.InputStream;
 public class InputStreamByteBuffer extends DynamicByteBuffer {
 	
 	final protected InputStream inputStream;
+	long _count = 0;
 	
 	/**
 	 * This is not the same as DynamicByteBuffer(InputStream) version.
@@ -42,10 +43,15 @@ public class InputStreamByteBuffer extends DynamicByteBuffer {
 	}
 	
 	@Override
-	public int position() { throw new UnsupportedOperationException();}
+	public int position() {
+		long l = positionL();
+		return Math.toIntExact(l);
+	}
+
+	public long positionL() { return _count - (_limit - _position); }
 	
 	@Override
-	public DynamicByteBuffer position(int newPosition) { throw new UnsupportedOperationException();}
+	public DynamicByteBuffer position(int newPosition) { throw new UnsupportedOperationException(); }
 	
 	/**
 	 * This is an estimate value, fully depend to the inputStream.available() behavior.
@@ -100,6 +106,7 @@ public class InputStreamByteBuffer extends DynamicByteBuffer {
 						break;
 					}
 					_limit += rL;
+					_count += rL;
 					l -= rL;
 				} catch (IOException e) {
 					throw new RuntimeException(e);
@@ -131,6 +138,7 @@ public class InputStreamByteBuffer extends DynamicByteBuffer {
 					break;
 				}
 				_limit += rL;
+				_count += rL;
 				l -= rL;
 			} catch (IOException e) {
 				throw new RuntimeException(e);
