@@ -39,7 +39,11 @@ public class OutputStreamByteBuffer extends DynamicByteBuffer {
 	}
 
 	public OutputStreamByteBuffer(File file, int capacity) throws FileNotFoundException {
-		this(new BufferedOutputStream(new FileOutputStream(file)), capacity);
+		this(file, capacity, false);
+	}
+
+	public OutputStreamByteBuffer(File file, int capacity, boolean append) throws FileNotFoundException {
+		this(new BufferedOutputStream(new FileOutputStream(file, append)), capacity);
 	}
 
 	@Override
