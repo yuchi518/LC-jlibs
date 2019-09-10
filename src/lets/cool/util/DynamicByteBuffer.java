@@ -1399,18 +1399,23 @@ public class DynamicByteBuffer {
 		public byte type;
 	}
 
+	public DynamicByteBuffer putIndexAnd4bitsType(int value, byte type) {
+		return putIndexAnd4bitsType(new IndexAnd4bitsType(value, type));
+	}
+
 	public DynamicByteBuffer putIndexAnd4bitsType(long value, byte type) {
-		return  putIndexAnd4bitsType(new IndexAnd4bitsType(value, type));
+		return putIndexAnd4bitsType(new IndexAnd4bitsType(value, type));
 	}
 	
 	public DynamicByteBuffer putIndexAnd4bitsType(IndexAnd4bitsType vat) {
-		if (vat.value>=0 && vat.value <= 0x07) {													// 0 ~ 0x07
+		final boolean isTrue = (vat.type <= 0xf) && (vat.value >= 0);
+		if (isTrue && vat.value <= 0x07) {													// 0 ~ 0x07
 			put((byte)((vat.type <<4) | vat.value));
-		} else if (vat.value>=0 && vat.value <= 0x03FF+(0x08)) {									// 0x08 ~ 0x3FF+0x08
+		} else if (isTrue && vat.value <= 0x03FF+(0x08)) {									// 0x08 ~ 0x3FF+0x08
 			putShort((short)((vat.type <<12) | 0x0800 | (vat.value-0x08)));
-		} else if (vat.value>=0 && vat.value <= 0x01FFFFL+0x0408L) {									// 0x0408 ~ 0x01FFFF+0x0408
+		} else if (isTrue && vat.value <= 0x01FFFFL+0x0408L) {									// 0x0408 ~ 0x01FFFF+0x0408
 			put3bytesInt((int)((vat.type <<20) | 0x0C0000 | (vat.value-0x0408L)));
-		} else if (vat.value>=0 && vat.value <= 0x00FFFFFFL+0x020408L) {								// 0x020408 ~ 0x00FFFFFF+0x020408
+		} else if (isTrue && vat.value <= 0x00FFFFFFL+0x020408L) {								// 0x020408 ~ 0x00FFFFFF+0x020408
 			putInt((int)((vat.type <<28) | 0x0E000000L | (vat.value-0x020408L)));
 		} else {
 			throw new IllegalArgumentException("Type(" + vat.type + ") or Value(" + vat.value + ") is out of range.");
