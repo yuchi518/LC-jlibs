@@ -72,6 +72,33 @@ public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIte
         }
     }
 
+    class EmptyImpl<T> implements CountingIterator<T> {
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public T next() {
+            return null;
+        }
+
+        @Override
+        public int index() {
+            return 0;
+        }
+
+        @Override
+        public double progressPercentage() {
+            return 100;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+    }
+
     class ReverseImpl<T> implements CountingIterator<T> {
         protected int index;
         protected int size;
