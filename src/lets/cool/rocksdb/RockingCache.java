@@ -24,6 +24,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import lets.cool.util.*;
 import lets.cool.util.logging.Level;
@@ -52,14 +53,15 @@ public class RockingCache {
                 ;
     }
 
-    public final String name;		// for debug
-    protected final File _folder;
-	protected RocksDB _rDB;
-	protected Options _options;
-	protected boolean readonly;
-	protected WeakHashMap<RockingKey, WeakReference<RockingObject>> uniqueObjects;
-	protected int cacheHit = 0, cacheError = 0, cacheMiss = 0;
-	
+	final public String name;		// for debug
+    final private File _folder;
+	final private RocksDB _rDB;
+	final private Options _options;
+	final private Map<String, ColumnFamilyHandle> columnFamilyHandleMap = new HashMap<>();
+	private boolean readonly;
+	private WeakHashMap<RockingKey, WeakReference<RockingObject>> uniqueObjects;
+	private int cacheHit = 0, cacheError = 0, cacheMiss = 0;
+
 	protected RockingCache(File folder) {
 		this(folder, null);
 	}
@@ -89,9 +91,35 @@ public class RockingCache {
 	protected RockingCache(RocksDB rDB, String name) {
 		_folder = null;
 		_rDB = rDB;
+		_options = null;
 		this.name = name;
         readonly = true;
 		uniqueObjects = null;
+	}
+
+	public ColumnFamilyHandle createColumnFamily(String columnFamilyName) {
+		synchronized (columnFamilyHandleMap) {
+			try {
+				final ColumnFamilyHandle columnFamilyHandle = _rDB.createColumnFamily(new ColumnFamilyDescriptor(columnFamilyName.getBytes(), new ColumnFamilyOptions()));
+				columnFamilyHandleMap.put(columnFamilyName, columnFamilyHandle);
+				return columnFamilyHandle;
+			} catch (RocksDBException e) {
+				log.error(e);
+				throw new RuntimeException("Can't create column family");
+			}
+		}
+	}
+
+	public void dropColumnFamily(String columnFamilyName) {
+		synchronized (columnFamilyHandleMap) {
+			try {
+				_rDB.dropColumnFamily(columnFamilyHandleMap.get(columnFamilyName));
+			} catch (RocksDBException e) {
+				log.error(e);
+				throw new RuntimeException("Can't drop column family");
+			}
+			columnFamilyHandleMap.remove(columnFamilyName);
+		}
 	}
 
 	public long getApproximateNumOfEntries() {
@@ -159,6 +187,24 @@ public class RockingCache {
         }
     }
 
+	private void _put(byte key[], byte value[], String columnFamilyName) {
+		if (readonly) {
+			throw new UnsupportedOperationException(this.name + ": Readonly mode");
+		}
+		try {
+			if (columnFamilyHandleMap.size()==0) {
+				_rDB.put(key, value);
+			} else if (columnFamilyName == null) {
+				_rDB.put(_rDB.getDefaultColumnFamily(), new WriteOptions(), key, value);
+			} else {
+				_rDB.put(columnFamilyHandleMap.get(columnFamilyName), new WriteOptions(), key, value);
+			}
+		} catch (RocksDBException e) {
+			log.warn("RocksDB can't put", e);
+			throw new RuntimeException(e);
+		}
+	}
+
     private void _pushToCache(RockingObject ro) {
         if (uniqueObjects != null) {
             synchronized(uniqueObjects) {
@@ -187,6 +233,11 @@ public class RockingCache {
 	public void put(byte key[], byte value[]) {
         if (uniqueObjects != null) throw new UnsupportedOperationException("ObjectUnique mode");
         _put(key, value);
+	}
+
+	public void put(byte key[], byte value[], String columnFamilyName) {
+		if (uniqueObjects != null) throw new UnsupportedOperationException("ObjectUnique mode");
+		_put(key, value, columnFamilyName);
 	}
 	
 	/**
@@ -517,13 +568,21 @@ public class RockingCache {
 		// dispose rDB if and only if it was created by self.
 		if (_folder!=null) {
 			if (_rDB!=null) {
+				if (columnFamilyHandleMap!=null) {
+					try {
+						_rDB.dropColumnFamilies(new ArrayList<>(columnFamilyHandleMap.values()));
+					} catch (RocksDBException e) {
+						log.error(e);
+					}
+					columnFamilyHandleMap.clear();
+				}
 				try {
 					_rDB.flush(new FlushOptions().setWaitForFlush(true).setAllowWriteStall(false));
 					_rDB.closeE();
 				} catch (Exception ex) {
 					log.error(ex);
 				}
-				_rDB = null;
+				//_rDB = null;
 			}
 		}
 	}

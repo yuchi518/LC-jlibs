@@ -81,6 +81,10 @@ public abstract class Pipeline<IN, OUT> {
         return this;
     }
 
+    public Pipeline<IN, OUT> withMaxNumberConcurrentWorks() {
+        return withConcurrentWorks(Runtime.getRuntime().availableProcessors());
+    }
+
     public Pipeline<IN, OUT> withNameOfExecutorService(String name) {
         nameOfExecutorService = name == null ? ExecutorServices.PIPELINE: name;
         completionService = ExecutorServices.cs(nameOfExecutorService);
