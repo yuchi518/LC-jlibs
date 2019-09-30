@@ -56,11 +56,17 @@ public class RockingCaches {
 			optionsConsumer.accept(_options);
 		}
 	}
-	
+
 	public RocksDB db(String name) {
-		return db(name, null);
+		return db(name, null, false);
 	}
-	public RocksDB db(String name, Consumer<Options> optionsConsumer) {
+	public RocksDB db(String name, boolean hardReadonly) {
+		return db(name, null, hardReadonly);
+	}
+	public RocksDB dbRO(String name) {
+		return db(name, null, true);
+	}
+	public RocksDB db(String name, Consumer<Options> optionsConsumer, boolean hardReadonly) {
 		RocksDB rDB = _rDBs.get(name);
 		if (rDB!=null) return rDB;
 
@@ -79,7 +85,9 @@ public class RockingCaches {
 			folder.mkdirs();
 			
 			try {
-				rDB = RocksDB.open(options, folder.getAbsolutePath());
+				rDB = hardReadonly ?
+						RocksDB.openReadOnly(options, folder.getAbsolutePath()) :
+						RocksDB.open(options, folder.getAbsolutePath());
 			} catch (RocksDBException e) {
 				log.warn("RocksDB can't create", e);
 				throw new RuntimeException(e);
@@ -92,10 +100,14 @@ public class RockingCaches {
 	}
 	
 	public RockingCache cache(String name) {
-		return new RockingCache(db(name), name);
+		return new RockingCache(db(name, false), name, false);
 	}
 
-    /**
+	public RockingCache cacheRO(String name) {
+		return new RockingCache(db(name, true), name, true);
+	}
+
+	/**
      *
      * @param name The name of database
      * @param subClass The sub class for cache
@@ -104,7 +116,18 @@ public class RockingCaches {
      */
 	public <S extends RockingCache> S cache(String name, Class<S> subClass) {
 		try {
-			return subClass.getConstructor(RocksDB.class,String.class).newInstance(db(name),name);
+			return subClass.getConstructor(RocksDB.class, String.class, boolean.class).newInstance(db(name, false), name, false);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			log.warn("Unsupported class", e);
+		}
+		return null;
+	}
+
+	public <S extends RockingCache> S cacheRO(String name, Class<S> subClass) {
+		try {
+			return subClass.getConstructor(RocksDB.class, String.class, boolean.class).newInstance(db(name, true), name, true);
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
@@ -114,9 +137,15 @@ public class RockingCaches {
 	}
 
 	public <TK extends RockingKey, TO extends RockingObject> RockingObjectsCache<TK, TO> objectsCache(String name, Class<TK> kcla, Class<TO> cla) {
-		return new RockingObjectsCache<>(kcla, cla, db(name), name);
+		return new RockingObjectsCache<>(kcla, cla, db(name, false), name, false);
 	}
-	
+	public <TK extends RockingKey, TO extends RockingObject> RockingObjectsCache<TK, TO> objectsCache(String name, Class<TK> kcla, Class<TO> cla, boolean hardReadonly) {
+		return new RockingObjectsCache<>(kcla, cla, db(name, hardReadonly), name, hardReadonly);
+	}
+	public <TK extends RockingKey, TO extends RockingObject> RockingObjectsCache<TK, TO> objectsCacheRO(String name, Class<TK> kcla, Class<TO> cla) {
+		return new RockingObjectsCache<>(kcla, cla, db(name, true), name, true);
+	}
+
 	/**
 	 * Return a RockingSetCache cache, make sure the DB is this type.
 	 * @param name
@@ -125,9 +154,12 @@ public class RockingCaches {
 	public RockingSetCache setCache(String name) {
 		return new RockingSetCache(db(name), name);
 	}
-	
+
 	public RockingPropertiesCache propertiesCache(String name) {
 		return new RockingPropertiesCache(db(name), name);
+	}
+	public RockingPropertiesCache propertiesCache(String name, boolean hardReadonly) {
+		return new RockingPropertiesCache(db(name, hardReadonly), name, hardReadonly);
 	}
 	
 	/**

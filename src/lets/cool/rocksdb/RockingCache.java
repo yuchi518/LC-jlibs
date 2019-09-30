@@ -24,7 +24,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import lets.cool.util.*;
 import lets.cool.util.logging.Level;
@@ -58,15 +57,16 @@ public class RockingCache {
 	final private RocksDB _rDB;
 	final private Options _options;
 	final private Map<String, ColumnFamilyHandle> columnFamilyHandleMap = new HashMap<>();
-	private boolean readonly;
+	final private boolean _hardReadonly;
+	private boolean _softReadonly;
 	private WeakHashMap<RockingKey, WeakReference<RockingObject>> uniqueObjects;
 	private int cacheHit = 0, cacheError = 0, cacheMiss = 0;
 
 	protected RockingCache(File folder) {
-		this(folder, null);
+		this(folder, null, false);
 	}
 
-	protected RockingCache(File folder, Consumer<Options> optionsConsumer) {
+	protected RockingCache(File folder, Consumer<Options> optionsConsumer, boolean hardReadonly) {
 		_folder = folder;
 		_folder.mkdirs();
 
@@ -77,23 +77,27 @@ public class RockingCache {
 		}
 		
 		try {
-			_rDB = RocksDB.open(_options, _folder.getAbsolutePath());
+			_rDB = hardReadonly ?
+					RocksDB.openReadOnly(_options, _folder.getAbsolutePath()) :
+					RocksDB.open(_options, _folder.getAbsolutePath());
 		} catch (RocksDBException e) {
 			log.warn("RocksDB can't create", e);
 			throw new RuntimeException(e);
 		}
 
 		name = _folder.getName();
-		readonly = true;
+		_softReadonly = true;
 		uniqueObjects = null;
+		_hardReadonly = hardReadonly;
 	}
 	
-	protected RockingCache(RocksDB rDB, String name) {
+	protected RockingCache(RocksDB rDB, String name, boolean hardReadonly) {
+		this.name = name;
 		_folder = null;
 		_rDB = rDB;
 		_options = null;
-		this.name = name;
-        readonly = true;
+		_softReadonly = true;
+		_hardReadonly = hardReadonly;
 		uniqueObjects = null;
 	}
 
@@ -137,8 +141,8 @@ public class RockingCache {
     /**
      * TODO: This is soft readonly function, we should implement a real readonly function to disable database directly.
      */
-    public void setReadonly(boolean readonly) { this.readonly = readonly; }
-    public boolean isReadonly() { return readonly; }
+    public void setReadonly(boolean readonly) { _softReadonly = readonly; }
+    public boolean isReadonly() { return _softReadonly | _hardReadonly; }
 
 	/**
 	 * ObjectUnique will try to keep only one RockingObject for each key in runtime.
@@ -176,7 +180,7 @@ public class RockingCache {
     }
 
     private void _put(byte key[], byte value[]) {
-        if (readonly) {
+        if (isReadonly()) {
             throw new UnsupportedOperationException(this.name + ": Readonly mode");
         }
         try {
@@ -188,7 +192,7 @@ public class RockingCache {
     }
 
 	private void _put(byte key[], byte value[], String columnFamilyName) {
-		if (readonly) {
+		if (isReadonly()) {
 			throw new UnsupportedOperationException(this.name + ": Readonly mode");
 		}
 		try {
@@ -281,7 +285,8 @@ public class RockingCache {
 		try {
 			return _rDB.get(key);
 		} catch (RocksDBException e) {
-			log.warn("RocksDB can't load data", e);
+			log.error("RocksDB can't load data" + e);
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
@@ -406,7 +411,8 @@ public class RockingCache {
         } catch (RocksDBException | InstantiationException | IllegalAccessException
                 | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
-            log.warn("RocksDB can't load data ("+cla+")", e);
+            log.error("RocksDB can't load data ("+cla+")" + e);
+			e.printStackTrace();
 
             MemoryPrinter.printMemory(log, Level.WARN, "key", key.toBytes(), 0, -1, 0);
             MemoryPrinter.printMemory(log, Level.WARN, "value", vb, 0, -1, 0);
@@ -471,7 +477,8 @@ public class RockingCache {
                 } catch (InstantiationException | IllegalAccessException
                         | IllegalArgumentException | InvocationTargetException
                         | NoSuchMethodException | SecurityException e) {
-                    log.warn("RocksDB can't load data ("+cla+")", e);
+                    log.error("RocksDB can't load data ("+cla+")" + e);
+					e.printStackTrace();
 
                     if (ks != null) MemoryPrinter.printMemory(log, Level.WARN, "key", ks, 0, -1, 0);
                     if (vs != null) MemoryPrinter.printMemory(log, Level.WARN, "value", vs, 0, -1, 0);
@@ -529,7 +536,8 @@ public class RockingCache {
                 } catch (InstantiationException | IllegalAccessException
                         | IllegalArgumentException | InvocationTargetException
                         | NoSuchMethodException | SecurityException e) {
-                    log.warn("RocksDB can't load key ("+cla+")", e);
+                    log.warn("RocksDB can't load key ("+cla+")" + e);
+					e.printStackTrace();
 
                     if (ks != null) MemoryPrinter.printMemory(log, Level.WARN, "key", ks, 0, -1, 0);
 
@@ -606,8 +614,8 @@ public class RockingCache {
 			}
 		}
 	}
-	
-	private void putAsync(Async a) {
+
+	protected void putAsync(Async a) {
 		synchronized(this) {
 			if (asyncT==null) {
 				asyncPercentage = new Percentage(a.size(),0);

@@ -35,18 +35,18 @@ public class RockingObjectsCache<TK extends RockingKey, TO extends RockingObject
 	final protected Class<TK> _keyClass;
 
 	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder) {
-		this(kcla, cla, folder,null);
+		this(kcla, cla, folder,null, false);
 	}
 
-	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder, Consumer<Options> optionsConsumer) {
-		super(folder, optionsConsumer);
+	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, File folder, Consumer<Options> optionsConsumer, boolean hardReadonly) {
+		super(folder, optionsConsumer, hardReadonly);
 		_keyClass = kcla;
 		_objectClass = cla;
 		setObjectUnique(true);
 	}
 
-	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, RocksDB rDB, String name) {
-	    super(rDB, name);
+	protected RockingObjectsCache(Class<TK> kcla, Class<TO> cla, RocksDB rDB, String name, boolean hardReadonly) {
+	    super(rDB, name, hardReadonly);
 		_keyClass = kcla;
 		_objectClass = cla;
 		setObjectUnique(true);

@@ -33,12 +33,16 @@ public class RockingPropertiesCache extends RockingCache {
 		super(folder);
 	}
 
-	public RockingPropertiesCache(File folder, Consumer<Options> optionsConsumer) {
-		super(folder, optionsConsumer);
+	public RockingPropertiesCache(File folder, Consumer<Options> optionsConsumer, boolean hardReadonly) {
+		super(folder, optionsConsumer, hardReadonly);
 	}
 
 	protected RockingPropertiesCache(RocksDB rDB, String name) {
-		super(rDB, name);
+		super(rDB, name, false);
+	}
+
+	protected RockingPropertiesCache(RocksDB rDB, String name, boolean hardReadonly) {
+		super(rDB, name, hardReadonly);
 	}
 	
 	public boolean contains(byte key[]) {
@@ -55,7 +59,7 @@ public class RockingPropertiesCache extends RockingCache {
 	}
 	
 	
-	public void setString(byte key[], String value) {
+	public void setString(byte[] key, String value) {
 		DynamicByteBuffer buf = new DynamicByteBuffer(16);
 		buf.putVarLengthString(value);
 		byte vb[] = buf.toBytesBeforeCurrentPosition();
@@ -64,7 +68,7 @@ public class RockingPropertiesCache extends RockingCache {
 		super.put(key, vb);
 	}
 	
-	public String getString(byte key[]) {
+	public String getString(byte[] key) {
 		byte vb[] = super.get(key);
 		if (vb==null) return null;
 		

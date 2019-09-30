@@ -34,12 +34,12 @@ public class RockingSetCache extends RockingCache {
 		super(folder);
 	}
 
-	public RockingSetCache(File folder, Consumer<Options> optionsConsumer) {
-		super(folder, optionsConsumer);
+	public RockingSetCache(File folder, Consumer<Options> optionsConsumer, boolean hardReadonly) {
+		super(folder, optionsConsumer, hardReadonly);
 	}
 	
 	protected RockingSetCache(RocksDB rDB, String name) {
-		super(rDB, name);
+		super(rDB, name, false);
 	}
 	
 	public void set(long key) {
