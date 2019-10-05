@@ -161,7 +161,13 @@ public class RockingCaches {
 	public RockingPropertiesCache propertiesCache(String name, boolean hardReadonly) {
 		return new RockingPropertiesCache(db(name, hardReadonly), name, hardReadonly);
 	}
-	
+
+	public RockingBlobsCache blobsCache(String name) {
+		return new RockingBlobsCache(db(name), name);
+	}
+	public RockingBlobsCache blobsCache(String name, boolean hardReadonly) {
+		return new RockingBlobsCache(db(name, hardReadonly), name, hardReadonly);
+	}
 	/**
 	 * Call this before application termination.
 	 */

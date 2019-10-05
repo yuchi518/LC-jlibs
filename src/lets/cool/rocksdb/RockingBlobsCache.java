@@ -1,5 +1,6 @@
 package lets.cool.rocksdb;
 
+import lets.cool.util.ByteUtil;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 
@@ -21,6 +22,10 @@ public class RockingBlobsCache/*<TK extends RockingKey>*/ extends RockingCache {
 
     protected RockingBlobsCache(RocksDB rDB, String name, boolean hardReadonly) {
         super(rDB, name, hardReadonly);
+    }
+
+    public byte[] getBlob(RockingKey key) {
+        return get(key.toBytes());
     }
 
     public void setBlob(byte[] key, byte[] blob) {
@@ -46,11 +51,7 @@ public class RockingBlobsCache/*<TK extends RockingKey>*/ extends RockingCache {
         if (originBlob == null) {
             put(key, appendingBlob);
         } else {
-            byte[] blob = new byte[originBlob.length + appendingBlob.length];
-
-            System.arraycopy(originBlob, 0, blob, 0, originBlob.length);
-            System.arraycopy(appendingBlob, 0, blob, originBlob.length, appendingBlob.length);
-
+            byte[] blob = ByteUtil.concat(originBlob, appendingBlob);
             put(key, blob);
         }
     }

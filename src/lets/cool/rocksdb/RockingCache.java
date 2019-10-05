@@ -139,10 +139,11 @@ public class RockingCache {
 	}
 
     /**
-     * TODO: This is soft readonly function, we should implement a real readonly function to disable database directly.
+     * TODO: This is soft readonly function.
      */
     public void setReadonly(boolean readonly) { _softReadonly = readonly; }
     public boolean isReadonly() { return _softReadonly | _hardReadonly; }
+    public boolean isHardReadonly() { return _hardReadonly; }
 
 	/**
 	 * ObjectUnique will try to keep only one RockingObject for each key in runtime.
@@ -181,7 +182,7 @@ public class RockingCache {
 
     private void _put(byte key[], byte value[]) {
         if (isReadonly()) {
-            throw new UnsupportedOperationException(this.name + ": Readonly mode");
+            throw new UnsupportedOperationException(this.name + ": Soft Readonly mode");
         }
         try {
             _rDB.put(key, value);
@@ -193,7 +194,7 @@ public class RockingCache {
 
 	private void _put(byte key[], byte value[], String columnFamilyName) {
 		if (isReadonly()) {
-			throw new UnsupportedOperationException(this.name + ": Readonly mode");
+			throw new UnsupportedOperationException(this.name + ": Soft Readonly mode");
 		}
 		try {
 			if (columnFamilyHandleMap.size()==0) {
@@ -672,7 +673,8 @@ public class RockingCache {
 					}
 				}
 			} catch(Exception e) {
-				log.warn("rDB exception", e);
+				log.error("rDB exception");
+				log.error(e);
 			} finally {
 				synchronized(RockingCache.this) {
 					if (asyncList.size()==0) {
