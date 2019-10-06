@@ -19,6 +19,8 @@
 
 package lets.cool.util;
 
+import lets.cool.util.logging.Logr;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -177,6 +179,20 @@ public class TaskMonitor {
 	public String usageText() {
 		return String.format("[%s]-%s(%s), Mem: %s",
 				upperName, elapsedTimeText(), progressText(), memoryUsage());
+	}
+
+	// ====
+	private long progressShownTime = 0L;
+	private double progressShownValue = 0.0;
+	public void logIfNecessary(Logr log) {
+		UpdateEvent event = checkEvent();
+		long dT = System.currentTimeMillis() - progressShownTime;
+		double dP = progressPercentage() - progressShownValue;
+		if (event.isProgressUpdated() && ((dP >= 10 && dT >= 10 * 1000) || (dP >= 1 && dT >= 60 * 1000))) {
+			log.info(usageText());
+			progressShownTime = System.currentTimeMillis();
+			progressShownValue = progressPercentage();
+		}
 	}
 }
 
