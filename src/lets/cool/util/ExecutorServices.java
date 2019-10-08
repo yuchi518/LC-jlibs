@@ -50,6 +50,9 @@ public class ExecutorServices {
 				threadFactory);
 	}
 
+	synchronized public static ExecutorService initiateExecutorService(String name) {
+		return initiateExecutorService(name, Runtime.getRuntime().availableProcessors());
+	}
 	synchronized public static ExecutorService initiateExecutorService(String name, int numberOfThreads) {
 		//ExecutorService es = Executors.newFixedThreadPool(numberOfThreads, defaultFactory);
         ExecutorService es = newFixedThreadPool(numberOfThreads, defaultFactory);
