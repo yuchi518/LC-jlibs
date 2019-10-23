@@ -92,6 +92,10 @@ public class Percentage {
 	synchronized public double value() {
 		return value;
 	}
+
+	synchronized public boolean isCompleted() {
+		return total == value;
+	}
 	
 	/**
 	 * Gap between total() & value()

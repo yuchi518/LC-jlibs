@@ -188,11 +188,22 @@ public class TaskMonitor {
 		UpdateEvent event = checkEvent();
 		long dT = System.currentTimeMillis() - progressShownTime;
 		double dP = progressPercentage() - progressShownValue;
-		if (event.isProgressUpdated() && ((dP >= 10 && dT >= 10 * 1000) || (dP >= 1 && dT >= 60 * 1000))) {
+		if (event.isProgressUpdated() && (progress.isCompleted() || (dP >= 10 && dT >= 10 * 1000) || (dP >= 1 && dT >= 60 * 1000))) {
 			log.info(usageText());
 			progressShownTime = System.currentTimeMillis();
 			progressShownValue = progressPercentage();
 		}
+	}
+
+	public boolean logIfNecessaryOrMemoryUsageAbovePercentage(Logr log, double percentage) {
+		memory.update();
+		if (this.memoryPercentage() > percentage) {
+			log.warn(usageText());
+			return true;
+		} else {
+			logIfNecessary(log);
+		}
+		return false;
 	}
 }
 

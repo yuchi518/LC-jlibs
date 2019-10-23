@@ -36,14 +36,14 @@ public class RockingBlobsCache/*<TK extends RockingKey>*/ extends RockingCache {
         put(key.toBytes(), blob);
     }
 
-    public void setBlobAsync(byte[] key, byte[] blob) {
+    public int setBlobAsync(byte[] key, byte[] blob) {
         AsyncBlob asb = new AsyncBlob(key, blob, false);
-        putAsync(asb);
+        return putAsync(asb);
     }
 
-    public void setBlobAsync(RockingKey key, byte[] blob) {
+    public int setBlobAsync(RockingKey key, byte[] blob) {
         AsyncBlob asb = new AsyncBlob(key.toBytes(), blob, false);
-        putAsync(asb);
+        return putAsync(asb);
     }
 
     public void appendBlob(byte[] key, byte[] appendingBlob) {
@@ -60,14 +60,14 @@ public class RockingBlobsCache/*<TK extends RockingKey>*/ extends RockingCache {
         appendBlob(key.toBytes(), appendingBlob);
     }
 
-    public void appendBlobAsync(byte[] key, byte[] appendingBlob) {
+    public int appendBlobAsync(byte[] key, byte[] appendingBlob) {
         AsyncBlob asb = new AsyncBlob(key, appendingBlob, true);
-        putAsync(asb);
+        return putAsync(asb);
     }
 
-    public void appendBlobAsync(RockingKey key, byte[] appendingBlob) {
+    public int appendBlobAsync(RockingKey key, byte[] appendingBlob) {
         AsyncBlob asb = new AsyncBlob(key.toBytes(), appendingBlob, true);
-        putAsync(asb);
+        return putAsync(asb);
     }
 
 

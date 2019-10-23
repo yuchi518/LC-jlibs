@@ -616,16 +616,18 @@ public class RockingCache {
 		}
 	}
 
-	protected void putAsync(Async a) {
+	protected int putAsync(Async a) {
 		synchronized(this) {
 			if (asyncT==null) {
 				asyncPercentage = new Percentage(a.size(),0);
 				asyncList = new ArrayList<>();
 				asyncT = a;
 				ExecutorServices.es(ExecutorServices.DB_NAME).execute(a);
+				return 1;
 			} else {
 				asyncPercentage.addTotal(a.size());
 				asyncList.add(a);
+				return asyncList.size();
 			}
 		}
 	}
