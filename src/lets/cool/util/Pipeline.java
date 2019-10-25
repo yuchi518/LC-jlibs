@@ -267,6 +267,7 @@ public abstract class Pipeline<IN, OUT> {
             }
         } else {
             // This function will be replaced for first object
+            throw new UnsupportedOperationException("This should be implemented by first object.");
         }
         return true;
     }
@@ -287,8 +288,19 @@ public abstract class Pipeline<IN, OUT> {
         }
 
         completionService.submit(() -> {
-            processIt((IN)obj);
-            semaphore.release();
+            Exception exception = null;
+            try {
+                processIt((IN) obj);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                exception = ex;
+            } finally {
+                semaphore.release();
+            }
+
+            if (exception != null)
+                throw new RuntimeException(exception);
+
             return null;
         });
 
