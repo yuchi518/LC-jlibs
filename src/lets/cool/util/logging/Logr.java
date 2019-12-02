@@ -271,6 +271,47 @@ public class Logr {
         this.logger.logp(level.level, clr.sourceClassName, clr.sourceMethodName, msg);
     }
 
+    // Exception log
+
+    public void exception(String msg) {
+        log(Level.ERROR, msg);
+        throw new RuntimeException(msg);
+    }
+
+    public void exception(Object obj) {
+        log(Level.ERROR, obj.toString());
+        throw new RuntimeException(obj.toString());
+    }
+
+    public void exception(Supplier<String> msgSupplier) {
+        log(Level.ERROR, msgSupplier);
+        throw new RuntimeException(msgSupplier.get());
+    }
+
+    /*public void exception(String msg, Object param1) {
+        log(Level.ERROR, msg, param1);
+    }
+
+    public void exception(String msg, Object params[]) {
+        log(Level.ERROR, msg, params);
+    }*/
+
+    public void exception(String msg, Throwable thrown) {
+        log(Level.ERROR, msg, thrown);
+        throw new RuntimeException(msg, thrown);
+    }
+
+    public void exception(Throwable thrown, Supplier<String> msgSupplier) {
+        log(Level.ERROR, thrown, msgSupplier);
+        throw new RuntimeException(msgSupplier.get(), thrown);
+    }
+
+    @FormatMethod
+    public void exceptionf(String format, Object ... args) {
+        logf(Level.ERROR, format, args);
+        throw new RuntimeException(String.format(format, args));
+    }
+
     // ERROR log
 
     public void error(String msg) {
