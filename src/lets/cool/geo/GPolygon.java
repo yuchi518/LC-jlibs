@@ -2,6 +2,7 @@ package lets.cool.geo;
 
 import lets.cool.util.logging.Logr;
 
+import java.awt.geom.Path2D;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,6 +29,10 @@ public class GPolygon<T extends GPoint> implements Iterable<T> {
 
     static public <T extends GPoint> GPolygon<T> create(T ... points) {
         return new GPolygon<>(Arrays.asList(points));
+    }
+
+    static public <T extends GPoint> GPolygon<T> create(List<T> pointsList) {
+        return new GPolygon<>(pointsList);
     }
 
     protected List<T> points;
@@ -85,5 +90,29 @@ public class GPolygon<T extends GPoint> implements Iterable<T> {
     public <V extends T> GPolygon<V> castAll(Function<? super T, ? extends V> action) {
         points.replaceAll(item -> action.apply(item));
         return (GPolygon<V>)this;
+    }
+
+    public Path2D toPath() {
+        return toPath(true, null);
+    }
+
+    public Path2D toPath(boolean forceToClose, Function<? super T, ? extends T> converter) {
+        if (converter == null)
+            converter = v -> v;
+
+        Path2D path = new Path2D.Double();
+        Iterator<T> iter = points.iterator();
+        if (iter.hasNext()) {
+            T p = converter.apply(iter.next());
+            path.moveTo(p.getX(), p.getY());
+            while (iter.hasNext()) {
+                p = converter.apply(iter.next());
+                path.lineTo(p.getX(), p.getY());
+            }
+            if (forceToClose) {
+                path.closePath();
+            }
+        }
+        return path;
     }
 }

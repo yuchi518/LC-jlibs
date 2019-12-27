@@ -35,6 +35,34 @@ public class EdgePolygon<T> {
         }
     }
 
+    public int countOfEdges() {
+        return edges.size();
+    }
+
+    /*public void addEdges(Edge<T> ... edges) {
+        for (Edge<T> edge: edges) {
+            addEdge(edge);
+        }
+    }*/
+
+    public void addEdges(Collection<Edge<T>> edges) {
+        for (Edge<T> edge: edges) {
+            addEdge(edge);
+        }
+    }
+
+    public boolean isClosedWay() {
+        if (polygon.size() <= 0)
+            return false;
+
+        for (T t : polygon.keySet()) {
+            if (polygon.get(t).size() % 2 != 0)
+                return false;
+        }
+
+        return true;
+    }
+
     public List<List<T>> toClosedWay() {
         ArrayList<List<T>> listlist = new ArrayList<>();
 
