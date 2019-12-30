@@ -33,10 +33,10 @@ import java.util.logging.*;
  */
 public class Logr {
 
-    static HashMap<String, Logr> _logrs = new HashMap<>();
+    static final HashMap<String, Logr> _logrs = new HashMap<>();
+    static final HashSet<Handler> fileHandlers = new HashSet<>();
     static String pauseAllButExcludedNames = null;
     static Level defaultLevel = Level.INFO;
-    static HashSet<Handler> fileHandlers = new HashSet<>();
 
     public static Logr logger() {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -78,7 +78,7 @@ public class Logr {
             }
         }
 
-        return null;
+        throw new RuntimeException("Can't not create logger, why ???");
     }
 
     /*public static void applyConfiguration(Consumer<Logr> setting) {

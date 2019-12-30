@@ -2,6 +2,7 @@ package lets.cool.geo;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import lets.cool.util.logging.Logr;
 
 import java.util.*;
@@ -64,7 +65,7 @@ public class EdgePolygon<T> {
     }
 
     public List<List<T>> toClosedWay() {
-        ArrayList<List<T>> listlist = new ArrayList<>();
+        ArrayList<List<T>> listList = new ArrayList<>();
 
         Set<Edge<T>> clonedEdges = new HashSet<>(edges);
 
@@ -116,10 +117,25 @@ public class EdgePolygon<T> {
                 edge = nextEdge;
             }
 
-            listlist.add(list);
+            listList.add(list);
         }
 
-        return listlist;
+        return listList;
     }
+
+    public Multimap<T, Edge<T>> cloneEdgeMap() {
+        return cloneEdgeMap(null, null);
+    }
+
+    public Multimap<T, Edge<T>> cloneEdgeMap(Comparator<? super T> keyComparator, Comparator<? super Edge<T>> valueComparator) {
+        if (keyComparator==null || valueComparator==null)
+            return HashMultimap.create(this.polygon);
+        else {
+            TreeMultimap<T, Edge<T>> treeMultimap = TreeMultimap.create(keyComparator, valueComparator);
+            treeMultimap.putAll(this.polygon);
+            return treeMultimap;
+        }
+    }
+
 }
 
