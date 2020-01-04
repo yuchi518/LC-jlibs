@@ -19,12 +19,14 @@
 
 package lets.cool.util.iter;
 
+import lets.cool.util.Debuggable;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIterator<T>, ProgressAwareIterator<T> {
+public interface CountingIterator<T> extends SizeAwareIterator<T>, IndexAwareIterator<T>, ProgressAwareIterator<T>, Debuggable {
 
     /**
      * A basic implementation, it wraps an iterator.

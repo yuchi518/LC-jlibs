@@ -1,8 +1,4 @@
-package lets.cool.osm.grid;
-
-import lets.cool.osm.grid.level.GridUnit;
-import lets.cool.osm.grid.level.Gridex;
-import lets.cool.geo.GPoint;
+package lets.cool.geo;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -13,9 +9,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class GridCanvas {
-    final private int width, height, marginWidth, marginHeight;
+    final public int width, height, marginWidth, marginHeight;
     final private BufferedImage bufferedImage;
     final private Graphics2D graphics;
+    final private Rectangle2D boundary;
     private double scaleX, scaleY;
     private double scale;
     private float lineWidth;
@@ -58,10 +55,17 @@ public class GridCanvas {
     }
 
     public GridCanvas(Rectangle2D rect, int width, int height, int marginWidth, int marginHeight) {
+        // TODO: optimize this algorithm
+        /*double maxWH = Math.max(rect.getWidth(), rect.getHeight());
+        int max = Math.max(width, height);
+        width = (int)Math.ceil(width * maxWH / max);
+        height = (int)Math.ceil(height * maxWH / max);*/
+        //
         this.width = width;
         this.height = height;
         this.marginWidth = marginWidth;
         this.marginHeight = marginHeight;
+        this.boundary = rect;
 
         bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
         graphics = bufferedImage.createGraphics();
@@ -177,5 +181,13 @@ public class GridCanvas {
 
     public void drawText(String text, GPoint point) {
         graphics.drawString(text, (float)point.getX(), (float)point.getY());
+    }
+
+    public void draw(Shape shape) {
+        graphics.draw(shape);
+    }
+
+    public void fillBackground() {
+        graphics.fill(boundary);
     }
 }
