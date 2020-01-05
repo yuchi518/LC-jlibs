@@ -1,4 +1,4 @@
-package lets.cool.util;
+package lets.cool.util.coll;
 
 import java.util.Set;
 import java.util.stream.Collectors;
