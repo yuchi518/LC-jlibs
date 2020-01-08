@@ -3,6 +3,9 @@ package lets.cool.util.coll;
 import java.util.*;
 import java.util.stream.IntStream;
 
+/**
+ * A view of long[] and supports List interface.
+ */
 public class LongArray implements List<Long> {
 
     final long[] array;

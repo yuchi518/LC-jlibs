@@ -55,11 +55,16 @@ public class GridCanvas {
     }
 
     public GridCanvas(Rectangle2D rect, int width, int height, int marginWidth, int marginHeight) {
-        // TODO: optimize this algorithm
-        /*double maxWH = Math.max(rect.getWidth(), rect.getHeight());
-        int max = Math.max(width, height);
-        width = (int)Math.ceil(width * maxWH / max);
-        height = (int)Math.ceil(height * maxWH / max);*/
+        double w = width-marginWidth*2;
+        double h = height-marginHeight*2;
+        if (w/h > rect.getWidth()/rect.getHeight()) {
+            w = h * rect.getWidth() / rect.getHeight();
+        } else {
+            h = w * rect.getHeight() / rect.getWidth();
+        }
+        width = (int)Math.ceil(w + marginWidth*2);
+        height = (int)Math.ceil(h + marginHeight*2);
+
         //
         this.width = width;
         this.height = height;
