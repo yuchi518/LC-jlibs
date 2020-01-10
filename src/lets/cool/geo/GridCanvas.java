@@ -165,8 +165,12 @@ public class GridCanvas {
     }
 
     public void saveToPNG(String filename) {
+        saveToPNG(new File(filename));
+    }
+
+    public void saveToPNG(File file) {
         try {
-            ImageIO.write(bufferedImage, "png", new File(filename));
+            ImageIO.write(bufferedImage, "png", file);
         } catch (IOException e) {
             e.printStackTrace();
         }
