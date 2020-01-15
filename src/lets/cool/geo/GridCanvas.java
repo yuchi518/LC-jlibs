@@ -6,7 +6,9 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.IntStream;
 
 public class GridCanvas {
     final public int width, height, marginWidth, marginHeight;
@@ -19,10 +21,14 @@ public class GridCanvas {
     private float[] dash = null;
 
     static private Rectangle2D pointsToRectangle(GPoint... points) {
+        return pointsToRectangle(Arrays.asList(points));
+    }
+    static private Rectangle2D pointsToRectangle(java.util.List<GPoint> points) {
         double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
 
         for (GPoint p: points) {
+            if (p instanceof GPoint.Virtual) continue;
             double x = p.getX();
             double y = p.getY();
             if (x > maxX)
@@ -39,6 +45,10 @@ public class GridCanvas {
     }
 
     public GridCanvas(GPoint... points) {
+        this(pointsToRectangle(points));
+    }
+
+    public GridCanvas(java.util.List<GPoint> points) {
         this(pointsToRectangle(points));
     }
 
@@ -82,7 +92,7 @@ public class GridCanvas {
         graphics.translate(-rect.getX(), -rect.getY());
         lineWidth = 1;
         graphics.setStroke(new BasicStroke((float)(lineWidth/scale)));
-        Font font = new Font("Arial", Font.PLAIN, 24);
+        Font font = new Font("Monospaced", Font.PLAIN, 16);
         Font fontSc = font.deriveFont(AffineTransform.getScaleInstance(1/scaleX, -1/scaleY));
         graphics.setFont(fontSc);
         //graphics.setColor(Color.white);
@@ -189,7 +199,12 @@ public class GridCanvas {
     }
 
     public void drawText(String text, GPoint point) {
-        graphics.drawString(text, (float)point.getX(), (float)point.getY());
+        double shift = boundary.getWidth() * 12 / width;
+        IntStream.range(0, text.length()).forEach(i -> {
+            char c = text.charAt(i);
+            graphics.drawString(Character.toString(c), (float)(point.getX()+shift*i), (float)point.getY());
+        });
+        //graphics.drawString(text, (float)point.getX(), (float)point.getY());
     }
 
     public void draw(Shape shape) {
@@ -198,5 +213,33 @@ public class GridCanvas {
 
     public void fillBackground() {
         graphics.fill(boundary);
+    }
+
+    public void drawDebug(java.util.List<GPoint> points, String filename) {
+        // background
+        setColor(Color.WHITE);
+        fillBackground();
+        setLineWidth(4);
+        setColor(Color.RED);
+        // content
+        GPoint first = null, last = null;
+        for (GPoint p: points) {
+            if (p instanceof GPoint.Virtual) {
+                last = null;
+                continue;
+            }
+            if (first==null) {
+                first = last = p;
+                continue;
+            }
+            if (last != null) {
+                graphics.draw(new Line2D.Double(last.toPoint2D(), p.toPoint2D()));
+            }
+            last = p;
+        }
+        /*if (first!=null && last!=null) {
+            graphics.draw(new Line2D.Double(last.toPoint2D(), first.toPoint2D()));
+        }*/
+        saveToPNG(new File(filename));
     }
 }
