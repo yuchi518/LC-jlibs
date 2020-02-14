@@ -81,7 +81,7 @@ public class RockingCaches {
 			rDB = _rDBs.get(name);
 			if (rDB!=null) return rDB;
 			
-			File folder = new File(_folder, name);
+			File folder = locationOfDB(name);
 			folder.mkdirs();
 			
 			try {
@@ -97,6 +97,10 @@ public class RockingCaches {
 			
 			return rDB;
 		}
+	}
+
+	final public File locationOfDB(String name) {
+		return new File(_folder, name);
 	}
 	
 	public RockingCache cache(String name) {

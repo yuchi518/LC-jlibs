@@ -86,9 +86,9 @@ public class RockingCache {
 		}
 
 		name = _folder.getName();
-		_softReadonly = true;
-		uniqueObjects = null;
+		_softReadonly = hardReadonly;
 		_hardReadonly = hardReadonly;
+		uniqueObjects = null;
 	}
 	
 	protected RockingCache(RocksDB rDB, String name, boolean hardReadonly) {
@@ -96,7 +96,7 @@ public class RockingCache {
 		_folder = null;
 		_rDB = rDB;
 		_options = null;
-		_softReadonly = true;
+		_softReadonly = hardReadonly;
 		_hardReadonly = hardReadonly;
 		uniqueObjects = null;
 	}

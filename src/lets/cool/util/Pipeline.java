@@ -108,6 +108,10 @@ public abstract class Pipeline<IN, OUT> {
         return newPipeline;
     }
 
+    // for kotlin language
+    public <REF> Pipeline<OUT, OUT> each(REF ref, BiConsumer<OUT, REF> operator) {
+        return each(operator, ref);
+    }
 
     public <REF> Pipeline<OUT, OUT> each(BiConsumer<OUT, REF> operator, REF ref) {
         Pipeline<OUT, OUT> newPipeline = new Pipeline<OUT, OUT>() {
@@ -141,6 +145,11 @@ public abstract class Pipeline<IN, OUT> {
         newPipeline.upperPipeline = this;
 
         return newPipeline;
+    }
+
+    // for kotlin language
+    public <REF> Pipeline<OUT, OUT> filter(REF ref, BiPredicate<? super OUT, REF> predicate) {
+        return filter(predicate, ref);
     }
 
     public <REF> Pipeline<OUT, OUT> filter(BiPredicate<? super OUT, REF> predicate, REF ref) {
@@ -177,6 +186,11 @@ public abstract class Pipeline<IN, OUT> {
         newPipeline.upperPipeline = this;
 
         return newPipeline;
+    }
+
+    // for kotlin language
+    public <R, REF> Pipeline<OUT, R> map(REF ref, BiFunction<? super OUT, REF, ? extends R> mapper) {
+        return map(mapper, ref);
     }
 
     public <R, REF> Pipeline<OUT, R> map(BiFunction<? super OUT, REF, ? extends R> mapper, REF ref) {
@@ -218,6 +232,11 @@ public abstract class Pipeline<IN, OUT> {
         newPipeline.upperPipeline = this;
 
         return newPipeline;
+    }
+
+    // for kotlin language
+    public <R, REF> Pipeline<OUT, R> expand(REF ref, BiFunction<? super OUT, REF, ? extends Iterator<R>> expander) {
+        return expand(expander, ref);
     }
 
     public <R, REF> Pipeline<OUT, R> expand(BiFunction<? super OUT, REF, ? extends Iterator<R>> expander, REF ref) {
